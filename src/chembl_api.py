@@ -73,11 +73,6 @@ def fetch_activities(target_id, filters, fields):
     return rows
 
 
-def get_molecule_properties(molecule_id):
-    """Propriedades calculadas de uma molécula (`molecule_properties`)."""
-    return get_json(f"{CHEMBL_API}/molecule/{molecule_id}.json")["molecule_properties"] or {}
-
-
 def fetch_molecule_properties(molecule_ids, properties):
     """Busca propriedades de várias moléculas, em lotes de 100 IDs por requisição."""
     molecule_ids = list(molecule_ids)

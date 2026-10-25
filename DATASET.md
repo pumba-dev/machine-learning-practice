@@ -34,7 +34,6 @@ Todo o processo (download, curadoria, decisões e análise exploratória) está 
 | `src/download.py` | Download com cache em `data/raw/` |
 | `src/inspection.py` | Inspeção das atividades brutas |
 | `src/curation.py` | Curadoria e montagem da base final |
-| `src/descriptors.py` | Comparação RDKit × ChEMBL |
 | `src/eda.py` | Tabelas da análise exploratória |
 | `src/plots.py` | Gráficos |
 
@@ -74,7 +73,7 @@ O notebook salva os downloads em `data/raw/` e os reaproveita nas execuções se
 | Coluna | Tipo | Papel | Descrição | Faltantes |
 |---|---|---|---|---|
 | `ChEMBL ID` | texto | identificador | ID da molécula no ChEMBL (ex.: `CHEMBL303519`). Único por linha. Página da molécula: `https://www.ebi.ac.uk/chembl/compound_report_card/<ID>`. | 0 |
-| `SMILES` | texto | opcional | Estrutura da molécula em notação SMILES canônica. A árvore não usa texto direto, mas é possível gerar fingerprints com RDKit. | 0 |
+| `SMILES` | texto | opcional | Estrutura da molécula em notação SMILES canônica. A árvore não usa texto direto, mas é possível gerar fingerprints a partir dele. | 0 |
 | `Molecular Weight` | float | feature | Massa molecular completa, em Dalton (g/mol). Campo `full_mwt` do ChEMBL. | 0 |
 | `LogP` | float | feature | Coeficiente de partição octanol/água calculado (campo `alogp`). Mede lipofilicidade: valor alto indica molécula mais "gordurosa" e menos solúvel em água. | 238 |
 | `HBA` | inteiro (salvo como float) | feature | Número de aceptores de ligação de hidrogênio. | 238 |

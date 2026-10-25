@@ -38,7 +38,6 @@ src/            código usado pelos notebooks, um módulo por etapa
 | `src/download.py` | Download com cache em `data/raw/` |
 | `src/inspection.py` | Inspeção das atividades brutas |
 | `src/curation.py` | Curadoria e montagem da base final |
-| `src/descriptors.py` | Comparação RDKit × ChEMBL |
 | `src/eda.py` | Tabelas da análise exploratória |
 | `src/plots.py` | Gráficos |
 
