@@ -25,7 +25,7 @@ A base foi inspirada no dataset do Kaggle [xjoannax88/multitarget-bioactivity-ch
 
 ## Como reproduzir
 
-O processo está em dois notebooks: [`notebooks/01_curadoria.ipynb`](notebooks/01_curadoria.ipynb) (download, curadoria e decisões) e [`notebooks/02_analise_exploratoria.ipynb`](notebooks/02_analise_exploratoria.ipynb) (análise exploratória). Os notebooks só chamam funções; a implementação fica no pacote `src/`, com um módulo por etapa:
+O processo está em dois notebooks: [`notebooks/01_curadoria.ipynb`](notebooks/01_curadoria.ipynb) (download e curadoria) e [`notebooks/02_analise_exploratoria.ipynb`](notebooks/02_analise_exploratoria.ipynb) (análise exploratória). Os notebooks só chamam funções; a implementação fica no pacote `src/`, com um módulo por etapa:
 
 | Módulo | Conteúdo |
 |---|---|

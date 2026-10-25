@@ -27,7 +27,7 @@ CHEMBL_API = f"{CHEMBL_HOST}/chembl/api/data"
 TARGETS = {"EGFR": "CHEMBL203", "BACE1": "CHEMBL4822", "DRD2": "CHEMBL217", "HDAC1": "CHEMBL325"}
 CLASSES = list(TARGETS)
 
-# Download das atividades (decisão: só ensaios de ligação, valor exato e pChEMBL preenchido)
+# Download das atividades: só ensaios de ligação, valor exato e pChEMBL preenchido
 ACTIVITY_FILTERS = {"assay_type": "B", "standard_relation": "=", "pchembl_value__isnull": "false"}
 ACTIVITY_FIELDS = [
     "activity_id", "molecule_chembl_id", "canonical_smiles", "target_chembl_id", "assay_chembl_id",

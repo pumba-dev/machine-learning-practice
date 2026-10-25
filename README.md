@@ -27,7 +27,7 @@ data/
   raw/          dados brutos baixados (ChEMBL e CSV original do Kaggle)
   processed/    chembl_4targets.csv, a base final para modelagem
 notebooks/
-  01_curadoria.ipynb              etapa 1: download, curadoria e decisões
+  01_curadoria.ipynb              etapa 1: download e curadoria
   02_analise_exploratoria.ipynb   etapa 2: análise exploratória da base final
 src/            código usado pelos notebooks, um módulo por etapa
 ```

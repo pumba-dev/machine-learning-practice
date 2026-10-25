@@ -13,7 +13,7 @@ def class_distribution(df, label="Protein"):
 
 
 def complete_rows(final):
-    """Linhas com os 5 descritores preenchidos (as que entram na modelagem, decisão D7)."""
+    """Linhas com os 5 descritores preenchidos (as que entram na modelagem)."""
     return final.dropna(subset=FEATURES)
 
 

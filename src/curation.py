@@ -1,10 +1,10 @@
 """Etapas 5 e 7: curadoria das atividades e montagem da base final.
 
 A sequência é:
-1. `apply_quality_filters`   remove medições suspeitas, duplicadas ou sem estrutura (D2)
-2. `aggregate_pairs`         uma linha por par molécula-alvo, com a mediana do pChEMBL (D3)
-3. `select_active`           mantém só pares com pChEMBL >= limiar (D4)
-4. `remove_multi_target`     remove moléculas ativas em mais de um alvo (D5)
+1. `apply_quality_filters`   remove medições suspeitas, duplicadas ou sem estrutura
+2. `aggregate_pairs`         uma linha por par molécula-alvo, com a mediana do pChEMBL
+3. `select_active`           mantém só pares com pChEMBL >= limiar
+4. `remove_multi_target`     remove moléculas ativas em mais de um alvo
 5. `build_final_dataset`     junta os descritores e salva a base final
 """
 import pandas as pd
