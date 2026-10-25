@@ -25,7 +25,7 @@ A base foi inspirada no dataset do Kaggle [xjoannax88/multitarget-bioactivity-ch
 
 ## Como reproduzir
 
-Todo o processo (download, curadoria, decisões e análise exploratória) está em [`notebooks/01_curadoria_e_eda.ipynb`](notebooks/01_curadoria_e_eda.ipynb). O notebook só chama funções; a implementação fica no pacote `src/`, com um módulo por etapa:
+O processo está em dois notebooks: [`notebooks/01_curadoria.ipynb`](notebooks/01_curadoria.ipynb) (download, curadoria e decisões) e [`notebooks/02_analise_exploratoria.ipynb`](notebooks/02_analise_exploratoria.ipynb) (análise exploratória). Os notebooks só chamam funções; a implementação fica no pacote `src/`, com um módulo por etapa:
 
 | Módulo | Conteúdo |
 |---|---|
@@ -40,18 +40,18 @@ Todo o processo (download, curadoria, decisões e análise exploratória) está 
 ```bash
 python -m venv .venv
 .venv/Scripts/python -m pip install -r requirements.txt
-.venv/Scripts/python -m jupyter notebook notebooks/01_curadoria_e_eda.ipynb
+.venv/Scripts/python -m jupyter notebook notebooks/
 ```
 
-O notebook salva os downloads em `data/raw/` e os reaproveita nas execuções seguintes. Para baixar tudo de novo, mude `REFRESH` para `True` na célula de configuração. A primeira execução faz cerca de 360 requisições à API do ChEMBL.
+O notebook 01 salva os downloads em `data/raw/` e os reaproveita nas execuções seguintes. Para baixar tudo de novo, mude `REFRESH` para `True` na célula de configuração. A primeira execução faz cerca de 360 requisições à API do ChEMBL.
 
 ## Pipeline de construção
 
-1. **Download das atividades** (notebook, seção 3; `download.load_activities`). Para cada alvo, baixa as medições que atendem a todos estes critérios:
+1. **Download das atividades** (notebook 01, seção 3; `download.load_activities`). Para cada alvo, baixa as medições que atendem a todos estes critérios:
    - `assay_type = B`: ensaio de ligação (binding).
    - `standard_relation = "="`: valor exato, sem `<` ou `>`.
    - `pchembl_value` preenchido: potência padronizada (IC50, Ki, Kd, EC50 etc. convertidos para -log10 molar).
-2. **Filtros de qualidade** (notebook, seção 5; `curation.apply_quality_filters`). Remove medições com `data_validity_comment` preenchido (dado marcado como suspeito pelo ChEMBL) ou com `potential_duplicate` ativo. Restam 51.359 medições.
+2. **Filtros de qualidade** (notebook 01, seção 5; `curation.apply_quality_filters`). Remove medições com `data_validity_comment` preenchido (dado marcado como suspeito pelo ChEMBL) ou com `potential_duplicate` ativo. Restam 51.359 medições.
 3. **Agregação.** Calcula a mediana do pChEMBL de cada par molécula-alvo.
 4. **Seleção de ativos.** Mantém só pares com pChEMBL >= 6 (potência de 1 µM ou melhor). Restam 27.798 pares.
 5. **Remoção de rótulos ambíguos.** Remove 42 moléculas ativas em mais de um alvo, porque uma molécula precisa ter uma única classe.

@@ -27,7 +27,8 @@ data/
   raw/          dados brutos baixados (ChEMBL e CSV original do Kaggle)
   processed/    chembl_4targets.csv, a base final para modelagem
 notebooks/
-  01_curadoria_e_eda.ipynb   download, curadoria, decisões e análise exploratória
+  01_curadoria.ipynb              etapa 1: download, curadoria e decisões
+  02_analise_exploratoria.ipynb   etapa 2: análise exploratória da base final
 src/            código usado pelos notebooks, um módulo por etapa
 ```
 
@@ -48,15 +49,16 @@ Testado com Python 3.13.
 ```bash
 python -m venv .venv
 .venv/Scripts/python -m pip install -r requirements.txt   # Linux/macOS: .venv/bin/python
-.venv/Scripts/python -m jupyter notebook notebooks/01_curadoria_e_eda.ipynb
+.venv/Scripts/python -m jupyter notebook notebooks/
 ```
 
-Os dados já estão no repositório, então o notebook roda sem baixar nada. Para baixar tudo de novo do ChEMBL, mude `REFRESH = True` na primeira célula.
+Rode os notebooks na ordem (01 e depois 02). Os dados já estão no repositório, então nada precisa ser baixado. Para baixar tudo de novo do ChEMBL, mude `REFRESH = True` na primeira célula do notebook 01.
 
 ## Etapas
 
-- [x] Curadoria da base e análise exploratória (`01_curadoria_e_eda.ipynb`)
-- [ ] Treino e avaliação da Decision Tree
+- [x] Etapa 1: curadoria da base (`01_curadoria.ipynb`)
+- [x] Etapa 2: análise exploratória (`02_analise_exploratoria.ipynb`)
+- [ ] Etapa 3: treino e avaliação da Decision Tree
 
 ## Licença dos dados
 

@@ -1,12 +1,12 @@
-"""Código do projeto, organizado por etapa do notebook de curadoria.
+"""Código do projeto, organizado por etapa dos notebooks.
 
-| Módulo          | Etapa do notebook                                   |
+| Módulo          | Onde é usado                                        |
 |-----------------|-----------------------------------------------------|
 | `config`        | Caminhos, alvos, filtros e constantes               |
 | `chembl_api`    | Cliente da API do ChEMBL (usado pelas outras etapas) |
-| `download`      | 1, 3 e 6: download com cache em `data/raw/`         |
-| `inspection`    | 4: inspeção das atividades brutas                   |
-| `curation`      | 5 e 7: curadoria e montagem da base final           |
-| `eda`           | 8: tabelas da análise exploratória                  |
-| `plots`         | Gráficos de todas as etapas                         |
+| `download`      | 01, seções 1, 3 e 6: download com cache             |
+| `inspection`    | 01, seção 4: inspeção das atividades brutas         |
+| `curation`      | 01, seções 5 e 7: curadoria e base final            |
+| `eda`           | 02: tabelas da análise exploratória                 |
+| `plots`         | Gráficos dos dois notebooks                         |
 """

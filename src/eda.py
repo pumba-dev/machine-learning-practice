@@ -1,4 +1,4 @@
-"""Etapa 8: tabelas da análise exploratória da base final."""
+"""Notebook 02: tabelas da análise exploratória da base final."""
 import pandas as pd
 from sklearn.model_selection import StratifiedKFold, cross_val_score
 from sklearn.tree import DecisionTreeClassifier
