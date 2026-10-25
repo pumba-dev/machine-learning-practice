@@ -1,0 +1,2 @@
+# Mantém os dados byte a byte (os hashes SHA-256 do DATASET.md dependem disso)
+data/** -text

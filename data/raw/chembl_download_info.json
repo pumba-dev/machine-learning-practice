@@ -1,0 +1,16 @@
+{
+  "chembl_db_version": "ChEMBL_37",
+  "chembl_release_date": "2026-05-01",
+  "downloaded_at": "2026-10-24T15:39:59",
+  "targets": {
+    "EGFR": "CHEMBL203",
+    "BACE1": "CHEMBL4822",
+    "DRD2": "CHEMBL217",
+    "HDAC1": "CHEMBL325"
+  },
+  "filters": {
+    "assay_type": "B",
+    "standard_relation": "=",
+    "pchembl_value__isnull": "false"
+  }
+}
