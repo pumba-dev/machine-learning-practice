@@ -12,6 +12,9 @@
 \sloppy
 \hyphenation{SMILES}
 
+% Números citados no texto, gerados por scripts/results_tables.py a partir de results/multiseed.csv.
+\input{results/numeros}
+
 \title{Classificação de alvos proteicos a partir de descritores moleculares do ChEMBL com árvores de decisão}
 
 \author{Bernan R. do Nascimento\inst{1}, Paulo E. R. Araujo\inst{1}, Thiago R. P. de Carvalho\inst{1}}
@@ -28,22 +31,25 @@
 \maketitle
 
 \begin{abstract}
-  Predicting which protein target an active molecule acts on is an early step in drug discovery.
-  We rebuild a dataset of 27,714 molecules active against four targets (EGFR, BACE1, DRD2 and HDAC1)
-  from the ChEMBL 37 API and train a decision tree on five physicochemical descriptors and twelve
-  counts taken from the SMILES string. With a grouped split, the SMILES counts raise accuracy from
-  0.77 to 0.89 (mean of 10 seeds). A random split overestimates accuracy by 1.3 to 4.1 points,
-  because a quarter of the test molecules have a twin with identical descriptors in the training set.
+  Predicting which protein target a molecule is associated with is an early step in drug discovery.
+  We rebuild from the ChEMBL 37 API a dataset of 27,714 molecules, each associated with one of four
+  targets (EGFR, BACE1, DRD2 and HDAC1), and train a decision tree on five physicochemical
+  descriptors and twelve counts taken from the SMILES string, a text that describes a molecule's
+  structure. With a grouped split, the SMILES counts raise accuracy from \accGrupDescEn\% to
+  \accGrupAmbosEn\% (a \ganhoAmbosEn\% relative gain; mean of 10 seeds). A random split overestimates
+  accuracy by up to \gapMaxEn\%, because a quarter of the test molecules have a twin with identical
+  descriptors in the training set; the grouped split keeps such twins on the same side.
 \end{abstract}
 
 \begin{resumo}
-  Prever em qual proteína-alvo uma molécula ativa age é uma etapa inicial da descoberta de
-  fármacos. Reconstruímos pela API do ChEMBL 37 uma base de 27.714 moléculas ativas contra quatro
-  alvos (EGFR, BACE1, DRD2 e HDAC1) e treinamos uma árvore de decisão com cinco descritores
-  físico-químicos e doze contagens extraídas do texto SMILES. Com divisão agrupada, as contagens
-  elevam a acurácia de 0,77 para 0,89 (média de 10 seeds). A divisão aleatória superestima o
-  resultado em 1,3 a 4,1 pontos, pois um quarto das moléculas de teste tem uma gêmea com
-  descritores idênticos no treino.
+  Prever a qual proteína-alvo uma molécula está associada é uma etapa inicial da descoberta de
+  fármacos. Reconstruímos pela API do ChEMBL 37 uma base de 27.714 moléculas, cada uma associada a
+  um de quatro alvos (EGFR, BACE1, DRD2 e HDAC1), e treinamos uma árvore de decisão com cinco
+  descritores físico-químicos e doze contagens extraídas do SMILES, texto que descreve a estrutura
+  da molécula. Com divisão agrupada, as contagens elevam a acurácia de \accGrupDesc\% para
+  \accGrupAmbos\% (ganho relativo de \ganhoAmbos\%; média de 10 seeds). A divisão aleatória
+  superestima o resultado em até \gapMax\%, pois um quarto das moléculas de teste tem uma gêmea de
+  descritores idênticos no treino; a divisão agrupada mantém essas gêmeas do mesmo lado.
 \end{resumo}
 
 \input{sections/01_introducao}

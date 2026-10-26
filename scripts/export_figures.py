@@ -22,6 +22,7 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
 import pandas as pd  # noqa: E402
+from matplotlib.ticker import PercentFormatter  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
@@ -42,12 +43,12 @@ SIZES = {
     "correlation_heatmap": (HALF, 2.5),
     "logp_tpsa_by_class": (FULL, 1.9),
     "model_comparison": (FULL, 2.5),
-    "depth_curve": (HALF, 2.3),
-    "pruning_curve": (HALF, 2.3),
+    "depth_curve": (HALF, 2.1),
+    "pruning_curve": (HALF, 2.1),
     "decision_tree": (FULL, 2.9),
-    "feature_importances": (FULL, 3.0),
-    "confusion_matrix": (HALF, 2.5),
-    "learning_curve": (HALF, 2.3),
+    "feature_importances": (FULL, 2.6),
+    "confusion_matrix": (HALF, 2.2),
+    "learning_curve": (HALF, 2.2),
     "error_pairs": (HALF, 2.3),
 }
 
@@ -82,8 +83,64 @@ def shorten_heatmap_labels(fig):
     ax.set_yticklabels(labels, rotation=0)
 
 
+#: Nomes do código -> nomes que o leitor do relatório entende.
+NOMES = {
+    "Molecular Weight": "Massa molecular",
+    "smiles_len": "Comprimento do SMILES",
+    "n_N": "Átomos de N",
+    "n_O": "Átomos de O",
+    "n_S": "Átomos de S",
+    "n_halogen": "Halogênios",
+    "n_rings": "Anéis",
+    "n_branch": "Ramificações",
+    "n_aromatic": "Átomos aromáticos",
+    "n_double": "Ligações duplas",
+    "n_triple": "Ligações triplas",
+    "n_charge": "Cargas",
+    "n_stereo": "Estereoquímica",
+}
+
+
+def rename_boxplot_titles(fig):
+    for ax in fig.axes:
+        ax.set_title(NOMES.get(ax.get_title(loc="left"), ax.get_title(loc="left")), loc="left")
+    rotate_xticks(fig)
+
+
+def rename_importances(fig):
+    # Os dois painéis compartilham o eixo y: renomear só o primeiro, senão o segundo (rótulos ocultos) apaga tudo.
+    left = fig.axes[0]
+    left.set_yticklabels([NOMES.get(t.get_text(), t.get_text()) for t in left.get_yticklabels()])
+    left.tick_params(axis="y", labelsize=6.5)  # 17 rótulos em 2,6 in de altura
+    for ax in fig.axes:
+        ax.set_xlabel("queda de desempenho atribuída ao atributo")
+
+
+def percent_axis(fig):
+    """Acurácia de 0 a 1 vira 0% a 100% no eixo vertical do painel principal."""
+    ax = fig.axes[0]
+    ax.yaxis.set_major_formatter(PercentFormatter(1.0, decimals=0))
+    ax.set_ylabel("acurácia")
+    legend = ax.get_legend()
+    if legend is not None:
+        for text in legend.get_texts():
+            text.set_text(text.get_text().replace("overfitting", "sobreajuste"))
+
+
+def tidy_pruning(fig):
+    percent_axis(fig)
+    fig.axes[0].set_xlabel("α da poda (primeiro ponto: sem poda)")
+
+
 #: Ajustes por figura depois do redimensionamento.
-POST = {"feature_boxplots": rotate_xticks, "correlation_heatmap": shorten_heatmap_labels}
+POST = {
+    "feature_boxplots": rename_boxplot_titles,
+    "correlation_heatmap": shorten_heatmap_labels,
+    "feature_importances": rename_importances,
+    "depth_curve": percent_axis,
+    "learning_curve": percent_axis,
+    "pruning_curve": tidy_pruning,
+}
 
 
 def finish(fig, name):
