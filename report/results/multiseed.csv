@@ -1,0 +1,91 @@
+seed,features,split,modelo,acurácia,F1 macro,F1 EGFR,F1 BACE1,F1 DRD2,F1 HDAC1,folhas,profundidade,% teste com gêmeo
+0,descritores,aleatória,Árvore de decisão,0.813,0.812,0.803,0.807,0.857,0.782,3853.0,27.0,25.9
+0,descritores,agrupada,Árvore de decisão,0.783,0.781,0.777,0.777,0.847,0.725,1233.0,23.0,25.9
+0,descritores + SMILES,aleatória,Árvore de decisão,0.91,0.908,0.913,0.92,0.916,0.884,1848.0,26.0,25.9
+0,descritores + SMILES,agrupada,Árvore de decisão,0.891,0.889,0.899,0.903,0.896,0.859,1806.0,24.0,25.9
+0,só SMILES,aleatória,Árvore de decisão,0.884,0.882,0.886,0.915,0.887,0.84,2396.0,22.0,25.9
+0,só SMILES,agrupada,Árvore de decisão,0.878,0.875,0.885,0.896,0.875,0.844,2373.0,24.0,25.9
+0,descritores + SMILES,agrupada,Dummy (classe majoritária),0.293,0.113,,,,,,,25.9
+0,descritores + SMILES,agrupada,Random Forest (300 árvores),0.951,0.951,,,,,,,25.9
+0,descritores + SMILES,agrupada,HistGradientBoosting,0.95,0.949,,,,,,,25.9
+1,descritores,aleatória,Árvore de decisão,0.82,0.819,0.805,0.823,0.872,0.776,3730.0,26.0,26.1
+1,descritores,agrupada,Árvore de decisão,0.766,0.764,0.76,0.763,0.829,0.705,1273.0,26.0,26.1
+1,descritores + SMILES,aleatória,Árvore de decisão,0.907,0.906,0.909,0.918,0.909,0.888,1846.0,22.0,26.1
+1,descritores + SMILES,agrupada,Árvore de decisão,0.894,0.892,0.895,0.903,0.904,0.867,1826.0,22.0,26.1
+1,só SMILES,aleatória,Árvore de decisão,0.89,0.887,0.896,0.912,0.888,0.854,2838.0,26.0,26.1
+1,só SMILES,agrupada,Árvore de decisão,0.866,0.862,0.876,0.905,0.866,0.801,2389.0,23.0,26.1
+1,descritores + SMILES,agrupada,Dummy (classe majoritária),0.293,0.113,,,,,,,26.1
+1,descritores + SMILES,agrupada,Random Forest (300 árvores),0.949,0.948,,,,,,,26.1
+1,descritores + SMILES,agrupada,HistGradientBoosting,0.95,0.95,,,,,,,26.1
+2,descritores,aleatória,Árvore de decisão,0.807,0.806,0.796,0.81,0.862,0.755,3696.0,28.0,25.7
+2,descritores,agrupada,Árvore de decisão,0.769,0.768,0.772,0.746,0.822,0.732,1236.0,23.0,25.7
+2,descritores + SMILES,aleatória,Árvore de decisão,0.904,0.903,0.903,0.92,0.907,0.884,1841.0,24.0,25.7
+2,descritores + SMILES,agrupada,Árvore de decisão,0.895,0.894,0.89,0.909,0.91,0.868,1836.0,22.0,25.7
+2,só SMILES,aleatória,Árvore de decisão,0.897,0.894,0.907,0.916,0.895,0.859,2832.0,27.0,25.7
+2,só SMILES,agrupada,Árvore de decisão,0.867,0.864,0.874,0.892,0.867,0.822,2419.0,25.0,25.7
+2,descritores + SMILES,agrupada,Dummy (classe majoritária),0.293,0.113,,,,,,,25.7
+2,descritores + SMILES,agrupada,Random Forest (300 árvores),0.954,0.953,,,,,,,25.7
+2,descritores + SMILES,agrupada,HistGradientBoosting,0.945,0.944,,,,,,,25.7
+3,descritores,aleatória,Árvore de decisão,0.811,0.809,0.814,0.8,0.854,0.769,3842.0,26.0,25.6
+3,descritores,agrupada,Árvore de decisão,0.768,0.766,0.753,0.779,0.836,0.696,1127.0,20.0,25.6
+3,descritores + SMILES,aleatória,Árvore de decisão,0.906,0.905,0.905,0.916,0.91,0.886,1837.0,24.0,25.6
+3,descritores + SMILES,agrupada,Árvore de decisão,0.893,0.891,0.888,0.916,0.908,0.853,1854.0,22.0,25.6
+3,só SMILES,aleatória,Árvore de decisão,0.883,0.88,0.887,0.914,0.884,0.834,2409.0,23.0,25.6
+3,só SMILES,agrupada,Árvore de decisão,0.876,0.872,0.878,0.917,0.881,0.813,2803.0,24.0,25.6
+3,descritores + SMILES,agrupada,Dummy (classe majoritária),0.293,0.113,,,,,,,25.6
+3,descritores + SMILES,agrupada,Random Forest (300 árvores),0.95,0.949,,,,,,,25.6
+3,descritores + SMILES,agrupada,HistGradientBoosting,0.946,0.945,,,,,,,25.6
+4,descritores,aleatória,Árvore de decisão,0.807,0.805,0.803,0.804,0.857,0.756,4017.0,29.0,25.9
+4,descritores,agrupada,Árvore de decisão,0.763,0.762,0.75,0.753,0.833,0.713,1122.0,22.0,25.9
+4,descritores + SMILES,aleatória,Árvore de decisão,0.904,0.903,0.901,0.92,0.919,0.87,1858.0,23.0,25.9
+4,descritores + SMILES,agrupada,Árvore de decisão,0.89,0.889,0.884,0.899,0.905,0.869,1822.0,22.0,25.9
+4,só SMILES,aleatória,Árvore de decisão,0.889,0.886,0.897,0.914,0.887,0.848,2774.0,23.0,25.9
+4,só SMILES,agrupada,Árvore de decisão,0.884,0.881,0.892,0.91,0.878,0.845,2778.0,29.0,25.9
+4,descritores + SMILES,agrupada,Dummy (classe majoritária),0.293,0.113,,,,,,,25.9
+4,descritores + SMILES,agrupada,Random Forest (300 árvores),0.951,0.95,,,,,,,25.9
+4,descritores + SMILES,agrupada,HistGradientBoosting,0.948,0.948,,,,,,,25.9
+5,descritores,aleatória,Árvore de decisão,0.813,0.811,0.802,0.82,0.863,0.759,3775.0,32.0,26.1
+5,descritores,agrupada,Árvore de decisão,0.782,0.782,0.758,0.782,0.853,0.735,1217.0,23.0,26.1
+5,descritores + SMILES,aleatória,Árvore de decisão,0.905,0.903,0.903,0.921,0.911,0.878,1814.0,23.0,26.1
+5,descritores + SMILES,agrupada,Árvore de decisão,0.898,0.897,0.9,0.907,0.905,0.875,1860.0,23.0,26.1
+5,só SMILES,aleatória,Árvore de decisão,0.887,0.884,0.898,0.91,0.884,0.845,2796.0,26.0,26.1
+5,só SMILES,agrupada,Árvore de decisão,0.883,0.88,0.893,0.913,0.878,0.836,2818.0,27.0,26.1
+5,descritores + SMILES,agrupada,Dummy (classe majoritária),0.293,0.113,,,,,,,26.1
+5,descritores + SMILES,agrupada,Random Forest (300 árvores),0.958,0.958,,,,,,,26.1
+5,descritores + SMILES,agrupada,HistGradientBoosting,0.95,0.95,,,,,,,26.1
+6,descritores,aleatória,Árvore de decisão,0.807,0.807,0.797,0.805,0.858,0.767,3758.0,28.0,24.9
+6,descritores,agrupada,Árvore de decisão,0.761,0.759,0.759,0.751,0.828,0.7,1130.0,26.0,24.9
+6,descritores + SMILES,aleatória,Árvore de decisão,0.906,0.904,0.902,0.926,0.914,0.875,1711.0,22.0,24.9
+6,descritores + SMILES,agrupada,Árvore de decisão,0.886,0.885,0.887,0.904,0.891,0.859,1824.0,23.0,24.9
+6,só SMILES,aleatória,Árvore de decisão,0.89,0.888,0.895,0.916,0.889,0.852,2809.0,23.0,24.9
+6,só SMILES,agrupada,Árvore de decisão,0.881,0.878,0.885,0.905,0.888,0.833,2820.0,24.0,24.9
+6,descritores + SMILES,agrupada,Dummy (classe majoritária),0.293,0.113,,,,,,,24.9
+6,descritores + SMILES,agrupada,Random Forest (300 árvores),0.951,0.95,,,,,,,24.9
+6,descritores + SMILES,agrupada,HistGradientBoosting,0.944,0.944,,,,,,,24.9
+7,descritores,aleatória,Árvore de decisão,0.806,0.805,0.794,0.799,0.874,0.752,3832.0,26.0,25.9
+7,descritores,agrupada,Árvore de decisão,0.777,0.776,0.767,0.767,0.846,0.723,1129.0,21.0,25.9
+7,descritores + SMILES,aleatória,Árvore de decisão,0.911,0.91,0.909,0.926,0.92,0.884,1832.0,23.0,25.9
+7,descritores + SMILES,agrupada,Árvore de decisão,0.898,0.898,0.897,0.909,0.905,0.881,1812.0,23.0,25.9
+7,só SMILES,aleatória,Árvore de decisão,0.888,0.885,0.89,0.916,0.888,0.846,2772.0,24.0,25.9
+7,só SMILES,agrupada,Árvore de decisão,0.873,0.87,0.877,0.901,0.869,0.834,2783.0,23.0,25.9
+7,descritores + SMILES,agrupada,Dummy (classe majoritária),0.293,0.113,,,,,,,25.9
+7,descritores + SMILES,agrupada,Random Forest (300 árvores),0.95,0.949,,,,,,,25.9
+7,descritores + SMILES,agrupada,HistGradientBoosting,0.946,0.945,,,,,,,25.9
+8,descritores,aleatória,Árvore de decisão,0.819,0.818,0.805,0.824,0.867,0.775,3790.0,26.0,25.9
+8,descritores,agrupada,Árvore de decisão,0.768,0.765,0.758,0.77,0.838,0.696,1156.0,21.0,25.9
+8,descritores + SMILES,aleatória,Árvore de decisão,0.91,0.909,0.906,0.919,0.917,0.895,1848.0,22.0,25.9
+8,descritores + SMILES,agrupada,Árvore de decisão,0.897,0.895,0.889,0.92,0.912,0.859,1592.0,16.0,25.9
+8,só SMILES,aleatória,Árvore de decisão,0.892,0.89,0.898,0.913,0.897,0.851,2872.0,25.0,25.9
+8,só SMILES,agrupada,Árvore de decisão,0.873,0.869,0.879,0.912,0.871,0.815,2919.0,28.0,25.9
+8,descritores + SMILES,agrupada,Dummy (classe majoritária),0.293,0.113,,,,,,,25.9
+8,descritores + SMILES,agrupada,Random Forest (300 árvores),0.953,0.953,,,,,,,25.9
+8,descritores + SMILES,agrupada,HistGradientBoosting,0.952,0.951,,,,,,,25.9
+9,descritores,aleatória,Árvore de decisão,0.818,0.816,0.81,0.82,0.856,0.778,3810.0,30.0,26.2
+9,descritores,agrupada,Árvore de decisão,0.778,0.777,0.772,0.766,0.835,0.733,1248.0,23.0,26.2
+9,descritores + SMILES,aleatória,Árvore de decisão,0.913,0.912,0.909,0.922,0.922,0.893,1726.0,23.0,26.2
+9,descritores + SMILES,agrupada,Árvore de decisão,0.899,0.897,0.895,0.915,0.907,0.872,1814.0,22.0,26.2
+9,só SMILES,aleatória,Árvore de decisão,0.888,0.885,0.895,0.911,0.888,0.849,2951.0,28.0,26.2
+9,só SMILES,agrupada,Árvore de decisão,0.879,0.876,0.889,0.905,0.877,0.832,2793.0,24.0,26.2
+9,descritores + SMILES,agrupada,Dummy (classe majoritária),0.293,0.113,,,,,,,26.2
+9,descritores + SMILES,agrupada,Random Forest (300 árvores),0.95,0.949,,,,,,,26.2
+9,descritores + SMILES,agrupada,HistGradientBoosting,0.948,0.947,,,,,,,26.2

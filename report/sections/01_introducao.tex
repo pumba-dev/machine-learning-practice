@@ -1,0 +1,14 @@
+\section{Introdução}
+
+Na descoberta de fármacos, saber em qual proteína uma molécula atua ajuda a priorizar experimentos e a antecipar efeitos colaterais. Bancos abertos como o ChEMBL~\cite{gaulton:12,zdrazil:24} reúnem milhões de medições de potência, e com eles é possível treinar modelos que sugerem o alvo de uma molécula~\cite{keiser:07}.
+
+Este trabalho trata uma versão controlada do problema: dada uma molécula que se sabe ativa contra exatamente uma de quatro proteínas (EGFR, quinase associada ao câncer de pulmão; BACE1, protease ligada ao Alzheimer; DRD2, receptor de dopamina alvo de antipsicóticos; e HDAC1, enzima epigenética estudada em oncologia), prever qual é. O modelo é uma árvore de decisão~\cite{breiman:84}, escolhida porque suas regras podem ser lidas e discutidas.
+
+Três pontos tornam o problema menos trivial do que parece. Primeiro, o conjunto do Kaggle que inspirou o trabalho está incompleto e foi preciso reconstruí-lo do ChEMBL. Segundo, cinco descritores físico-químicos globais separam mal as classes. Terceiro, muitas moléculas compartilham exatamente os mesmos descritores, o que contamina a avaliação se o teste for sorteado ao acaso. As contribuições são:
+\begin{itemize}
+  \item uma base reconstruída do ChEMBL\_37, com 27.714 moléculas de quatro alvos e curadoria documentada passo a passo;
+  \item 12 atributos obtidos apenas contando caracteres do SMILES, sem biblioteca de química, que elevam a acurácia da árvore em 12 pontos sobre os descritores;
+  \item uma avaliação com divisão agrupada e 10 seeds, que mede o quanto a divisão aleatória superestima o resultado (de 1,3 a 4,1 pontos) e situa a árvore entre um piso e um teto dados por modelos de referência.
+\end{itemize}
+
+O texto segue a ordem do trabalho: fundamentos, base e curadoria, análise exploratória, metodologia de modelagem, resultados, limitações e conclusão.

@@ -1,0 +1,21 @@
+\section{Metodologia de modelagem}\label{sec:metodologia}
+
+Tudo foi implementado em Python com scikit-learn~\cite{pedregosa:11}. A tarefa é classificação multiclasse: prever a proteína-alvo (4 classes) das 27.476 moléculas com os cinco descritores completos.
+
+\subsection{Conjuntos de features}
+
+Além dos descritores, foram criadas 12 features por contagem de caracteres do SMILES, sem biblioteca de química: comprimento da cadeia; número de átomos de N, O e S; de halogênios (F, Cl, Br, I); de anéis (dígitos de fechamento dividido por 2); de ramificações (\texttt{(}); de átomos aromáticos (c, n, o, s minúsculos); de ligações duplas (\texttt{=}) e triplas (\texttt{\#}); de cargas (\texttt{+}, \texttt{-}); e de marcas de estereoquímica (\texttt{@}, \texttt{/}). Cl e Br contam como um único símbolo, para que o ``C'' de Cl não seja contado como carbono. Comparam-se três conjuntos: os 5 descritores, as 12 contagens de SMILES e os 17 atributos juntos.
+
+\subsection{Divisão treino-teste e vazamento}\label{sec:splits}
+
+Os dados são divididos em 80\% para treino (21.980 moléculas) e 20\% para teste (5.496), em dois esquemas. A divisão \emph{aleatória} usa amostragem estratificada comum e ignora que linhas com descritores idênticos podem cair nos dois lados. A divisão \emph{agrupada} usa o primeiro fold de um \texttt{StratifiedGroupKFold} de 5 partes, no qual todas as linhas com a mesma tupla dos cinco descritores formam um grupo que não é separado. As duas preservam a proporção das classes. A diferença entre elas mede o vazamento~\cite{kapoor:23}, ou seja, o quanto o teste aleatório premia a memorização de moléculas quase idênticas às de treino.
+
+\subsection{Ajuste, avaliação e modelos de referência}
+
+Para cada um dos 6 cenários (3 conjuntos de features $\times$ 2 divisões), uma busca em grade com validação cruzada de 5 partes escolhe os hiperparâmetros da árvore de decisão: critério (\texttt{gini} ou \texttt{entropy}), profundidade máxima (8, 12, 16 ou sem limite), mínimo de amostras por folha (1, 5 ou 20) e parâmetro de poda por custo-complexidade $\alpha$ (0, $10^{-4}$ ou $3\times10^{-4}$), 72 combinações. A validação interna segue a mesma disciplina da divisão externa: com treino agrupado, usa dobras agrupadas. A métrica de escolha é a acurácia. No teste, reportam-se acurácia, F1 macro (média simples do F1 das quatro classes), F1 por classe e a matriz de confusão.
+
+Como piso e teto, usam-se no mesmo treino e teste um classificador que responde a classe majoritária, uma Random Forest de 300 árvores e um \emph{gradient boosting} baseado em histogramas (\texttt{HistGradientBoosting}), ambos sem ajuste de hiperparâmetros.
+
+\subsection{Repetição com várias seeds}
+
+Um único split pode ser favorável ou desfavorável por acaso. Todo o procedimento acima é repetido com 10 seeds (0 a 9), que mudam as duas divisões, as dobras da validação cruzada e a semente dos modelos. As tabelas trazem média $\pm$ desvio padrão amostral. As curvas, a árvore desenhada e a análise de erros usam a seed 42, a mesma dos notebooks do projeto. A variação das seeds cobre o sorteio da divisão, mas não a escolha dos dados: a base é a mesma em todas as repetições.

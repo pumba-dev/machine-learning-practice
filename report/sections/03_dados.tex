@@ -1,0 +1,54 @@
+\section{Dados e curadoria}
+
+\subsection{Base de partida}
+
+O trabalho partiu do conjunto \emph{MultiTarget Bioactivity ChEMBL}, publicado no Kaggle~\cite{kaggle:multitarget}. O arquivo disponível, porém, não corresponde à descrição da própria página: tem 1.333 linhas em vez de 8.711, nenhuma molécula de EGFR, apenas duas de BACE1 e 95,5\% das linhas em DRD2. A página também associa BACE1 ao identificador CHEMBL1987, que designa outra proteína; o correto é CHEMBL4822. Como as versões anteriores exigem login para download, a base foi reconstruída diretamente do ChEMBL.
+
+\subsection{Reconstrução a partir do ChEMBL}
+
+Os dados vêm da API REST do ChEMBL~\cite{davies:15}, um banco curado de moléculas bioativas~\cite{gaulton:12,zdrazil:24}, na versão ChEMBL\_37 (lançada em 01/05/2026, extração em 24/10/2026). Para cada um dos quatro alvos da Tabela~\ref{tab:classes} foram baixadas as medições de ensaios de ligação (\texttt{assay\_type = B}) com relação exata (\texttt{=}) e pChEMBL preenchido. O pChEMBL é a potência padronizada pelo ChEMBL, $-\log_{10}$ da concentração molar de IC$_{50}$, K$_i$, K$_d$ ou EC$_{50}$; o valor 6 equivale a 1~$\mu$M.
+
+A Figura~\ref{fig:funil} resume a curadoria. As 58.736 medições brutas perdem 7.328 registros marcados pelo ChEMBL como duplicata potencial e 49 sem SMILES. As 51.359 restantes são agregadas pela mediana do pChEMBL em cada par molécula-alvo (37.424 pares). Mantêm-se os pares com pChEMBL~$\geq 6$ (27.798) e removem-se 42 moléculas ativas em mais de um alvo, cujo rótulo seria ambíguo. O resultado são 27.714 moléculas, uma por linha, com a proteína-alvo como classe.
+
+\begin{figure}[ht]
+\centering
+\begin{tikzpicture}[
+    box/.style={draw, rounded corners=1pt, minimum width=2.2cm, minimum height=1.15cm, text width=2.05cm,
+                align=center, inner sep=2pt, font=\scriptsize},
+    arr/.style={-{Stealth[length=4pt]}, thick}]
+  \node[box] (a) {\textbf{58.736}\\medições de ligação brutas};
+  \node[box, right=0.18cm of a] (b) {\textbf{51.359}\\sem duplicata potencial nem SMILES vazio};
+  \node[box, right=0.18cm of b] (c) {\textbf{37.424}\\pares molécula-alvo (mediana do pChEMBL)};
+  \node[box, right=0.18cm of c] (d) {\textbf{27.798}\\pares ativos (pChEMBL $\geq 6$)};
+  \node[box, right=0.18cm of d] (e) {\textbf{27.714}\\moléculas de alvo único ($-42$)};
+  \node[box, right=0.18cm of e] (f) {\textbf{27.476}\\com os 5 descritores ($-238$)};
+  \foreach \x/\y in {a/b, b/c, c/d, d/e, e/f} \draw[arr] (\x) -- (\y);
+\end{tikzpicture}
+\caption{Funil de curadoria, do download à base de modelagem.}
+\label{fig:funil}
+\end{figure}
+
+Cada molécula é descrita pelos cinco descritores que o ChEMBL calcula para a molécula parental, sem sal nem contraíon: massa molecular, LogP (ALogP), números de aceptores e doadores de ligação de hidrogênio (HBA e HBD) e área de superfície polar topológica (TPSA)~\cite{ertl:00}. O pChEMBL não é usado como atributo, pois resulta do ensaio contra o próprio alvo e vazaria o rótulo. Nas 525 moléculas presentes também no arquivo do Kaggle, 99,6\% têm o mesmo rótulo e 99,4\% os mesmos descritores.
+
+\begin{table}[ht]
+\centering
+\caption{Classes da base final. A última coluna é a proporção das 27.714 moléculas.}
+\label{tab:classes}
+\small
+\begin{tabular}{llrr}
+\toprule
+Alvo & ChEMBL ID & Moléculas & \% \\
+\midrule
+EGFR  & CHEMBL203  & 8.108 & 29,3 \\
+BACE1 & CHEMBL4822 & 7.344 & 26,5 \\
+DRD2  & CHEMBL217  & 6.650 & 24,0 \\
+HDAC1 & CHEMBL325  & 5.612 & 20,2 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Problemas conhecidos}
+
+Há quatro ressalvas. (i)~Em 238 moléculas (0,86\%) faltam LogP, HBA, HBD e TPSA; são sobretudo peptídeos grandes (mediana de 1.103~Da), e essas linhas foram removidas, restando 27.476 para modelagem. (ii)~4.777 linhas repetem exatamente os cinco descritores de outra linha, sempre da mesma classe; isso causa o vazamento tratado na Seção~\ref{sec:vazamento}. (iii)~182 moléculas passam de 1.000~Da. (iv)~A base contém só moléculas ativas, então o modelo aprende a distinguir entre alvos, e não ativas de inativas.
+
+O código, os notebooks e os dados estão em \url{https://github.com/pumba-dev/machine-learning-practice}. Os dados derivados do ChEMBL seguem a licença CC BY-SA 3.0.

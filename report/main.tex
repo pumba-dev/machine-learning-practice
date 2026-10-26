@@ -1,0 +1,61 @@
+\documentclass[12pt]{article}
+
+\usepackage{sbc-template}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[english,brazilian]{babel}
+\usepackage{graphicx,url}
+\usepackage{booktabs}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning}
+
+\sloppy
+\hyphenation{SMILES}
+
+\title{Classificação de alvos proteicos a partir de descritores moleculares do ChEMBL com árvores de decisão}
+
+\author{Bernan R. do Nascimento\inst{1}, Paulo E. R. Araujo\inst{1}, Thiago R. P. de Carvalho\inst{1}}
+
+\address{Universidade Federal do Piauí (UFPI)\\
+  Programa de Pós-Graduação em Ciência da Computação -- Teresina -- PI -- Brasil\\
+  PPGCC010 -- Aprendizagem de Máquina (2026.2) -- Prof. Vinicius Ponte Machado
+  \email{bernanr7@gmail.com, pauloaraujo@ufpi.edu.br}
+  \email{thiago.rafael.pc@gmail.com}
+}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+  Predicting which protein target an active molecule acts on is an early step in drug discovery.
+  We rebuild a dataset of 27,714 molecules active against four targets (EGFR, BACE1, DRD2 and HDAC1)
+  from the ChEMBL 37 API and train a decision tree on five physicochemical descriptors and twelve
+  counts taken from the SMILES string. With a grouped split, the SMILES counts raise accuracy from
+  0.77 to 0.89 (mean of 10 seeds). A random split overestimates accuracy by 1.3 to 4.1 points,
+  because a quarter of the test molecules have a twin with identical descriptors in the training set.
+\end{abstract}
+
+\begin{resumo}
+  Prever em qual proteína-alvo uma molécula ativa age é uma etapa inicial da descoberta de
+  fármacos. Reconstruímos pela API do ChEMBL 37 uma base de 27.714 moléculas ativas contra quatro
+  alvos (EGFR, BACE1, DRD2 e HDAC1) e treinamos uma árvore de decisão com cinco descritores
+  físico-químicos e doze contagens extraídas do texto SMILES. Com divisão agrupada, as contagens
+  elevam a acurácia de 0,77 para 0,89 (média de 10 seeds). A divisão aleatória superestima o
+  resultado em 1,3 a 4,1 pontos, pois um quarto das moléculas de teste tem uma gêmea com
+  descritores idênticos no treino.
+\end{resumo}
+
+\input{sections/01_introducao}
+\input{sections/02_fundamentacao}
+\input{sections/03_dados}
+\input{sections/04_eda}
+\input{sections/05_metodologia}
+\input{sections/06_resultados}
+\input{sections/07_limitacoes}
+\input{sections/08_conclusao}
+
+\bibliographystyle{sbc}
+\bibliography{refs}
+
+\end{document}
