@@ -29,6 +29,7 @@ data/
 notebooks/
   01_curadoria.ipynb              etapa 1: download e curadoria
   02_analise_exploratoria.ipynb   etapa 2: análise exploratória da base final
+  03_decision_tree.ipynb          etapa 3: treino, ajuste e avaliação da árvore
 src/            código usado pelos notebooks, um módulo por etapa
 ```
 
@@ -40,6 +41,7 @@ src/            código usado pelos notebooks, um módulo por etapa
 | `src/inspection.py` | Inspeção das atividades brutas |
 | `src/curation.py` | Curadoria e montagem da base final |
 | `src/eda.py` | Tabelas da análise exploratória |
+| `src/modeling.py` | Features, splits, ajuste e avaliação da árvore |
 | `src/plots.py` | Gráficos |
 
 ## Como executar
@@ -52,13 +54,25 @@ python -m venv .venv
 .venv/Scripts/python -m jupyter notebook notebooks/
 ```
 
-Rode os notebooks na ordem (01 e depois 02). Os dados já estão no repositório, então nada precisa ser baixado. Para baixar tudo de novo do ChEMBL, mude `REFRESH = True` na primeira célula do notebook 01.
+Rode os notebooks na ordem (01, 02, 03). Os dados já estão no repositório, então nada precisa ser baixado. Para baixar tudo de novo do ChEMBL, mude `REFRESH = True` na primeira célula do notebook 01.
 
 ## Etapas
 
 - [x] Etapa 1: curadoria da base (`01_curadoria.ipynb`)
 - [x] Etapa 2: análise exploratória (`02_analise_exploratoria.ipynb`)
-- [ ] Etapa 3: treino e avaliação da Decision Tree
+- [x] Etapa 3: treino e avaliação da Decision Tree (`03_decision_tree.ipynb`)
+
+## Resultado
+
+Árvore de decisão com as 5 propriedades físico-químicas mais 12 contagens de caracteres do `SMILES`, avaliada num split que impede moléculas de descritores idênticos de cair nos dois lados:
+
+| | Acurácia | F1 macro |
+|---|---|---|
+| Chutar a classe majoritária | 0,293 | 0,113 |
+| **Árvore de decisão** | **0,897** | **0,896** |
+| Random Forest (referência) | 0,952 | 0,952 |
+
+As contagens de caracteres do `SMILES` valem cerca de 10 pontos de acurácia, e sozinhas superam os 5 descritores. Detalhes em [`notebooks/03_decision_tree.ipynb`](notebooks/03_decision_tree.ipynb).
 
 ## Licença dos dados
 

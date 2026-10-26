@@ -25,7 +25,7 @@ A base foi inspirada no dataset do Kaggle [xjoannax88/multitarget-bioactivity-ch
 
 ## Como reproduzir
 
-O processo está em dois notebooks: [`notebooks/01_curadoria.ipynb`](notebooks/01_curadoria.ipynb) (download e curadoria) e [`notebooks/02_analise_exploratoria.ipynb`](notebooks/02_analise_exploratoria.ipynb) (análise exploratória). Os notebooks só chamam funções; a implementação fica no pacote `src/`, com um módulo por etapa:
+O processo está em dois notebooks: [`notebooks/01_curadoria.ipynb`](notebooks/01_curadoria.ipynb) (download e curadoria) e [`notebooks/02_analise_exploratoria.ipynb`](notebooks/02_analise_exploratoria.ipynb) (análise exploratória) e [`notebooks/03_decision_tree.ipynb`](notebooks/03_decision_tree.ipynb) (treino e avaliação da árvore). Os notebooks só chamam funções; a implementação fica no pacote `src/`, com um módulo por etapa:
 
 | Módulo | Conteúdo |
 |---|---|
@@ -35,6 +35,7 @@ O processo está em dois notebooks: [`notebooks/01_curadoria.ipynb`](notebooks/0
 | `src/inspection.py` | Inspeção das atividades brutas |
 | `src/curation.py` | Curadoria e montagem da base final |
 | `src/eda.py` | Tabelas da análise exploratória |
+| `src/modeling.py` | Features, splits, ajuste e avaliação da árvore |
 | `src/plots.py` | Gráficos |
 
 ```bash

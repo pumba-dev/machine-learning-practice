@@ -42,4 +42,19 @@ FEATURES = list(PROPERTY_COLUMNS.values())
 # Curadoria
 ACTIVE_THRESHOLD = 6.0  # pChEMBL >= 6 equivale a potência de 1 µM ou melhor
 
+# Modelagem
+TEST_SIZE = 0.2
+CV_FOLDS = 5
+# Colunas contadas a partir do texto do SMILES (ver modeling.smiles_features).
+SMILES_FEATURES = [
+    "smiles_len", "n_N", "n_O", "n_S", "n_halogen", "n_rings",
+    "n_branch", "n_aromatic", "n_double", "n_triple", "n_charge", "n_stereo",
+]
+# Os três conjuntos de features comparados no notebook 03.
+FEATURE_SETS = {
+    "descritores": FEATURES,
+    "descritores + SMILES": FEATURES + SMILES_FEATURES,
+    "só SMILES": SMILES_FEATURES,
+}
+
 RANDOM_STATE = 42

@@ -8,5 +8,6 @@
 | `inspection`    | 01, seção 4: inspeção das atividades brutas         |
 | `curation`      | 01, seções 5 e 7: curadoria e base final            |
 | `eda`           | 02: tabelas da análise exploratória                 |
-| `plots`         | Gráficos dos dois notebooks                         |
+| `modeling`      | 03: features, splits, tuning e avaliação da árvore  |
+| `plots`         | Gráficos dos três notebooks                         |
 """

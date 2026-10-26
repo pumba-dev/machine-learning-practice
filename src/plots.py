@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
 from matplotlib.colors import LinearSegmentedColormap
+from sklearn.tree import plot_tree
 
 from src.config import ACTIVE_THRESHOLD, CLASSES, FEATURES
 
@@ -17,6 +18,9 @@ TEXT_PRIMARY = "#0b0b0b"
 TEXT_SECONDARY = "#52514e"
 SURFACE = "#fcfcfb"
 DIVERGING = LinearSegmentedColormap.from_list("diverging", ["#2a78d6", "#f0efec", "#e34948"])
+# Para grandeza que vai de zero a um máximo (contagem, acerto). A DIVERGING é centrada no meio da
+# escala e pintaria de neutro valores médios, que aqui não têm nada de neutro.
+SEQUENTIAL = LinearSegmentedColormap.from_list("sequential", ["#fcfcfb", "#2a78d6"])
 
 
 def set_style():
@@ -143,5 +147,107 @@ def pchembl_by_class(final):
                 palette=CLASS_COLORS, showfliers=False, width=0.6, linewidth=1, legend=False, ax=ax)
     ax.set_xlabel("")
     ax.set_title("pChEMBL mediano por proteína-alvo", loc="left")
+    fig.tight_layout()
+    plt.show()
+
+
+# --- Notebook 03: árvore de decisão ------------------------------------------------------------
+
+def model_comparison(comparacao, baseline=None):
+    """Barras de acurácia por conjunto de features, com os dois splits lado a lado."""
+    wide = comparacao.pivot(index="features", columns="split", values="acurácia teste")
+    positions = np.arange(len(wide))
+    fig, ax = plt.subplots(figsize=(9, 3.4))
+    for offset, (split, color) in zip([-0.19, 0.19], [("aleatória", CONTEXT_GRAY), ("agrupada", SERIES_COLOR)]):
+        ax.bar(positions + offset, wide[split], width=0.36, color=color, label=f"divisão {split}")
+        for x, value in zip(positions + offset, wide[split]):
+            ax.text(x, value + 0.015, f"{value:.3f}", ha="center", color=TEXT_SECONDARY, fontsize=9)
+    if baseline:
+        ax.axhline(baseline, color=TEXT_PRIMARY, linewidth=1, linestyle="--")
+        ax.text(-0.45, baseline + 0.03, f"classe majoritária ({baseline:.1%})", color=TEXT_SECONDARY, fontsize=9)
+    ax.set_xticks(positions, wide.index)
+    ax.set_ylim(0, 1.12)
+    ax.set_ylabel("acurácia no teste")
+    ax.grid(axis="x", visible=False)
+    # Acima do gráfico e à direita: as barras passam de 0,9 e cobririam qualquer canto interno,
+    # e o título ocupa a esquerda.
+    ax.legend(frameon=False, loc="lower right", bbox_to_anchor=(1.0, 1.0), ncol=2)
+    ax.set_title("Acurácia por conjunto de features e por tipo de divisão", loc="left")
+    fig.tight_layout()
+    plt.show()
+
+
+def depth_curve(curva):
+    """Acurácia de treino e de validação por profundidade, com a diferença sombreada."""
+    fig, ax = plt.subplots(figsize=(7.5, 3.6))
+    ax.fill_between(curva.index, curva["validação"], curva["treino"], color=CONTEXT_GRAY, alpha=0.6,
+                    label="diferença (overfitting)")
+    ax.plot(curva.index, curva["treino"], color="#eb6834", linewidth=2, marker="o", markersize=4, label="treino")
+    ax.plot(curva.index, curva["validação"], color=SERIES_COLOR, linewidth=2, marker="o", markersize=4, label="validação")
+    ax.set_xlabel("profundidade máxima")
+    ax.set_ylabel("acurácia")
+    ax.set_ylim(0.5, 1.02)
+    ax.legend(frameon=False, loc="lower right")
+    ax.set_title("A árvore decora o treino, a validação estaciona", loc="left")
+    fig.tight_layout()
+    plt.show()
+
+
+def pruning_curve(curva):
+    """`ccp_alpha` em escala log contra acurácia, com o número de folhas no eixo da direita."""
+    fig, ax = plt.subplots(figsize=(7.5, 3.6))
+    x = curva.index.to_numpy()
+    x = np.where(x == 0, curva.index[curva.index > 0].min() / 3, x)  # zero não existe em escala log
+    ax.set_xscale("log")
+    ax.plot(x, curva["treino"], color="#eb6834", linewidth=2, marker="o", markersize=4, label="treino")
+    ax.plot(x, curva["validação"], color=SERIES_COLOR, linewidth=2, marker="o", markersize=4, label="validação")
+    ax.set_xlabel("ccp_alpha (o primeiro ponto é 0, sem poda)")
+    ax.set_ylabel("acurácia")
+    ax.legend(frameon=False, loc="lower left")
+    leaves = ax.twinx()
+    leaves.plot(x, curva["folhas"], color=TEXT_SECONDARY, linewidth=1, linestyle=":", marker="s", markersize=3)
+    leaves.set_yscale("log")
+    leaves.set_ylabel("folhas (linha pontilhada)", color=TEXT_SECONDARY)
+    leaves.grid(visible=False)
+    ax.set_title("Poda por custo-complexidade", loc="left")
+    fig.tight_layout()
+    plt.show()
+
+
+def decision_tree(model, dados=None, feature_names=None, max_depth=2):
+    """Desenha só as primeiras camadas da árvore: completa, ela é ilegível."""
+    names = feature_names if feature_names is not None else list(dados.X.columns)
+    fig, ax = plt.subplots(figsize=(16, 7))
+    plot_tree(model, max_depth=max_depth, feature_names=names, class_names=sorted(CLASSES),
+              filled=True, proportion=True, rounded=True, impurity=False, fontsize=9, ax=ax)
+    ax.set_title(f"Primeiras {max_depth} camadas da árvore escolhida", loc="left")
+    fig.tight_layout()
+    plt.show()
+
+
+def feature_importances(tabela):
+    """Importância por impureza e por permutação, na mesma ordem de features."""
+    fig, axes = plt.subplots(1, 2, figsize=(13, 4.6), sharey=True)
+    axes[0].barh(tabela.index, tabela["impureza"], color=SERIES_COLOR, height=0.7)
+    axes[0].set_title("Por impureza (durante o treino)", loc="left")
+    axes[1].barh(tabela.index, tabela["permutação"], xerr=tabela["desvio"], color=SERIES_COLOR, height=0.7,
+                 error_kw={"ecolor": TEXT_SECONDARY, "elinewidth": 1})
+    axes[1].set_title("Por permutação (no teste)", loc="left")
+    for ax in axes:
+        ax.grid(axis="y", visible=False)
+        ax.set_xlabel("queda de desempenho atribuída à feature")
+    fig.suptitle("Importância das features", x=0.01, ha="left", fontweight="bold")
+    fig.tight_layout()
+    plt.show()
+
+
+def confusion_matrix(matriz):
+    """Matriz de confusão: cor pela proporção da linha, número em contagem bruta."""
+    share = matriz.div(matriz.sum(axis=1), axis=0)
+    labels = matriz.map(lambda v: f"{v:,}".replace(",", "."))
+    fig, ax = plt.subplots(figsize=(6, 4.8))
+    sns.heatmap(share, cmap=SEQUENTIAL, vmin=0, vmax=1, annot=labels, fmt="", square=True,
+                linewidths=2, linecolor=SURFACE, cbar_kws={"shrink": 0.8, "label": "proporção da classe real"}, ax=ax)
+    ax.set_title("Matriz de confusão no conjunto de teste", loc="left")
     fig.tight_layout()
     plt.show()
