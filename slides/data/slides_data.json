@@ -1,0 +1,191 @@
+{
+  "seed": 42,
+  "classes": {
+    "EGFR": {
+      "moleculas": 8108,
+      "percentual": 29.255971711048566
+    },
+    "BACE1": {
+      "moleculas": 7344,
+      "percentual": 26.49924226022949
+    },
+    "DRD2": {
+      "moleculas": 6650,
+      "percentual": 23.99509273291477
+    },
+    "HDAC1": {
+      "moleculas": 5612,
+      "percentual": 20.249693295807173
+    }
+  },
+  "total_moleculas": 27714,
+  "descritor_sozinho": {
+    "Molecular Weight": 37.7966266806002,
+    "LogP": 38.71015134838738,
+    "HBA": 43.26322195776761,
+    "TPSA": 44.890058846668865,
+    "HBD": 45.141198231023836
+  },
+  "piso": 29.331052554957054,
+  "exemplo": {
+    "id": "CHEMBL1085117",
+    "classe": "HDAC1",
+    "smiles": "CCN(CC)CCn1cnc2cc(C(=O)NC(=O)NCCCCCC(=O)NO)ccc21",
+    "descritores": {
+      "Molecular Weight": 432.53,
+      "LogP": 1.88,
+      "HBA": 7.0,
+      "HBD": 4.0,
+      "TPSA": 128.59
+    },
+    "contagens": {
+      "smiles_len": 48,
+      "n_N": 6,
+      "n_O": 4,
+      "n_S": 0,
+      "n_halogen": 0,
+      "n_rings": 2,
+      "n_branch": 5,
+      "n_aromatic": 9,
+      "n_double": 3,
+      "n_triple": 0,
+      "n_charge": 0,
+      "n_stereo": 0
+    }
+  },
+  "arvore": {
+    "raiz": {
+      "atributo": "TPSA",
+      "limiar": 67.89500045776367
+    },
+    "esquerda": {
+      "fatia": 0.2548680618744313,
+      "classe": "DRD2",
+      "fatia_classe": 0.6908247054623349,
+      "pergunta": {
+        "atributo": "n_aromatic",
+        "limiar": 14.5
+      }
+    },
+    "direita": {
+      "fatia": 0.7451319381255687,
+      "classe": "EGFR",
+      "fatia_classe": 0.34051776773720843,
+      "pergunta": {
+        "atributo": "n_aromatic",
+        "limiar": 12.5
+      }
+    },
+    "folhas": 1854
+  },
+  "matriz_confusao": {
+    "classes": [
+      "EGFR",
+      "BACE1",
+      "DRD2",
+      "HDAC1"
+    ],
+    "valores": [
+      [
+        1449,
+        49,
+        39,
+        75
+      ],
+      [
+        52,
+        1335,
+        31,
+        45
+      ],
+      [
+        63,
+        41,
+        1178,
+        25
+      ],
+      [
+        88,
+        42,
+        18,
+        966
+      ]
+    ]
+  },
+  "erros": {
+    "total": 568,
+    "teste": 5496,
+    "percentual_erro": 10.334788937409025,
+    "par_hdac1_egfr": 28.7,
+    "previsoes_com_confianca_100": 100.0
+  },
+  "multiseed": {
+    "cenarios": {
+      "descritores": {
+        "aleatoria": 81.21000000000001,
+        "agrupada": 77.14999999999999,
+        "dp_aleatoria": 0.5404730438339234,
+        "dp_agrupada": 0.7877534865397656
+      },
+      "só SMILES": {
+        "aleatoria": 88.88000000000001,
+        "agrupada": 87.6,
+        "dp_aleatoria": 0.39665266081716083,
+        "dp_agrupada": 0.6236095644623241
+      },
+      "descritores + SMILES": {
+        "aleatoria": 90.76,
+        "agrupada": 89.41,
+        "dp_aleatoria": 0.3169297153067926,
+        "dp_agrupada": 0.4175324338699134
+      }
+    },
+    "referencia": {
+      "Dummy (classe majoritária)": 29.300000000000004,
+      "Árvore de decisão": 89.41,
+      "Random Forest (300 árvores)": 95.16999999999997,
+      "HistGradientBoosting": 94.78999999999999
+    },
+    "dp_maximo": 0.7877534865397656,
+    "macros": {
+      "accGrupDesc": "77,1",
+      "sdGrupDesc": "0,8",
+      "accAleatDesc": "81,2",
+      "gapDesc": "5,3",
+      "sdGapDesc": "1,2",
+      "accGrupSmiles": "87,6",
+      "sdGrupSmiles": "0,6",
+      "accAleatSmiles": "88,9",
+      "gapSmiles": "1,5",
+      "sdGapSmiles": "1,0",
+      "accGrupAmbos": "89,4",
+      "sdGrupAmbos": "0,4",
+      "accAleatAmbos": "90,8",
+      "gapAmbos": "1,5",
+      "sdGapAmbos": "0,4",
+      "gapMin": "1,5",
+      "gapMax": "5,3",
+      "ganhoAmbos": "16",
+      "ganhoSmiles": "14",
+      "faixaMin": "88,6",
+      "faixaMax": "89,9",
+      "fscoreGrupAmbos": "89,3",
+      "fscoreEGFR": "89,2",
+      "fscoreBACEone": "90,9",
+      "fscoreDRDtwo": "90,4",
+      "fscoreHDACone": "86,6",
+      "accMaj": "29,3",
+      "sdMaj": "0,0",
+      "accArvore": "89,4",
+      "sdArvore": "0,4",
+      "accRF": "95,2",
+      "sdRF": "0,3",
+      "accHGB": "94,8",
+      "sdHGB": "0,3",
+      "ganhoRF": "6,4",
+      "gemeas": "25,8",
+      "sdGemeas": "0,4",
+      "nSeeds": "10"
+    }
+  }
+}
