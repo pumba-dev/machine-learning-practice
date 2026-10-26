@@ -23,6 +23,7 @@ from sklearn.model_selection import (
     GridSearchCV,
     StratifiedGroupKFold,
     StratifiedKFold,
+    learning_curve,
     train_test_split,
     validation_curve,
 )
@@ -31,8 +32,8 @@ from sklearn.tree import DecisionTreeClassifier, export_text
 from src.config import CLASSES, CV_FOLDS, FEATURE_SETS, FEATURES, RANDOM_STATE, SMILES_FEATURES, TEST_SIZE
 from src.eda import complete_rows
 
-#: X, y, ids de grupo e os dois splits, para não repassar quatro objetos em cada chamada.
-Dados = namedtuple("Dados", "X y grupos splits")
+#: X, y, ids de grupo, os dois splits e a base completa (para identificar moléculas nos erros).
+Dados = namedtuple("Dados", "X y grupos splits base")
 
 SPLITS = ["aleatória", "agrupada"]
 #: A combinação honesta: features completas e split sem vazamento. Usada das seções 6 a 11.
@@ -45,6 +46,7 @@ PARAM_GRID = {
     "ccp_alpha": [0.0, 1e-4, 3e-4],
 }
 DEPTHS = [2, 3, 4, 5, 6, 8, 10, 12, 16, 20, 25]
+FRACTIONS = [0.05, 0.1, 0.2, 0.35, 0.5, 0.7, 0.85, 1.0]
 ALPHAS = [0.0, 1e-5, 3e-5, 1e-4, 3e-4, 1e-3, 3e-3, 1e-2]
 
 
@@ -100,7 +102,7 @@ def prepare(final):
     grupos = descriptor_groups(complete)
     y = complete["Protein"]
     splits = {"aleatória": _random_split(y), "agrupada": _grouped_split(y, grupos)}
-    return Dados(X, y, grupos, splits)
+    return Dados(X, y, grupos, splits, complete)
 
 
 def _subset(dados, features=None, split=None):
@@ -248,6 +250,75 @@ def evaluation(model, dados, features=None, split=None):
         columns=pd.Index(CLASSES, name="classe prevista"),
     )
     return report.loc[CLASSES + ["accuracy", "macro avg"]].round(3), matrix
+
+
+def learning_curve_table(dados, fractions=FRACTIONS, features=None, split=None):
+    """Acurácia de treino e de validação por tamanho do conjunto de treino."""
+    X_tr, _, y_tr, _ = _subset(dados, features, split)
+    sizes, train, test = learning_curve(
+        DecisionTreeClassifier(random_state=RANDOM_STATE), X_tr, y_tr,
+        train_sizes=fractions,
+        groups=dados.grupos[dados.splits[split or CHOSEN[1]][0]],
+        cv=StratifiedGroupKFold(CV_FOLDS, shuffle=True, random_state=RANDOM_STATE),
+        n_jobs=-1,
+    )
+    return pd.DataFrame(
+        {"treino": train.mean(axis=1).round(3), "validação": test.mean(axis=1).round(3)},
+        index=pd.Index(sizes, name="linhas de treino"),
+    )
+
+
+def _errors(model, dados, features=None, split=None):
+    """(X_teste, y_real, y_previsto, máscara de erro) do conjunto de teste."""
+    _, X_te, _, y_te = _subset(dados, features, split)
+    predicted = pd.Series(model.predict(X_te), index=y_te.index)
+    return X_te, y_te, predicted, y_te != predicted
+
+
+def error_overview(model, dados, features=None, split=None):
+    """Pares (classe real, classe prevista) mais frequentes entre os erros."""
+    _, y_te, predicted, wrong = _errors(model, dados, features, split)
+    pairs = pd.DataFrame({"real": y_te[wrong], "prevista": predicted[wrong]}).value_counts()
+    table = pairs.rename("erros").reset_index()
+    table["% dos erros"] = (100 * table["erros"] / wrong.sum()).round(1)
+    # Quanto esse par pesa dentro da própria classe real, que é o que diz se ela é frágil.
+    table["% da classe real"] = (100 * table["erros"] / y_te.value_counts()[table["real"]].to_numpy()).round(1)
+    return table
+
+
+def error_profile(model, dados, features=None, split=None):
+    """Mediana de cada feature nos acertos e nos erros, com a diferença medida em IQR."""
+    X_te, _, _, wrong = _errors(model, dados, features, split)
+    right = X_te[~wrong]
+    table = pd.DataFrame({"acertos": right.median(), "erros": X_te[wrong].median()})
+    table["diferença"] = (table["erros"] - table["acertos"]).round(2)
+    # Em IQR, para comparar features de escalas diferentes: uma mudança de 1 oxigênio e uma de
+    # 1 Dalton não são o mesmo tamanho de efeito. Percentual distorceria contagens perto de zero.
+    spread = (right.quantile(0.75) - right.quantile(0.25)).replace(0, float("nan"))
+    table["diferença em IQR"] = (table["diferença"] / spread).astype(float).round(2)
+    return table.sort_values("diferença em IQR", key=abs, ascending=False)
+
+
+def confidence_table(model, dados, features=None, split=None):
+    """Acurácia por faixa de confiança: a árvore sabe quando está em dúvida?"""
+    X_te, y_te, predicted, wrong = _errors(model, dados, features, split)
+    confidence = model.predict_proba(X_te).max(axis=1)
+    bins = pd.cut(confidence, [0, 0.5, 0.7, 0.9, 0.999, 1.0],
+                  labels=["até 50%", "50-70%", "70-90%", "90-100%", "100% (folha pura)"])
+    grouped = pd.DataFrame({"faixa": bins, "acerto": (~wrong).to_numpy()}).groupby("faixa", observed=False)["acerto"]
+    table = pd.DataFrame({
+        "previsões": grouped.size(),
+        "% do teste": (100 * grouped.size() / len(y_te)).round(1),
+        "acurácia": grouped.mean().round(3),
+    })
+    return table[table["previsões"] > 0]  # faixas vazias só poluiriam a leitura
+
+
+def error_examples(model, dados, real, prevista, n=6, features=None, split=None):
+    """Moléculas de um par de confusão específico, com ChEMBL ID e SMILES."""
+    _, y_te, predicted, _ = _errors(model, dados, features, split)
+    picked = y_te.index[(y_te == real) & (predicted == prevista)][:n]
+    return dados.base.loc[picked, ["ChEMBL ID", "SMILES", *FEATURES]]
 
 
 def reference_models(dados, features=None, split=None):

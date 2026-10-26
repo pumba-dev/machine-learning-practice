@@ -241,6 +241,38 @@ def feature_importances(tabela):
     plt.show()
 
 
+def learning_curve(curva):
+    """Acurácia de treino e de validação por tamanho do conjunto de treino."""
+    fig, ax = plt.subplots(figsize=(7.5, 3.6))
+    ax.fill_between(curva.index, curva["validação"], curva["treino"], color=CONTEXT_GRAY, alpha=0.6,
+                    label="diferença (overfitting)")
+    ax.plot(curva.index, curva["treino"], color="#eb6834", linewidth=2, marker="o", markersize=4, label="treino")
+    ax.plot(curva.index, curva["validação"], color=SERIES_COLOR, linewidth=2, marker="o", markersize=4, label="validação")
+    ax.set_xlabel("linhas de treino")
+    ax.set_ylabel("acurácia")
+    ax.set_ylim(0.5, 1.02)
+    ax.legend(frameon=False, loc="lower right")
+    ax.set_title("A validação ainda sobe quando os dados acabam", loc="left")
+    fig.tight_layout()
+    plt.show()
+
+
+def error_pairs(tabela, top=8):
+    """Barras dos pares de confusão mais frequentes, coloridas pela classe real."""
+    data = tabela.head(top).iloc[::-1]
+    labels = data["real"] + " lido como " + data["prevista"]
+    fig, ax = plt.subplots(figsize=(7.5, 3.4))
+    ax.barh(labels, data["erros"], color=[CLASS_COLORS[c] for c in data["real"]], height=0.7)
+    for y, (count, share) in enumerate(zip(data["erros"], data["% dos erros"])):
+        ax.text(count + 1.5, y, f"{count}  ({share}%)", va="center", color=TEXT_SECONDARY, fontsize=9)
+    ax.set_xlim(0, data["erros"].max() * 1.25)
+    ax.set_xlabel("erros no conjunto de teste")
+    ax.grid(axis="y", visible=False)
+    ax.set_title("Onde a árvore erra", loc="left")
+    fig.tight_layout()
+    plt.show()
+
+
 def confusion_matrix(matriz):
     """Matriz de confusão: cor pela proporção da linha, número em contagem bruta."""
     share = matriz.div(matriz.sum(axis=1), axis=0)

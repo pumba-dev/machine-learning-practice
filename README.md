@@ -72,7 +72,7 @@ Rode os notebooks na ordem (01, 02, 03). Os dados já estão no repositório, en
 | **Árvore de decisão** | **0,897** | **0,896** |
 | Random Forest (referência) | 0,952 | 0,952 |
 
-As contagens de caracteres do `SMILES` valem cerca de 10 pontos de acurácia, e sozinhas superam os 5 descritores. Detalhes em [`notebooks/03_decision_tree.ipynb`](notebooks/03_decision_tree.ipynb).
+As contagens de caracteres do `SMILES` valem cerca de 10 pontos de acurácia, e sozinhas superam os 5 descritores. A curva de aprendizado ainda sobe no último ponto, então o limite atual é a quantidade de dados, não o modelo. Detalhes em [`notebooks/03_decision_tree.ipynb`](notebooks/03_decision_tree.ipynb).
 
 ## Licença dos dados
 
