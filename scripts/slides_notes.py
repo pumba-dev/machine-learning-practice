@@ -370,9 +370,9 @@ def build_notes(d):
     notes.append({
         "tempo": "1:00",
         "fala": f"Onde a árvore erra? A matriz de confusão, na seed 42, mostra que o maior erro é entre HDAC1 e EGFR: "
-                f"{comma(err['par_hdac1_egfr'])}% de todos os erros. Olhamos exemplos desses erros e alguns têm um mesmo "
-                f"grupo de átomos, o C(=O)NO, que contagens de caracteres não conseguem distinguir. Outro ponto "
-                f"importante: sem poda, toda folha da árvore é pura, então ela diz ter "
+                f"{comma(err['par_hdac1_egfr'])}% de todos os erros. Isso acontece porque os atributos tirados do SMILES são só "
+                f"contagens e podem não bastar para representar a molécula: duas moléculas diferentes podem ter contagens "
+                f"parecidas. Outro ponto importante: sem poda, toda folha da árvore é pura, então ela diz ter "
                 f"{comma(err['previsoes_com_confianca_100'], 0)}% de confiança nas {thousands(err['teste'])} previsões do "
                 f"teste, embora {comma(err['percentual_erro'])}% estejam erradas. A confiança dela, portanto, não "
                 f"distingue acerto de erro. Isso aponta para os próximos passos.",
@@ -413,9 +413,8 @@ def build_notes(d):
                 f"um ganho relativo de {m['ganhoAmbos']}% sobre só os descritores. E a divisão aleatória superestimaria o "
                 f"resultado entre {m['gapMin']}% e {m['gapMax']}%. Os limites: o agrupamento cobre só descritores "
                 f"idênticos, não famílias de moléculas parecidas; o modelo sempre escolhe uma entre quatro classes; e não "
-                f"há validação externa. Como próximos passos: representações estruturais da molécula, divisão por "
-                f"esqueleto molecular, mais dados e probabilidades calibradas. O código e os dados estão no repositório. "
-                f"Obrigado, e estamos abertos a perguntas.",
+                f"há validação externa. O código e os dados estão no repositório. Obrigado, e estamos abertos a "
+                f"perguntas.",
         "estudo": [
             f"Contribuições: (1) uma base reconstruída do ChEMBL_37 com {thousands(d['total_moleculas'])} moléculas de "
             f"quatro alvos; (2) 12 atributos obtidos só contando caracteres do SMILES, com ganho relativo de "
@@ -425,7 +424,8 @@ def build_notes(d):
             "classes, sem a opção 'nenhuma das quatro'; as 10 seeds variam o sorteio mas não os dados, então o desvio não "
             "mede incerteza para dados novos; não há validação externa; Random Forest e gradient boosting estão sem "
             "ajuste; 238 moléculas sem descritores foram descartadas; as probabilidades da árvore não são calibradas.",
-            "Próximos passos: representações estruturais da molécula (calculadas com biblioteca de química) enxergariam "
+            "Próximos passos (estão no relatório, não no slide; use se perguntarem): representações estruturais da "
+            "molécula (calculadas com biblioteca de química) enxergariam "
             "subestruturas como o C(=O)NO; divisão por esqueleto molecular daria uma estimativa menos otimista; mais "
             "dados (outros alvos ou limiar de pChEMBL mais baixo), já que a curva de aprendizado ainda sobe; e poda ou "
             "conjunto de árvores para probabilidades calibradas.",

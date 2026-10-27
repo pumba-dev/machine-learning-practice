@@ -224,7 +224,7 @@ Obrigado, Paulo. Para saber se 89,4% é bom, comparamos com um piso e um teto. A
 
 **Roteiro (o que falar)** · Bernan · 1:00
 
-Onde a árvore erra? A matriz de confusão, na seed 42, mostra que o maior erro é entre HDAC1 e EGFR: 28,7% de todos os erros. Olhamos exemplos desses erros e alguns têm um mesmo grupo de átomos, o C(=O)NO, que contagens de caracteres não conseguem distinguir. Outro ponto importante: sem poda, toda folha da árvore é pura, então ela diz ter 100% de confiança nas 5.496 previsões do teste, embora 10,3% estejam erradas. A confiança dela, portanto, não distingue acerto de erro. Isso aponta para os próximos passos.
+Onde a árvore erra? A matriz de confusão, na seed 42, mostra que o maior erro é entre HDAC1 e EGFR: 28,7% de todos os erros. Isso acontece porque os atributos tirados do SMILES são só contagens e podem não bastar para representar a molécula: duas moléculas diferentes podem ter contagens parecidas. Outro ponto importante: sem poda, toda folha da árvore é pura, então ela diz ter 100% de confiança nas 5.496 previsões do teste, embora 10,3% estejam erradas. A confiança dela, portanto, não distingue acerto de erro. Isso aponta para os próximos passos.
 
 **Para estudar** (apoio; não faz parte da fala)
 
@@ -246,11 +246,11 @@ Onde a árvore erra? A matriz de confusão, na seed 42, mostra que o maior erro 
 - **P:** O erro é maior em alguma classe?  
   **R:** HDAC1 é a mais difícil (F1 86,6%); BACE1 é a mais fácil (90,9%).
 
-## Slide 10: Conclusões e próximos passos
+## Slide 10: Conclusões e limites
 
 **Roteiro (o que falar)** · Bernan · 1:00
 
-Resumindo. Com avaliação honesta, a árvore chega a 89,4% de acurácia. Contar o SMILES dá um ganho relativo de 16% sobre só os descritores. E a divisão aleatória superestimaria o resultado entre 1,5% e 5,3%. Os limites: o agrupamento cobre só descritores idênticos, não famílias de moléculas parecidas; o modelo sempre escolhe uma entre quatro classes; e não há validação externa. Como próximos passos: representações estruturais da molécula, divisão por esqueleto molecular, mais dados e probabilidades calibradas. O código e os dados estão no repositório. Obrigado, e estamos abertos a perguntas.
+Resumindo. Com avaliação honesta, a árvore chega a 89,4% de acurácia. Contar o SMILES dá um ganho relativo de 16% sobre só os descritores. E a divisão aleatória superestimaria o resultado entre 1,5% e 5,3%. Os limites: o agrupamento cobre só descritores idênticos, não famílias de moléculas parecidas; o modelo sempre escolhe uma entre quatro classes; e não há validação externa. O código e os dados estão no repositório. Obrigado, e estamos abertos a perguntas.
 
 > Bernan conduz as perguntas.
 
@@ -258,7 +258,7 @@ Resumindo. Com avaliação honesta, a árvore chega a 89,4% de acurácia. Contar
 
 - Contribuições: (1) uma base reconstruída do ChEMBL_37 com 27.714 moléculas de quatro alvos; (2) 12 atributos obtidos só contando caracteres do SMILES, com ganho relativo de 16%; (3) avaliação com divisão agrupada e 10 seeds, que mede a superestimativa da divisão aleatória e situa a árvore entre o piso (29,3%) e o teto (Random Forest, 95,2%).
 - Limites em detalhe: o agrupamento só considera descritores idênticos; o modelo é de conjunto fechado de 4 classes, sem a opção 'nenhuma das quatro'; as 10 seeds variam o sorteio mas não os dados, então o desvio não mede incerteza para dados novos; não há validação externa; Random Forest e gradient boosting estão sem ajuste; 238 moléculas sem descritores foram descartadas; as probabilidades da árvore não são calibradas.
-- Próximos passos: representações estruturais da molécula (calculadas com biblioteca de química) enxergariam subestruturas como o C(=O)NO; divisão por esqueleto molecular daria uma estimativa menos otimista; mais dados (outros alvos ou limiar de pChEMBL mais baixo), já que a curva de aprendizado ainda sobe; e poda ou conjunto de árvores para probabilidades calibradas.
+- Próximos passos (estão no relatório, não no slide; use se perguntarem): representações estruturais da molécula (calculadas com biblioteca de química) enxergariam subestruturas como o C(=O)NO; divisão por esqueleto molecular daria uma estimativa menos otimista; mais dados (outros alvos ou limiar de pChEMBL mais baixo), já que a curva de aprendizado ainda sobe; e poda ou conjunto de árvores para probabilidades calibradas.
 - Reprodutibilidade: seeds de 0 a 9, notebooks 01 a 03, hash SHA-256 de cada arquivo no DATASET.md; dados derivados do ChEMBL sob a licença CC BY-SA 3.0.
 
 **Perguntas prováveis**
