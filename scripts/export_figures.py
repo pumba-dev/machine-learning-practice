@@ -45,7 +45,7 @@ SIZES = {
     "model_comparison": (FULL, 2.5),
     "depth_curve": (HALF, 2.1),
     "pruning_curve": (HALF, 2.1),
-    "decision_tree": (FULL, 2.9),
+    "decision_tree": (FULL, 3.0),
     "feature_importances": (FULL, 2.6),
     "confusion_matrix": (HALF, 2.2),
     "learning_curve": (HALF, 2.2),
@@ -132,8 +132,15 @@ def tidy_pruning(fig):
     fig.axes[0].set_xlabel("α da poda (primeiro ponto: sem poda)")
 
 
+def translate_tree_edges(fig):
+    """plot_tree escreve "True  " e "  False" nas arestas da raiz; os espaços afastam o texto da seta."""
+    for text in fig.axes[0].texts:
+        text.set_text(text.get_text().replace("True", "sim").replace("False", "não"))
+
+
 #: Ajustes por figura depois do redimensionamento.
 POST = {
+    "decision_tree": translate_tree_edges,
     "feature_boxplots": rename_boxplot_titles,
     "correlation_heatmap": shorten_heatmap_labels,
     "feature_importances": rename_importances,
@@ -210,8 +217,10 @@ def main():
     draw("model_comparison", comparacao, baseline=0.293)
     draw("depth_curve", modeling.depth_curve(dados))
     draw("pruning_curve", modeling.pruning_curve(dados))
-    # Só a raiz e os dois filhos: com 3 camadas os nós (texto de 36 caracteres) se sobrepõem em 15 cm.
-    draw("decision_tree", arvore, dados, max_depth=1)
+    # Três camadas cabem em 15 cm só sem os rótulos "samples =", "value =", "class =" e com fonte menor;
+    # a legenda do LaTeX explica as quatro linhas de cada nó.
+    draw("decision_tree", arvore, feature_names=[NOMES.get(c, c) for c in dados.X.columns],
+         max_depth=2, fontsize=7, label="none")
     draw("feature_importances", modeling.importances(arvore, dados))
     _, matriz = modeling.evaluation(arvore, dados)
     draw("confusion_matrix", matriz)

@@ -32,9 +32,16 @@ A busca em grade escolheu a entropia como critério e nenhum limite de profundid
 
 \subsection{O que a árvore aprendeu}
 
-A árvore escolhida tem 1.854 folhas e 24 níveis, grande demais para ser desenhada. As primeiras camadas, porém, são legíveis. A raiz divide por TPSA (limiar de 67,9) e o ramo de TPSA baixa tem 69\% de DRD2, como a análise exploratória antecipava. Em seguida vêm o número de átomos aromáticos, um atributo do SMILES, e depois HBD, número de anéis, comprimento do SMILES e número de halogênios. Descritores e contagens se misturam já no topo. A Figura~\ref{fig:import} confirma o quadro: TPSA e o número de átomos aromáticos lideram nas duas medidas de importância, seguidos por HBD e por um bloco de contagens (átomos de N, halogênios, estereoquímica, anéis) acima de LogP e HBA. A importância por permutação, medida no teste, dá mais peso às contagens do que a de impureza.
+A árvore escolhida tem 1.854 folhas e 24 níveis, grande demais para ser desenhada. As primeiras camadas, porém, são legíveis (Figura~\ref{fig:arvore}). A raiz divide por TPSA (limiar de 67,9) e o ramo de TPSA baixa tem 69\% de DRD2, como a análise exploratória antecipava. Em seguida vêm o número de átomos aromáticos, um atributo do SMILES, e depois HBD, número de anéis, comprimento do SMILES e número de halogênios. Descritores e contagens se misturam já no topo. A Figura~\ref{fig:import} confirma o quadro: TPSA e o número de átomos aromáticos lideram nas duas medidas de importância, seguidos por HBD e por um bloco de contagens (átomos de N, halogênios, estereoquímica, anéis) acima de LogP e HBA. A importância por permutação, medida no teste, dá mais peso às contagens do que a de impureza.
 
-\begin{figure}[ht]
+\begin{figure}[!ht]
+\centering
+\includegraphics[width=\textwidth]{figures/decision_tree.pdf}
+\caption{Três primeiras camadas da árvore escolhida (seed 42, divisão agrupada, 17 atributos). Cada nó mostra a regra de divisão, a fração das moléculas de treino que chega a ele, a proporção de cada classe (na ordem BACE1, DRD2, EGFR e HDAC1) e a classe majoritária, que também define a cor. A aresta ``sim'' leva às moléculas que satisfazem a regra; os nós cinza marcam subárvores omitidas.}
+\label{fig:arvore}
+\end{figure}
+
+\begin{figure}[!ht]
 \centering
 \includegraphics[width=\textwidth]{figures/feature_importances.pdf}
 \caption{Importância dos atributos da árvore escolhida (seed 42). À esquerda, a redução de impureza acumulada nos nós que usam o atributo, durante o treino. À direita, a queda de acurácia no teste quando os valores do atributo são embaralhados (permutação).}
@@ -47,7 +54,7 @@ Entre as classes, BACE1 e DRD2 são as mais fáceis (F1 de \fscoreBACEone\% e \f
 
 A árvore também não sabe quando erra. Sem poda, toda folha é pura, então a probabilidade de classe estimada pela árvore é 100\% nas 5.496 previsões de teste, embora 10,3\% estejam erradas. A curva de aprendizado (Figura~\ref{fig:erros}b) mostra a outra limitação: o treino fica em 100\% e a validação sobe de 61,5\% (879 linhas) para 87,0\% (17.584) sem se achatar, de modo que mais moléculas provavelmente renderiam mais acurácia.
 
-\begin{figure}[ht]
+\begin{figure}[!ht]
 \centering
 \includegraphics[width=.44\textwidth]{figures/confusion_matrix.pdf}\hfill
 \includegraphics[width=.52\textwidth]{figures/learning_curve.pdf}

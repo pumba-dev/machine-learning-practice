@@ -214,12 +214,12 @@ def pruning_curve(curva):
     plt.show()
 
 
-def decision_tree(model, dados=None, feature_names=None, max_depth=2):
+def decision_tree(model, dados=None, feature_names=None, max_depth=2, fontsize=9, label="all"):
     """Desenha só as primeiras camadas da árvore: completa, ela é ilegível."""
     names = feature_names if feature_names is not None else list(dados.X.columns)
     fig, ax = plt.subplots(figsize=(16, 7))
     plot_tree(model, max_depth=max_depth, feature_names=names, class_names=sorted(CLASSES),
-              filled=True, proportion=True, rounded=True, impurity=False, fontsize=9, ax=ax)
+              filled=True, proportion=True, rounded=True, impurity=False, fontsize=fontsize, label=label, ax=ax)
     ax.set_title(f"Primeiras {max_depth} camadas da árvore escolhida", loc="left")
     fig.tight_layout()
     plt.show()
