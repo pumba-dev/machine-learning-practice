@@ -34,7 +34,10 @@ notebooks/
   05_random_forest.ipynb          etapa 5: Random Forest
   06_gradient_boosting.ipynb      etapa 6: gradient boosting por histogramas
   07_comparacao.ipynb             etapa 7: todos os modelos com 10 seeds e experimento-ponte
-scripts/        multiseed.py repete o ajuste de todos os modelos com 10 seeds
+report/         relatório (LaTeX, formato SBC), figuras e tabelas geradas
+scripts/        multiseed.py, tabelas e figuras do relatório, montagem dos slides
+slides/         apresentacao.pptx (primeira parte, árvore de decisão) e
+                apresentacao_random_tree.pptx (segunda parte, comparação de modelos), com roteiros em .md
 src/            código usado pelos notebooks, um módulo por etapa
 ```
 
@@ -64,6 +67,16 @@ python -m venv .venv
 ```
 
 Rode os notebooks na ordem (01 a 07). O 07 lê `report/results/multiseed.csv`; para gerar de novo, rode `python scripts/multiseed.py` (cerca de 1 hora com 10 seeds). Os dados já estão no repositório, então nada precisa ser baixado. Para baixar tudo de novo do ChEMBL, mude `REFRESH = True` na primeira célula do notebook 01.
+
+Relatório e slides, a partir da raiz (os slides precisam de `python-pptx`; o PDF, do PowerPoint):
+
+```bash
+python scripts/results_tables.py      # tabelas e números do relatório (report/results/)
+python scripts/export_figures.py      # figuras do relatório (report/figures/)
+python scripts/slides_data.py && python scripts/build_slides.py          # primeira apresentação
+python scripts/slides_rt_data.py && python scripts/build_slides_rt.py    # segunda apresentação
+powershell -File scripts/export_slides_pdf.ps1 slides/apresentacao_random_tree.pptx
+```
 
 ## Etapas
 
