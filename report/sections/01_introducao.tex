@@ -2,11 +2,12 @@
 
 Na descoberta de fármacos, saber a qual proteína uma molécula está associada ajuda a priorizar experimentos. Bancos abertos como o ChEMBL~\cite{gaulton:12,zdrazil:24} reúnem milhões de medições de potência de moléculas contra proteínas, e com eles é possível treinar modelos que sugerem o alvo de uma molécula~\cite{keiser:07}.
 
-Este trabalho trata uma versão controlada do problema: dada uma molécula associada a exatamente uma de quatro proteínas (EGFR, BACE1, DRD2 e HDAC1), prever qual é. A molécula é descrita por números calculados a partir dela: cinco descritores físico-químicos e contagens extraídas do SMILES, um texto que descreve a estrutura da molécula. O modelo é uma árvore de decisão~\cite{breiman:84}, escolhida porque suas regras podem ser lidas e discutidas.
+Este trabalho trata uma versão controlada do problema: dada uma molécula associada a exatamente uma de quatro proteínas (EGFR, BACE1, DRD2 e HDAC1), prever qual é. A molécula é descrita por números calculados a partir dela: cinco descritores físico-químicos e contagens extraídas do SMILES, um texto que descreve a estrutura da molécula. O modelo principal é uma árvore de decisão~\cite{breiman:84}, escolhida porque suas regras podem ser lidas e discutidas. Depois, ela é comparada com a Random Tree, uma árvore que sorteia os atributos de cada nó, e com conjuntos de árvores.
 
 Três pontos tornam o problema menos trivial do que parece. Primeiro, o conjunto do Kaggle que inspirou o trabalho está incompleto e foi preciso reconstruí-lo do ChEMBL. Segundo, cinco descritores globais separam mal as classes. Terceiro, muitas moléculas compartilham exatamente os mesmos descritores: se uma cai no treino e outra no teste, o modelo é premiado por memorizar. Por isso comparamos a divisão aleatória, que sorteia as moléculas livremente, com a divisão agrupada, que mantém do mesmo lado as moléculas de descritores idênticos (Seção~\ref{sec:splits}). As contribuições são:
 \begin{itemize}
   \item uma base reconstruída do ChEMBL\_37, com 27.714 moléculas de quatro alvos e curadoria documentada passo a passo;
   \item 12 atributos obtidos apenas contando caracteres do SMILES, que, somados aos descritores, elevam a acurácia da árvore em \ganhoAmbos\% (ganho relativo);
-  \item uma avaliação com divisão agrupada e 10 seeds, que mede o quanto a divisão aleatória superestima o resultado (de \gapMin\% a \gapMax\%, em termos relativos) e situa a árvore entre um piso e um teto dados por modelos de referência.
+  \item uma avaliação com divisão agrupada e 10 seeds, que mede o quanto a divisão aleatória superestima o resultado (de \gapMin\% a \gapMax\%, em termos relativos);
+  \item uma comparação da árvore com a Random Tree do Weka, a Random Forest e o \emph{gradient boosting}, que mostra por que o sorteio de atributos, que piora uma árvore sozinha, é a peça da Random Forest.
 \end{itemize}

@@ -38,7 +38,10 @@
   structure. With a grouped split, the SMILES counts raise accuracy from \accGrupDescEn\% to
   \accGrupAmbosEn\% (a \ganhoAmbosEn\% relative gain; mean of 10 seeds). A random split overestimates
   accuracy by up to \gapMaxEn\%, because a quarter of the test molecules have a twin with identical
-  descriptors in the training set; the grouped split keeps such twins on the same side.
+  descriptors in the training set; the grouped split keeps such twins on the same side. Weka's Random
+  Tree, which samples the features tried at each node, falls \relRTEn\% below the decision tree, while
+  tree ensembles gain \relHGBEn\% to \relGBajEn\%: feature sampling hurts a single tree but, across
+  300 trees, it is what makes the Random Forest work.
 \end{abstract}
 
 \begin{resumo}
@@ -49,7 +52,10 @@
   da molécula. Com divisão agrupada, as contagens elevam a acurácia de \accGrupDesc\% para
   \accGrupAmbos\% (ganho relativo de \ganhoAmbos\%; média de 10 seeds). A divisão aleatória
   superestima o resultado em até \gapMax\%, pois um quarto das moléculas de teste tem uma gêmea de
-  descritores idênticos no treino; a divisão agrupada mantém essas gêmeas do mesmo lado.
+  descritores idênticos no treino; a divisão agrupada mantém essas gêmeas do mesmo lado. A Random Tree
+  do Weka, que sorteia os atributos de cada nó, fica \relRT\% abaixo da árvore, enquanto conjuntos de
+  árvores ganham de \relHGB\% a \relGBaj\%: o sorteio de atributos piora uma árvore sozinha, mas,
+  somado em 300 árvores, é o que faz a Random Forest funcionar.
 \end{resumo}
 
 \input{sections/01_introducao}

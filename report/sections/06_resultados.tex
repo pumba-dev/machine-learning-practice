@@ -62,14 +62,51 @@ A árvore também não sabe quando erra. Sem poda, toda folha é pura, então a 
 \label{fig:erros}
 \end{figure}
 
-\subsection{Comparação com modelos de referência}
+\subsection{Random Tree}\label{sec:rt}
 
-A Tabela~\ref{tab:referencia} situa a árvore entre um piso e um teto. Responder sempre EGFR, a classe majoritária, dá \accMaj\% de acurácia, que é a proporção de EGFR na base. A Random Forest~\cite{breiman:01} chega a \accRF~$\pm$~\sdRF\% e o \emph{gradient boosting} a \accHGB~$\pm$~\sdHGB\%, enquanto a árvore única acerta \accArvore~$\pm$~\sdArvore\%: a Random Forest supera a árvore em \ganhoRF\% (relativo). Esse ganho é o preço da interpretabilidade: a árvore responde por que uma molécula foi classificada como DRD2 com um caminho de perguntas sobre TPSA e contagens, enquanto os conjuntos não têm regras legíveis.
+Sozinha, a Random Tree perde para a árvore de decisão. Com os padrões do Weka, ela acerta \accRTweka~$\pm$~\sdRTweka\% no cenário principal, \relRTweka\% abaixo da árvore, e fica abaixo dela em todas as 10 seeds. Com a busca em grade, chega a \accRT~$\pm$~\sdRT\%, ainda \relRT\% abaixo, e fica abaixo da árvore em \cenariosRTabaixo{} dos 6 cenários (Tabela~\ref{tab:rt}). A maior perda, de \piorRT\%, ocorre com só os cinco descritores na divisão agrupada: com 5 atributos, sortear 3 em cada nó esconde quase metade das opções de corte. O único cenário sem perda, as contagens de SMILES na divisão aleatória, é um empate.
 
 \begin{table}[ht]
 \centering
-\caption{Árvore e modelos de referência na divisão agrupada, com os 17 atributos (média $\pm$ desvio em 10 seeds).}
-\label{tab:referencia}
+\caption{Random Tree ajustada contra a árvore de decisão nos seis cenários (média $\pm$ desvio em 10 seeds). Diferença: relativa, calculada em cada seed. Última coluna: em quantas das 10 seeds a Random Tree acertou mais que a árvore.}
+\label{tab:rt}
 \footnotesize
-\input{results/tab_referencia}
+\input{results/tab_rt}
 \end{table}
+
+A busca em grade puxa a Random Tree de volta na direção da árvore de decisão: em 5 dos 6 cenários ela escolhe sortear 75\% dos atributos, a maior fração do grid. A Figura~\ref{fig:rtk} mostra o mesmo efeito na seed 42. A acurácia de validação sobe de 78,7\% com $K = 1$ para 86,7\% com $K = 5$, o padrão do Weka, e depois fica num platô de 86,6\% a 88,1\%. Com $K = 17$ não há sorteio, e o modelo é a própria árvore de decisão. O sorteio também deixa o resultado instável: só trocando a semente, com os mesmos dados e a mesma divisão, a acurácia de teste da Random Tree ajustada vai de 87,8\% a 89,8\% em 50 sementes (desvio de 0,45 ponto), contra 88,7\% a 89,4\% da árvore com os mesmos hiperparâmetros (desvio de 0,17). A Random Tree aprende o mesmo que a árvore: TPSA e o número de átomos aromáticos lideram a importância, HDAC1 é a classe mais difícil e o par HDAC1 $\leftrightarrow$ EGFR concentra os erros.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\textwidth]{figures/max_features_curve.pdf}
+\caption{Random Tree: acurácia de treino e de validação agrupada por número $K$ de atributos sorteados em cada nó (seed 42, 17 atributos, demais hiperparâmetros escolhidos pela busca). $K = 17$ desliga o sorteio e equivale à árvore de decisão.}
+\label{fig:rtk}
+\end{figure}
+
+\subsection{Árvore única contra conjuntos de árvores}\label{sec:conjuntos-resultados}
+
+A Tabela~\ref{tab:modelos} reúne todos os modelos no cenário principal. Eles formam dois grupos, separados por uma distância muito maior que o desvio entre seeds: as árvores únicas, de \accRTweka\% a \accArvore\%, e a Random Forest e o \emph{gradient boosting}, de \accHGB\% a \accGBaj\%. Todos os conjuntos superam a árvore nas 10 seeds. O \emph{gradient boosting} ajustado é o mais preciso, com \accGBaj~$\pm$~\sdGBaj\%, \relGBaj\% acima da árvore.
+
+\begin{table}[ht]
+\centering
+\caption{Todos os modelos na divisão agrupada, com os 17 atributos (média $\pm$ desvio em 10 seeds). Diferença para a árvore: relativa, calculada em cada seed.}
+\label{tab:modelos}
+\footnotesize
+\input{results/tab_modelos}
+\end{table}
+
+O ajuste de hiperparâmetros pesa de forma diferente nos dois conjuntos. Na Random Forest, a floresta ajustada (\accRFaj\%) empata com a padrão (\accRF\%): as melhores combinações da busca ficam dentro de 0,4 ponto de validação, e só o mínimo de uma amostra por folha importa. No \emph{boosting}, o ajuste rende \pontosGBaj{} pontos sobre a árvore, contra \pontosHGB{} do padrão. Boa parte da diferença vem do que mudou junto com o grid: o padrão do scikit-learn usa 100 iterações e, com mais de 10 mil linhas, para cedo com base numa validação aleatória de 10\% do treino, que aqui contém gêmeas. Com 300 iterações e sem parada antecipada, a acurácia de treino chega a 100\% em 50 iterações e a de validação continua a subir até cerca de 200.
+
+A Figura~\ref{fig:ponte}a (seed 42) mostra o efeito do sorteio de atributos numa árvore só e num conjunto, com a mesma árvore base. A árvore de decisão sem poda acerta 88,5\%. Com sorteio ($K = \sqrt{17}$), a árvore única cai para 86,6\% ($-$1,9 ponto), e o desvio entre sementes fica cinco vezes maior (0,87 contra 0,16 ponto): uma árvore única quer o melhor corte de cada nó, e o sorteio às vezes o esconde. Já 300 dessas árvores, cada uma numa amostra \emph{bootstrap} do treino, formam a Random Forest, que acerta 95,2\%, 6,7 pontos acima da árvore de decisão. No conjunto, o sorteio é o que torna as árvores diferentes entre si: elas erram em moléculas diferentes, e a média cancela os erros. A Figura~\ref{fig:ponte}b mostra o ganho crescendo com o número de árvores: com uma ou duas, a floresta fica perto de 84\%, abaixo da árvore de decisão, porque cada árvore vê só uma amostra do treino e um sorteio dos atributos; com cinco, já passa de 91\%, e a partir de 50 árvores fica estável, perto de 94\%. É por isso que a Random Tree perde sozinha e, ainda assim, é a peça da Random Forest.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=.49\textwidth]{figures/tree_to_forest.pdf}\hfill
+\includegraphics[width=.49\textwidth]{figures/n_trees_curve.pdf}
+\caption{Da árvore à Random Forest (seed 42, divisão agrupada, 17 atributos). (a) Acurácia no teste da árvore de decisão sem poda, da Random Tree ($K = \sqrt{17}$) e da Random Forest de 300 dessas árvores; as árvores únicas mostram a média e o desvio de 10 sementes; o eixo começa em 80\%. (b) Acurácia de validação agrupada da Random Forest por número de árvores.}
+\label{fig:ponte}
+\end{figure}
+
+Os conjuntos melhoram todas as classes, e HDAC1 é a que mais ganha: o F1 sobe de \fscoreHDAConeArvore\% na árvore para \fscoreHDAConeGBaj\% no \emph{boosting} ajustado. A confusão de fundo, porém, continua: o par HDAC1 $\leftrightarrow$ EGFR soma cerca de 30\% dos erros em todos os modelos, que caem de 568 na árvore para 279 na Random Forest e 191 no \emph{boosting} (seed 42). Nenhum modelo enxerga a subestrutura que as contagens não representam.
+
+A confiança dos modelos também difere. A árvore e a Random Tree dizem 100\% em quase tudo. A Random Forest sabe quando está em dúvida: as previsões com confiança abaixo de 70\% são 19,8\% do teste, mas reúnem 91\% dos erros, e acima de 90\% de confiança ela não erra. O \emph{boosting} é confiante demais: 89,2\% das previsões saem com mais de 99,9\% de confiança, e essa faixa ainda guarda 20\% dos erros. Para separar as previsões que merecem revisão, a Random Forest é a mais útil, apesar de acertar \difGBRF{} ponto a menos que o \emph{boosting}. Em todos os casos, o ganho de acurácia custa a legibilidade: só a árvore de decisão responde, com um caminho de perguntas, por que uma molécula foi classificada como DRD2.

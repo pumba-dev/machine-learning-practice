@@ -1,4 +1,4 @@
-"""Exporta para report/figures/ as figuras dos notebooks 02 e 03, no tamanho final do relatório.
+"""Exporta para report/figures/ as figuras dos notebooks 02, 03, 04 e 07, no tamanho final do relatório.
 
 As funções de `src/plots.py` terminam em `plt.show()`; aqui `show` é trocado por um `savefig`, então
 os gráficos são exatamente os dos notebooks. O que muda para o papel: tamanho em polegadas (largura
@@ -13,6 +13,7 @@ Uso, a partir da raiz do projeto:
 Sobre a seed: usa a padrão (42), a mesma dos notebooks. A tabela com várias seeds sai de multiseed.py.
 """
 import argparse
+import re
 import sys
 from contextlib import contextmanager
 from pathlib import Path
@@ -27,7 +28,7 @@ from matplotlib.ticker import PercentFormatter  # noqa: E402
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from src import eda, modeling, plots  # noqa: E402
+from src import comparison, eda, modeling, plots, random_tree  # noqa: E402
 from src.config import FINAL_CSV  # noqa: E402
 
 OUT_DIR = ROOT / "report" / "figures"
@@ -50,6 +51,9 @@ SIZES = {
     "confusion_matrix": (HALF, 2.2),
     "learning_curve": (HALF, 2.2),
     "error_pairs": (HALF, 2.3),
+    "max_features_curve": (FULL, 2.3),
+    "tree_to_forest": (HALF, 2.4),
+    "n_trees_curve": (HALF, 2.4),
 }
 
 #: Figuras com vários painéis: o título de cada painel (feature, classe, medida) fica; nas demais
@@ -138,8 +142,44 @@ def translate_tree_edges(fig):
         text.set_text(text.get_text().replace("True", "sim").replace("False", "não"))
 
 
+def comma_values(fig):
+    """Valores anotados como 0.943 viram 94,3%, como no resto do relatório."""
+    for ax in fig.axes:
+        for text in ax.texts:
+            text.set_text(re.sub(r"\b0\.(\d{2})(\d)\b", lambda m: f"{int(m.group(1))},{m.group(2)}%", text.get_text()))
+
+
+def tidy_max_features(fig):
+    percent_axis(fig)
+    comma_values(fig)
+
+
+def tidy_n_trees(fig):
+    ax = fig.axes[0]
+    percent_axis(fig)
+    comma_values(fig)
+    ax.set_ylabel("acurácia de validação")
+    # 200 e 300 se sobrepõem na escala log em meia largura.
+    ticks = [n for n in ax.get_xticks() if n != 200]
+    ax.set_xticks(ticks, [str(int(n)) for n in ticks])
+    ax.minorticks_off()
+
+
+def tidy_tree_to_forest(fig):
+    ax = fig.axes[0]
+    for text in ax.texts:
+        text.set_text(text.get_text().replace(".", ","))
+        text.set_fontsize(7.5)
+    ax.set_xticks(ax.get_xticks(), ["Árvore de\ndecisão", "Random\nTree", "Random\nForest"])
+    ax.set_yticks([80, 85, 90, 95, 100])
+    ax.set_ylabel("acurácia no teste (%)")
+
+
 #: Ajustes por figura depois do redimensionamento.
 POST = {
+    "max_features_curve": tidy_max_features,
+    "tree_to_forest": tidy_tree_to_forest,
+    "n_trees_curve": tidy_n_trees,
     "decision_tree": translate_tree_edges,
     "feature_boxplots": rename_boxplot_titles,
     "correlation_heatmap": shorten_heatmap_labels,
@@ -226,6 +266,17 @@ def main():
     draw("confusion_matrix", matriz)
     draw("learning_curve", modeling.learning_curve_table(dados))
     draw("error_pairs", modeling.error_overview(arvore, dados))
+
+    # Notebooks 04 e 07: Random Tree e da árvore à Random Forest, seed 42. O experimento do notebook 07
+    # também tem o bagging; o relatório mostra só árvore, Random Tree e Random Forest.
+    _, random_tree_model = modeling.tune_chosen(dados, random_tree.estimator(dados.seed), random_tree.PARAM_GRID)
+    params = modeling.chosen_params(random_tree_model, random_tree.PARAM_GRID)
+    print("Random Tree, parâmetros escolhidos:", params, flush=True)
+    draw("max_features_curve", random_tree.max_features_curve(dados, params),
+         weka_k=random_tree.weka_k(len(dados.X.columns)))
+    draw("tree_to_forest", comparison.bridge(dados))
+    forest = comparison.bridge_curve(dados)[["Random Forest (com sorteio)"]]
+    draw("n_trees_curve", forest.set_axis(["validação"], axis=1))
 
 
 if __name__ == "__main__":

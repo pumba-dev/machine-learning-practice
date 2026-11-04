@@ -5,6 +5,7 @@ categórica). Chame `set_style()` uma vez antes de plotar.
 """
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 import seaborn as sns
 from matplotlib.colors import LinearSegmentedColormap
 from sklearn.tree import plot_tree
@@ -443,5 +444,33 @@ def models_summary(tabela, low=None):
     ax.set_xlabel(f"acurácia no teste (%), média das seeds; eixo a partir de {low}")
     ax.grid(axis="y", visible=False)
     ax.set_title("Todos os modelos no mesmo cenário", loc="left")
+    fig.tight_layout()
+    plt.show()
+
+
+def tree_to_forest(ponte):
+    """Árvore de decisão, Random Tree e Random Forest lado a lado: o sorteio de atributos numa árvore só e
+    em 300 árvores. `ponte` é a tabela de `comparison.bridge`; a célula sem sorteio com 300 árvores fica de fora.
+    As árvores únicas mostram a média e o desvio entre sementes."""
+    rows = [("sem sorteio", "1 árvore", "Árvore de decisão", CONTEXT_GRAY),
+            ("com sorteio", "1 árvore", "Random Tree", CONTEXT_GRAY),
+            ("com sorteio", ponte["árvores"].iloc[-1], "Random Forest", SERIES_COLOR)]
+    values, errors = [], []
+    for sorteio, arvores, _, _ in rows:
+        row = ponte[(ponte["sorteio de atributos"] == sorteio) & (ponte["árvores"] == arvores)].iloc[0]
+        values.append(row["acurácia teste"] * 100)
+        sd = row["desvio entre sementes"]
+        errors.append(0 if pd.isna(sd) else sd * 100)
+    fig, ax = plt.subplots(figsize=(7.5, 3.6))
+    positions = np.arange(len(rows))
+    ax.bar(positions, values, yerr=errors, width=0.6, color=[r[3] for r in rows],
+           error_kw={"ecolor": TEXT_PRIMARY, "elinewidth": 1, "capsize": 3})
+    for x, value, sd in zip(positions, values, errors):
+        ax.text(x, value + sd + 0.6, f"{value:.1f}%", ha="center", va="bottom", color=TEXT_PRIMARY, fontsize=9)
+    ax.set_xticks(positions, [r[2] for r in rows])
+    ax.set_ylim(80, 100)
+    ax.set_ylabel("acurácia no teste (%)\neixo a partir de 80")
+    ax.grid(axis="x", visible=False)
+    ax.set_title("Sorteio de atributos numa árvore e em 300", loc="left")
     fig.tight_layout()
     plt.show()
