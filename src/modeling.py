@@ -10,6 +10,9 @@ A ordem de uso é a do notebook:
 6. `leakage_gap`    quanto o split aleatório superestima
 7. `depth_curve` / `pruning_curve`  profundidade e poda
 8. `tree_rules` / `importances` / `evaluation` / `reference_models`
+
+As funções de ajuste (`tune_all`, `tune_chosen`, `_sweep`) recebem o estimador como parâmetro, com a
+árvore de decisão como padrão; os notebooks 04 a 07 reusam o mesmo protocolo com outros modelos.
 """
 from collections import namedtuple
 
@@ -146,44 +149,87 @@ def split_summary(dados):
     return pd.DataFrame(columns)
 
 
-def _search(split, seed, grid=PARAM_GRID):
-    """GridSearchCV cuja validação cruzada respeita o mesmo agrupamento do split externo."""
+def _cv(split, seed):
+    """Validação cruzada interna com a mesma disciplina do split externo."""
     # Usar StratifiedKFold dentro de um treino agrupado dá uma CV ~5 pontos otimista: o splitter
     # interno precisa seguir a mesma disciplina do externo.
-    cv = (StratifiedGroupKFold(CV_FOLDS, shuffle=True, random_state=seed) if split == "agrupada"
-          else StratifiedKFold(CV_FOLDS, shuffle=True, random_state=seed))
-    return GridSearchCV(DecisionTreeClassifier(random_state=seed), grid, scoring="accuracy", cv=cv, n_jobs=-1)
+    return (StratifiedGroupKFold(CV_FOLDS, shuffle=True, random_state=seed) if split == "agrupada"
+            else StratifiedKFold(CV_FOLDS, shuffle=True, random_state=seed))
 
 
-def tune_all(dados, grid=PARAM_GRID):
-    """Busca em grade nas 6 combinações; devolve a tabela comparativa e os modelos ajustados."""
+def _search(split, seed, grid=PARAM_GRID, estimator=None):
+    """GridSearchCV cuja validação cruzada respeita o mesmo agrupamento do split externo."""
+    estimator = estimator if estimator is not None else DecisionTreeClassifier(random_state=seed)
+    return GridSearchCV(estimator, grid, scoring="accuracy", cv=_cv(split, seed), n_jobs=-1)
+
+
+def _train_groups(dados, split):
+    """Ids de grupo das linhas de treino, ou None no split aleatório."""
+    return dados.grupos[dados.splits[split][0]] if split == "agrupada" else None
+
+
+def test_scores(model, dados, features=None, split=None):
+    """Acurácia e F1 macro no teste de um modelo já ajustado."""
+    _, X_te, _, y_te = _subset(dados, features, split)
+    predicted = model.predict(X_te)
+    return {"acurácia teste": round(accuracy_score(y_te, predicted), 3),
+            "F1 macro teste": round(f1_score(y_te, predicted, average="macro"), 3)}
+
+
+def tune_all(dados, grid=PARAM_GRID, estimator=None):
+    """Busca em grade nas 6 combinações; devolve a tabela comparativa e os modelos ajustados.
+
+    `estimator` precisa ser uma árvore (`DecisionTreeClassifier`), porque a tabela traz folhas e
+    profundidade; `ccp_alpha` só aparece quando faz parte do grid.
+    """
     rows, models = [], {}
     for features in FEATURE_SETS:
         for split in SPLITS:
-            X_tr, X_te, y_tr, y_te = _subset(dados, features, split)
-            groups = dados.grupos[dados.splits[split][0]] if split == "agrupada" else None
-            search = _search(split, dados.seed, grid).fit(X_tr, y_tr, groups=groups)
+            X_tr, _, y_tr, _ = _subset(dados, features, split)
+            search = _search(split, dados.seed, grid, estimator).fit(X_tr, y_tr, groups=_train_groups(dados, split))
             tree = search.best_estimator_
             models[(features, split)] = tree
-            rows.append({
-                "features": features,
-                "split": split,
-                "acurácia CV": round(search.best_score_, 3),
-                "acurácia teste": round(accuracy_score(y_te, tree.predict(X_te)), 3),
-                "F1 macro teste": round(f1_score(y_te, tree.predict(X_te), average="macro"), 3),
-                "folhas": tree.get_n_leaves(),
-                "profundidade": tree.get_depth(),
-                "ccp_alpha": search.best_params_["ccp_alpha"],
-            })
+            row = {"features": features, "split": split, "acurácia CV": round(search.best_score_, 3),
+                   **test_scores(tree, dados, features, split),
+                   "folhas": tree.get_n_leaves(), "profundidade": tree.get_depth()}
+            if "ccp_alpha" in grid:
+                row["ccp_alpha"] = search.best_params_["ccp_alpha"]
+            rows.append(row)
     return pd.DataFrame(rows), models
 
 
-def best_params_table(models):
+def best_params_table(models, grid=PARAM_GRID):
     """Hiperparâmetros escolhidos em cada combinação."""
     return pd.DataFrame(
-        [{"features": f, "split": s, **{k: v for k, v in m.get_params().items() if k in PARAM_GRID}}
+        [{"features": f, "split": s, **{k: v for k, v in m.get_params().items() if k in grid}}
          for (f, s), m in models.items()]
     )
+
+
+def tune_chosen(dados, estimator, grid):
+    """Busca em grade só no cenário escolhido (`CHOSEN`), com a mesma CV agrupada.
+
+    Devolve (tabela com todas as combinações, da melhor para a pior; modelo reajustado no treino todo).
+    """
+    X_tr, _, y_tr, _ = _subset(dados)
+    search = _search(CHOSEN[1], dados.seed, grid, estimator).fit(X_tr, y_tr, groups=_train_groups(dados, CHOSEN[1]))
+    results = pd.DataFrame(search.cv_results_)
+    table = pd.DataFrame(results["params"].tolist())
+    table["acurácia CV"] = results["mean_test_score"].round(3)
+    table["desvio CV"] = results["std_test_score"].round(3)
+    table["segundos por ajuste"] = results["mean_fit_time"].round(1)
+    return table.sort_values("acurácia CV", ascending=False).reset_index(drop=True), search.best_estimator_
+
+
+def validation_fold(dados):
+    """Um fold de validação agrupado tirado do treino do cenário escolhido: o teste fica intocado.
+
+    Usado pelas curvas que precisam de um único modelo ajustado (árvores acumuladas da floresta,
+    iterações do boosting) em vez de uma validação cruzada inteira.
+    """
+    X_tr, _, y_tr, _ = _subset(dados)
+    fit, val = next(iter(_cv(CHOSEN[1], dados.seed).split(X_tr, y_tr, _train_groups(dados, CHOSEN[1]))))
+    return X_tr.iloc[fit], X_tr.iloc[val], y_tr.iloc[fit], y_tr.iloc[val]
 
 
 def leakage_gap(comparacao):
@@ -193,12 +239,13 @@ def leakage_gap(comparacao):
     return wide.reindex(FEATURE_SETS)
 
 
-def _sweep(dados, param, values, features, split):
+def _sweep(dados, param, values, features, split, estimator=None):
     """Varre um hiperparâmetro em uma única chamada paralela; um laço com cross_val_score por
     valor gastaria mais tempo criando processos no Windows do que ajustando árvores."""
     X_tr, _, y_tr, _ = _subset(dados, features, split)
+    estimator = estimator if estimator is not None else DecisionTreeClassifier(random_state=dados.seed)
     train, test = validation_curve(
-        DecisionTreeClassifier(random_state=dados.seed), X_tr, y_tr,
+        estimator, X_tr, y_tr,
         param_name=param, param_range=values,
         groups=dados.grupos[dados.splits[split or CHOSEN[1]][0]],
         cv=StratifiedGroupKFold(CV_FOLDS, shuffle=True, random_state=dados.seed),
@@ -229,11 +276,14 @@ def tree_rules(model, dados, features=None, max_depth=2):
 
 
 def importances(model, dados, features=None, split=None, n_repeats=10):
-    """Importância por impureza e por permutação (média e desvio), medidas no conjunto de teste."""
+    """Importância por impureza e por permutação (média e desvio), medidas no conjunto de teste.
+
+    Modelos sem importância por impureza (o gradient boosting por histogramas) ficam com NaN nessa coluna.
+    """
     _, X_te, _, y_te = _subset(dados, features, split)
     perm = permutation_importance(model, X_te, y_te, n_repeats=n_repeats, random_state=dados.seed, n_jobs=-1)
     return pd.DataFrame({
-        "impureza": model.feature_importances_,
+        "impureza": getattr(model, "feature_importances_", np.full(X_te.shape[1], np.nan)),
         "permutação": perm.importances_mean,
         "desvio": perm.importances_std,
     }, index=list(X_te.columns)).sort_values("permutação")
@@ -300,12 +350,12 @@ def error_profile(model, dados, features=None, split=None):
     return table.sort_values("diferença em IQR", key=abs, ascending=False)
 
 
-def confidence_table(model, dados, features=None, split=None):
-    """Acurácia por faixa de confiança: a árvore sabe quando está em dúvida?"""
+def confidence_table(model, dados, features=None, split=None, top_label="100% (folha pura)"):
+    """Acurácia por faixa de confiança: o modelo sabe quando está em dúvida?"""
     X_te, y_te, predicted, wrong = _errors(model, dados, features, split)
     confidence = model.predict_proba(X_te).max(axis=1)
     bins = pd.cut(confidence, [0, 0.5, 0.7, 0.9, 0.999, 1.0],
-                  labels=["até 50%", "50-70%", "70-90%", "90-100%", "100% (folha pura)"])
+                  labels=["até 50%", "50-70%", "70-90%", "90-100%", top_label])
     grouped = pd.DataFrame({"faixa": bins, "acerto": (~wrong).to_numpy()}).groupby("faixa", observed=False)["acerto"]
     table = pd.DataFrame({
         "previsões": grouped.size(),
@@ -322,16 +372,27 @@ def error_examples(model, dados, real, prevista, n=6, features=None, split=None)
     return dados.base.loc[picked, ["ChEMBL ID", "SMILES", *FEATURES]]
 
 
-def reference_models(dados, features=None, split=None):
+def reference_candidates(seed):
+    """Piso e teto sem ajuste de hiperparâmetros. Os ajustados ficam nos notebooks 05 e 06."""
+    return {
+        "Dummy (classe majoritária)": DummyClassifier(strategy="most_frequent"),
+        "Random Forest (300 árvores)": RandomForestClassifier(n_estimators=300, random_state=seed, n_jobs=-1),
+        "HistGradientBoosting": HistGradientBoostingClassifier(random_state=seed),
+    }
+
+
+def chosen_params(model, grid):
+    """Os hiperparâmetros de `grid` com o valor escolhido no modelo ajustado."""
+    return {k: v for k, v in model.get_params().items() if k in grid}
+
+
+def reference_models(dados, features=None, split=None, only=None):
     """Piso (`DummyClassifier`) e teto (Random Forest, HistGradientBoosting) no mesmo split da árvore."""
     X_tr, X_te, y_tr, y_te = _subset(dados, features, split)
-    candidates = {
-        "Dummy (classe majoritária)": DummyClassifier(strategy="most_frequent"),
-        "Random Forest (300 árvores)": RandomForestClassifier(n_estimators=300, random_state=dados.seed, n_jobs=-1),
-        "HistGradientBoosting": HistGradientBoostingClassifier(random_state=dados.seed),
-    }
     rows = []
-    for name, model in candidates.items():
+    for name, model in reference_candidates(dados.seed).items():
+        if only is not None and name not in only:
+            continue
         predicted = model.fit(X_tr, y_tr).predict(X_te)
         rows.append({
             "modelo": name,

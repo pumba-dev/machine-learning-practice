@@ -226,13 +226,20 @@ def decision_tree(model, dados=None, feature_names=None, max_depth=2, fontsize=9
 
 
 def feature_importances(tabela):
-    """Importância por impureza e por permutação, na mesma ordem de features."""
-    fig, axes = plt.subplots(1, 2, figsize=(13, 4.6), sharey=True)
-    axes[0].barh(tabela.index, tabela["impureza"], color=SERIES_COLOR, height=0.7)
-    axes[0].set_title("Por impureza (durante o treino)", loc="left")
-    axes[1].barh(tabela.index, tabela["permutação"], xerr=tabela["desvio"], color=SERIES_COLOR, height=0.7,
-                 error_kw={"ecolor": TEXT_SECONDARY, "elinewidth": 1})
-    axes[1].set_title("Por permutação (no teste)", loc="left")
+    """Importância por impureza e por permutação, na mesma ordem de features.
+
+    Sem importância por impureza (coluna toda NaN, caso do gradient boosting), só o painel da permutação.
+    """
+    if tabela["impureza"].isna().all():
+        fig, ax = plt.subplots(figsize=(7, 4.6))
+        axes = [ax]
+    else:
+        fig, axes = plt.subplots(1, 2, figsize=(13, 4.6), sharey=True)
+        axes[0].barh(tabela.index, tabela["impureza"], color=SERIES_COLOR, height=0.7)
+        axes[0].set_title("Por impureza (durante o treino)", loc="left")
+    axes[-1].barh(tabela.index, tabela["permutação"], xerr=tabela["desvio"], color=SERIES_COLOR, height=0.7,
+                  error_kw={"ecolor": TEXT_SECONDARY, "elinewidth": 1})
+    axes[-1].set_title("Por permutação (no teste)", loc="left")
     for ax in axes:
         ax.grid(axis="y", visible=False)
         ax.set_xlabel("queda de desempenho atribuída à feature")
@@ -257,7 +264,7 @@ def learning_curve(curva):
     plt.show()
 
 
-def error_pairs(tabela, top=8):
+def error_pairs(tabela, top=8, title="Onde a árvore erra"):
     """Barras dos pares de confusão mais frequentes, coloridas pela classe real."""
     data = tabela.head(top).iloc[::-1]
     labels = data["real"] + " lido como " + data["prevista"]
@@ -268,7 +275,7 @@ def error_pairs(tabela, top=8):
     ax.set_xlim(0, data["erros"].max() * 1.25)
     ax.set_xlabel("erros no conjunto de teste")
     ax.grid(axis="y", visible=False)
-    ax.set_title("Onde a árvore erra", loc="left")
+    ax.set_title(title, loc="left")
     fig.tight_layout()
     plt.show()
 
@@ -281,5 +288,160 @@ def confusion_matrix(matriz):
     sns.heatmap(share, cmap=SEQUENTIAL, vmin=0, vmax=1, annot=labels, fmt="", square=True,
                 linewidths=2, linecolor=SURFACE, cbar_kws={"shrink": 0.8, "label": "proporção da classe real"}, ax=ax)
     ax.set_title("Matriz de confusão no conjunto de teste", loc="left")
+    fig.tight_layout()
+    plt.show()
+
+
+# --- Notebooks 04 a 07: Random Tree, conjuntos de árvores e comparação ---------------------------
+
+TRAIN_COLOR = "#eb6834"
+
+
+def _train_val(ax, curva, x=None):
+    """Linhas de treino (se houver) e validação, com a diferença sombreada."""
+    x = curva.index if x is None else x
+    if "treino" in curva:
+        ax.fill_between(x, curva["validação"], curva["treino"], color=CONTEXT_GRAY, alpha=0.6,
+                        label="diferença (overfitting)")
+        ax.plot(x, curva["treino"], color=TRAIN_COLOR, linewidth=2, marker="o", markersize=4, label="treino")
+    ax.plot(x, curva["validação"], color=SERIES_COLOR, linewidth=2, marker="o", markersize=4, label="validação")
+
+
+def max_features_curve(curva, weka_k=None):
+    """Acurácia de treino e de validação por K, com o K do Weka e o K = todos (árvore de decisão) marcados."""
+    fig, ax = plt.subplots(figsize=(7.5, 3.8))
+    _train_val(ax, curva)
+    best = curva["validação"].idxmax()
+    # Rótulos na horizontal, na faixa vazia abaixo da validação: o do Weka à direita da linha, o da
+    # árvore de decisão à esquerda da última linha.
+    marks = [(curva.index.max(), "sem sorteio = árvore de decisão ", "right")]
+    if weka_k is not None:
+        marks.append((weka_k, f" padrão do Weka (K = {weka_k})", "left"))
+    for k, text, align in marks:
+        ax.axvline(k, color=TEXT_SECONDARY, linewidth=1, linestyle=":")
+        ax.text(k, 0.715, text, color=TEXT_SECONDARY, fontsize=8, va="bottom", ha=align)
+    ax.annotate(f"melhor validação: K = {best} ({curva.loc[best, 'validação']:.3f})",
+                (best, curva.loc[best, "validação"]), xytext=(0, -24), textcoords="offset points",
+                ha="center", color=TEXT_SECONDARY, fontsize=8, arrowprops={"arrowstyle": "-", "color": TEXT_SECONDARY})
+    ax.set_xticks(curva.index)
+    ax.set_xlabel(curva.index.name)
+    ax.set_ylabel("acurácia")
+    ax.set_ylim(0.7, 1.02)
+    ax.legend(frameon=False, loc="lower right", bbox_to_anchor=(1.0, 1.0), ncol=3)
+    ax.set_title("Quantos atributos sortear em cada nó", loc="left", pad=22)
+    fig.tight_layout()
+    plt.show()
+
+
+def seed_variance(variancia):
+    """Acurácia de teste por semente: uma linha de pontos por modelo, com a média marcada."""
+    models = list(dict.fromkeys(variancia["modelo"]))
+    colors = {models[0]: SERIES_COLOR, **{m: TEXT_SECONDARY for m in models[1:]}}
+    rng = np.random.default_rng(0)
+    fig, ax = plt.subplots(figsize=(7.5, 2.9))
+    for y, model in enumerate(models):
+        values = variancia.loc[variancia["modelo"] == model, "acurácia teste"]
+        ax.scatter(values, y + rng.uniform(-0.12, 0.12, len(values)), s=36, color=colors[model],
+                   edgecolor=SURFACE, linewidth=1, alpha=0.85)
+        ax.plot([values.mean()] * 2, [y - 0.25, y + 0.25], color=TEXT_PRIMARY, linewidth=2)
+        ax.text(values.mean(), y + 0.3, f"média {values.mean():.3f}  (de {values.min():.3f} a {values.max():.3f})",
+                ha="center", color=TEXT_SECONDARY, fontsize=8)
+    ax.set_yticks(range(len(models)), models)
+    ax.set_ylim(-0.6, len(models) - 0.15)
+    ax.set_xlabel("acurácia no teste (mesmo split, só a semente muda)")
+    ax.grid(axis="y", visible=False)
+    ax.set_title(f"A mesma configuração com {variancia['semente'].nunique()} sementes", loc="left")
+    fig.tight_layout()
+    plt.show()
+
+
+def n_trees_curve(curva):
+    """Acurácia de validação por número de árvores da floresta, em escala log."""
+    fig, ax = plt.subplots(figsize=(7.5, 3.4))
+    ax.set_xscale("log")
+    _train_val(ax, curva)
+    last = curva.index[-1]
+    ax.text(last, curva.loc[last, "validação"] - 0.012, f"{curva.loc[last, 'validação']:.3f}",
+            ha="center", va="top", color=TEXT_SECONDARY, fontsize=9)
+    ax.set_xticks(curva.index, [str(n) for n in curva.index])
+    ax.minorticks_off()
+    ax.set_xlabel("árvores na floresta")
+    ax.set_ylabel("acurácia de validação")
+    ax.set_title("Acurácia por número de árvores", loc="left")
+    fig.tight_layout()
+    plt.show()
+
+
+def iterations_curve(curva):
+    """Acurácia de treino e de validação por iteração do boosting."""
+    fig, ax = plt.subplots(figsize=(7.5, 3.6))
+    _train_val(ax, curva)
+    ax.set_xlabel("iterações (árvores somadas)")
+    ax.set_ylabel("acurácia")
+    ax.set_ylim(0.75, 1.02)
+    ax.legend(frameon=False, loc="lower right")
+    ax.set_title("Acurácia por iteração do boosting", loc="left")
+    fig.tight_layout()
+    plt.show()
+
+
+def bridge(matriz):
+    """Desenho 2×2: barras por sorteio de atributos, 1 árvore em cinza e o conjunto em azul."""
+    rows = ["sem sorteio", "com sorteio"]
+    cols = list(matriz.columns)  # "1 árvore", "300 árvores"
+    positions = np.arange(len(rows))
+    labels = {"sem sorteio": "sem sorteio de atributos", "com sorteio": "com sorteio de atributos"}
+    names = {("sem sorteio", cols[0]): "Árvore de decisão", ("com sorteio", cols[0]): "Random Tree",
+             ("sem sorteio", cols[1]): "Bagging", ("com sorteio", cols[1]): "Random Forest"}
+    fig, ax = plt.subplots(figsize=(7.5, 3.8))
+    for offset, (col, color) in zip([-0.19, 0.19], [(cols[0], CONTEXT_GRAY), (cols[1], SERIES_COLOR)]):
+        values = matriz.loc[rows, col]
+        ax.bar(positions + offset, values, width=0.36, color=color, label=col)
+        for x, row, value in zip(positions + offset, rows, values):
+            ax.text(x, value + 0.4, f"{value:.1f}%", ha="center", color=TEXT_PRIMARY, fontsize=9)
+            ax.text(x, 80.5, names[(row, col)], ha="center", va="bottom", rotation=90,
+                    color=TEXT_PRIMARY if color == CONTEXT_GRAY else SURFACE, fontsize=8)
+    ax.set_xticks(positions, [labels[r] for r in rows])
+    ax.set_ylim(80, 100)
+    ax.set_ylabel("acurácia no teste (%)\neixo a partir de 80")
+    ax.grid(axis="x", visible=False)
+    ax.legend(frameon=False, loc="lower right", bbox_to_anchor=(1.0, 1.0), ncol=2)
+    ax.set_title("De onde vem o ganho da Random Forest", loc="left", pad=22)
+    fig.tight_layout()
+    plt.show()
+
+
+def bridge_curve(curva):
+    """Acurácia de validação por número de árvores, bagging contra Random Forest, com rótulo no fim da linha."""
+    fig, ax = plt.subplots(figsize=(7.5, 3.6))
+    ax.set_xscale("log")
+    for column, color in zip(curva.columns, [TEXT_SECONDARY, SERIES_COLOR]):
+        ax.plot(curva.index, curva[column], color=color, linewidth=2, marker="o", markersize=4, label=column)
+        ax.text(curva.index[-1] * 1.15, curva[column].iloc[-1], f"{curva[column].iloc[-1]:.3f}",
+                va="center", color=TEXT_PRIMARY, fontsize=8)
+    ax.set_xticks(curva.index, [str(n) for n in curva.index])
+    ax.minorticks_off()
+    ax.set_xlim(curva.index[0] * 0.8, curva.index[-1] * 2)
+    ax.set_xlabel("árvores")
+    ax.set_ylabel("acurácia de validação")
+    ax.legend(frameon=False, loc="lower right")
+    ax.set_title("Bagging e Random Forest por número de árvores", loc="left")
+    fig.tight_layout()
+    plt.show()
+
+
+def models_summary(tabela, low=None):
+    """Barras horizontais com a acurácia média de cada modelo e o desvio entre seeds."""
+    data = tabela.iloc[::-1]
+    fig, ax = plt.subplots(figsize=(8, 0.42 * len(data) + 1.2))
+    ax.barh(data.index, data["acurácia (%)"], xerr=data["desvio (pontos)"], color=SERIES_COLOR, height=0.65,
+            error_kw={"ecolor": TEXT_PRIMARY, "elinewidth": 1, "capsize": 2})
+    for y, (value, sd) in enumerate(zip(data["acurácia (%)"], data["desvio (pontos)"])):
+        ax.text(value + sd + 0.2, y, f"{value:.1f} ± {sd:.1f}", va="center", color=TEXT_SECONDARY, fontsize=8)
+    low = 80 if low is None else low
+    ax.set_xlim(low, 100)
+    ax.set_xlabel(f"acurácia no teste (%), média das seeds; eixo a partir de {low}")
+    ax.grid(axis="y", visible=False)
+    ax.set_title("Todos os modelos no mesmo cenário", loc="left")
     fig.tight_layout()
     plt.show()
