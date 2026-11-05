@@ -81,10 +81,16 @@ def class_counts(final):
     plt.show()
 
 
-def feature_boxplots(final):
-    """Um boxplot por feature, com as classes lado a lado (outliers ocultos)."""
-    fig, axes = plt.subplots(1, len(FEATURES), figsize=(16, 3.8))
-    for ax, feature in zip(axes, FEATURES):
+def feature_boxplots(final, features=None, ncols=6):
+    """Um boxplot por feature, com as classes lado a lado (outliers ocultos). Quebra em linhas de `ncols`."""
+    features = features or FEATURES
+    ncols = min(ncols, len(features))
+    nrows = -(-len(features) // ncols)
+    fig, axes = plt.subplots(nrows, ncols, figsize=(16, 3.8 * nrows))
+    axes = np.atleast_1d(axes).ravel()
+    for ax in axes[len(features):]:
+        ax.set_visible(False)
+    for ax, feature in zip(axes, features):
         sns.boxplot(
             data=final, x="Protein", y=feature, order=CLASSES, hue="Protein", hue_order=CLASSES,
             palette=CLASS_COLORS, showfliers=False, width=0.6, linewidth=1, legend=False, ax=ax,
@@ -99,7 +105,7 @@ def feature_boxplots(final):
 
 def single_feature_accuracy(accuracy, baseline):
     """Barras com a acurácia de cada feature sozinha e a linha de referência da classe majoritária."""
-    fig, ax = plt.subplots(figsize=(7, 3.1))
+    fig, ax = plt.subplots(figsize=(7, 0.4 * len(accuracy) + 1.1))
     ax.barh(accuracy.index, accuracy.tolist(), color=SERIES_COLOR, height=0.6)
     for y, value in enumerate(accuracy.tolist()):
         ax.text(value + 0.005, y, f"{value:.1%}", va="center", color=TEXT_SECONDARY, fontsize=9)
@@ -114,11 +120,15 @@ def single_feature_accuracy(accuracy, baseline):
     plt.show()
 
 
-def correlation_heatmap(complete):
+def correlation_heatmap(complete, features=None):
     """Matriz de correlação de Spearman entre as features."""
-    correlation = complete[FEATURES].corr(method="spearman")
-    fig, ax = plt.subplots(figsize=(5.8, 4.6))
+    features = features or FEATURES
+    correlation = complete[features].corr(method="spearman")
+    # 5 features no tamanho original; com mais, a figura cresce e o texto das células encolhe.
+    side = max(1.0, len(features) / 5 * 0.65)
+    fig, ax = plt.subplots(figsize=(5.8 * side, 4.6 * side))
     sns.heatmap(correlation, vmin=-1, vmax=1, cmap=DIVERGING, annot=True, fmt=".2f", square=True,
+                annot_kws={} if len(features) <= 5 else {"fontsize": 8},
                 linewidths=2, linecolor=SURFACE, cbar_kws={"shrink": 0.8, "label": "correlação de Spearman"}, ax=ax)
     ax.set_title("Correlação entre features", loc="left")
     fig.tight_layout()

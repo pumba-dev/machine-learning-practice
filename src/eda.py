@@ -3,7 +3,7 @@ import pandas as pd
 from sklearn.model_selection import StratifiedKFold, cross_val_score
 from sklearn.tree import DecisionTreeClassifier
 
-from src.config import CLASSES, FEATURES, RANDOM_STATE
+from src.config import CLASSES, FEATURES, RANDOM_STATE, SMILES_FEATURES
 
 
 def class_distribution(df, label="Protein"):
@@ -33,22 +33,63 @@ def describe_features(final):
     return final[FEATURES + ["pChEMBL"]].describe().round(2).T
 
 
-def medians_by_class(final):
-    """Mediana de cada feature por classe."""
-    return final.groupby("Protein")[FEATURES + ["pChEMBL"]].median().reindex(CLASSES).round(2)
+def medians_by_class(final, features=None):
+    """Mediana de cada feature por classe (por padrão, os 5 descritores e o pChEMBL)."""
+    features = features or FEATURES + ["pChEMBL"]
+    return final.groupby("Protein")[features].median().reindex(CLASSES).round(2)
 
 
-def single_feature_accuracy(final, max_depth=3, folds=5):
+def with_smiles_features(final):
+    """Linhas completas com as 12 contagens do SMILES ao lado dos descritores, as mesmas da modelagem."""
+    from src.modeling import smiles_features  # import local: modeling já importa este módulo
+    complete = complete_rows(final)
+    return pd.concat([complete, smiles_features(complete["SMILES"])], axis=1)
+
+
+def smiles_variability(complete):
+    """Quanto cada contagem do SMILES varia na base.
+
+    Além de média, desvio e faixa: coeficiente de variação (desvio / média), número de valores
+    distintos, parcela de moléculas com contagem zero e parcela do valor mais comum. Contagens quase
+    sempre iguais (muitos zeros, poucos valores) têm pouco a oferecer como atributo.
+    """
+    counts = complete[SMILES_FEATURES]
+    return pd.DataFrame({
+        "média": counts.mean(),
+        "desvio": counts.std(),
+        "CV": counts.std() / counts.mean(),
+        "mín": counts.min(),
+        "mediana": counts.median(),
+        "p95": counts.quantile(0.95),
+        "máx": counts.max(),
+        "valores distintos": counts.nunique(),
+        "% zeros": (counts == 0).mean() * 100,
+        "% valor mais comum": counts.apply(lambda c: c.value_counts(normalize=True).iloc[0] * 100),
+    }).round(2)
+
+
+def presence_by_class(complete, features=None):
+    """Percentual de moléculas de cada classe com contagem maior que zero.
+
+    Para as contagens quase sempre nulas (ligação tripla, carga, enxofre), a mediana é zero em todas as
+    classes e o boxplot não mostra nada; a presença por classe mostra onde elas aparecem.
+    """
+    features = features or SMILES_FEATURES
+    return (complete[features] > 0).groupby(complete["Protein"]).mean().reindex(CLASSES).mul(100).round(1)
+
+
+def single_feature_accuracy(final, max_depth=3, folds=5, features=None):
     """Acurácia em validação cruzada de uma árvore rasa treinada com uma única feature.
 
     Diagnóstico do sinal de cada feature sozinha, não é o modelo final.
     Devolve (acurácia por feature, acurácia de sempre chutar a classe majoritária).
     """
+    features = features or FEATURES
     complete = complete_rows(final)
     cv = StratifiedKFold(n_splits=folds, shuffle=True, random_state=RANDOM_STATE)
     accuracy = pd.Series({
         feature: cross_val_score(DecisionTreeClassifier(max_depth=max_depth, random_state=RANDOM_STATE), complete[[feature]], complete["Protein"], cv=cv).mean()
-        for feature in FEATURES
+        for feature in features
     }, dtype=float).sort_values()
     baseline = complete["Protein"].value_counts(normalize=True).max()
     return accuracy, baseline
