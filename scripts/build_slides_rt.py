@@ -19,7 +19,7 @@ from pptx.enum.shapes import MSO_SHAPE
 from pptx.enum.text import MSO_ANCHOR, PP_ALIGN
 from pptx.util import Inches, Pt
 
-from slides_common import (GRAY_BAR, GREEN, GREEN_DK, INK, MIN_FONT, MUTED, RED, RED_TINT, TINT, Deck, alt,
+from slides_common import (GRAY_BAR, GREEN, GREEN_DK, INK, MIN_FONT, MUTED, RED, TINT, Deck, alt,
                            audit_fonts, br, card, label_points, rgb, shape, style_chart, text_box, thousands, write)
 from slides_rt_notes import build_notes
 
@@ -249,12 +249,6 @@ def slide_protocol(deck, d):
           "Tabela: combinações de hiperparâmetros testadas. Árvore de decisão 72 e Random Tree 54, nos 6 cenários; "
           "Random Forest 6 e gradient boosting 9, no cenário principal.", size=18)
 
-    card(slide, 0.92, 5.6, 11.1, 1.1, RED_TINT, [
-        {"runs": [("Desligados: ", {"bold": True, "color": RED}),
-                  ("estimativa out-of-bag e parada antecipada. Os dois sorteiam uma validação aleatória e deixariam "
-                   "gêmeas dos dois lados.", {})]},
-    ], name="Atalhos desligados", size=20, pad=0.25)
-
 
 def slide_results(deck, d):
     models = d["multiseed"]["modelos"]
@@ -405,20 +399,29 @@ def slide_confidence(deck, d):
     conf = d["seed42"]["confianca"]
     rf, gb = conf["Random Forest"], conf["Gradient boosting"]
     slide = deck.slide("Somente Título", "Só a Random Forest sabe quando está em dúvida")
+    card(slide, 0.92, 1.85, 11.1, 0.95, GRAY_TINT, [
+        {"runs": [("Confiança ", {"bold": True, "color": GREEN_DK}),
+                  ("= probabilidade que o modelo dá à classe que ele prevê.", {})], "space_after": 0},
+        {"text": "Ex.: 210 das 300 árvores da floresta votam EGFR → confiança de 70%.", "color": MUTED},
+    ], name="Definição de confiança", size=20, pad=0.2, anchor=MSO_ANCHOR.MIDDLE)
+    rf_share = round(rf["erros_abaixo_70"] / 10)  # 91% dos erros: 9 em 10
+    gb_share = round(100 / gb["erros_confianca_maxima"])  # 21% dos erros: 1 em 5
     rows = [
         ["Modelo", "Acurácia", "Regras legíveis", "Confiança útil?"],
-        ["Árvore de decisão", f"{br(models['Árvore de decisão']['acuracia'])}%", "sim", "não: 100% em tudo"],
-        ["Random Tree", f"{br(models['Random Tree (ajustada)']['acuracia'])}%", "mudam com a semente", "não"],
+        ["Árvore de decisão", f"{br(models['Árvore de decisão']['acuracia'])}%", "sim", "não: diz 100% até quando erra"],
+        ["Random Tree", f"{br(models['Random Tree (ajustada)']['acuracia'])}%", "mudam com a semente",
+         "não: quase sempre 100%"],
         ["Random Forest", f"{br(models['Random Forest (padrão)']['acuracia'])}%", "não",
-         {"text": f"sim: {br(rf['erros_abaixo_70'], 0)}% dos erros com ≤ 70%", "bold": True, "color": GREEN_DK}],
+         {"text": f"sim: {rf_share} em 10 erros vêm com confiança baixa", "bold": True, "color": GREEN_DK}],
         ["Gradient boosting", f"{br(models['Gradient boosting (ajustado)']['acuracia'])}%", "não",
-         f"pouco: {br(gb['erros_confianca_maxima'], 0)}% dos erros > 99,9%"],
+         f"pouco: 1 em {gb_share} erros vem com certeza total"],
     ]
-    table(slide, 0.92, 2.0, [2.6, 1.45, 3.05, 4.0], 0.72, rows, "Tabela de confiança",
-          "Tabela: acurácia (10 seeds), regras legíveis e utilidade da confiança. Árvore: sim, não. Random Tree: regras "
-          "mudam com a semente, confiança não útil. Random Forest: sem regras; confiança útil. Gradient boosting: sem "
-          "regras; confiança exagerada.", fills={3: TINT})
-    card(slide, 0.92, 6.0, 11.1, 0.85, TINT, [
+    table(slide, 0.92, 3.0, [2.35, 1.2, 2.8, 4.75], 0.58, rows, "Tabela de confiança",
+          "Tabela: acurácia (10 seeds), regras legíveis e utilidade da confiança. Árvore: regras legíveis; diz 100% "
+          "até quando erra. Random Tree: regras mudam com a semente; quase sempre 100%. Random Forest: sem regras; "
+          f"{rf_share} em 10 erros vêm com confiança baixa. Gradient boosting: sem regras; 1 em {gb_share} erros vem "
+          "com certeza total.", fills={3: TINT}, size=18)
+    card(slide, 0.92, 6.1, 11.1, 0.8, TINT, [
         {"runs": [("Na prática: ", {"bold": True, "color": GREEN_DK}),
                   (f"revisar os {br(rf['previsoes_abaixo_70'], 0)}% de previsões da floresta com confiança ≤ 70% "
                    f"pega {br(rf['erros_abaixo_70'], 0)}% dos erros", {})]},

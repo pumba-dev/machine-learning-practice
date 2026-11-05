@@ -63,7 +63,7 @@ Os quatro modelos são feitos da mesma peça, a árvore, e mudam em duas pergunt
 
 **Roteiro (o que falar)** · Paulo · 1:00
 
-Para a comparação ser justa, todos os modelos passam pela mesma régua: o mesmo treino e o mesmo teste com divisão agrupada, a mesma busca de hiperparâmetros com validação cruzada que também respeita as gêmeas, e tudo repetido com 10 seeds. Cada modelo tem a sua busca: 72 combinações para a árvore, 54 para a Random Tree, e buscas leves para a floresta e o boosting. Um detalhe: desligamos dois atalhos desses conjuntos, a estimativa out-of-bag e a parada antecipada, porque os dois sorteiam uma validação aleatória e deixariam gêmeas dos dois lados.
+Para a comparação ser justa, todos os modelos passam pela mesma régua: o mesmo treino e o mesmo teste com divisão agrupada, a mesma busca de hiperparâmetros com validação cruzada que também respeita as gêmeas, e tudo repetido com 10 seeds. Cada modelo tem a sua busca: 72 combinações para a árvore, 54 para a Random Tree, e buscas leves para a floresta e o boosting.
 
 **Para estudar** (apoio; não faz parte da fala)
 
@@ -76,6 +76,9 @@ Para a comparação ser justa, todos os modelos passam pela mesma régua: o mesm
 
 - **P:** A busca da floresta e do boosting não foi pequena demais?  
   **R:** Foi leve de propósito. Na floresta, as melhores combinações ficam dentro de 0,4 ponto de validação; no boosting, deslocamos o grid quando o ótimo caiu no canto. O teto pode estar um pouco subestimado.
+
+- **P:** Por que não usar a estimativa out-of-bag da floresta ou a parada antecipada do boosting?  
+  **R:** Os dois sorteiam uma validação aleatória dentro do treino e deixariam gêmeas dos dois lados, o que infla a estimativa. Por isso ficaram desligados, e toda escolha usa a validação cruzada agrupada.
 
 - **P:** Por que 10 seeds?  
   **R:** Uma seed só pode dar sorte ou azar. Com 10, dá para ver se a diferença entre dois modelos é maior que a variação do sorteio.
@@ -175,7 +178,7 @@ Ajustar hiperparâmetros vale a pena? Depende do conjunto. Na Random Forest, nã
 
 **Roteiro (o que falar)** · Bernan · 0:50
 
-Acurácia não é tudo. A árvore de decisão diz 100% de confiança em todas as previsões, mesmo errando uma em cada dez. A Random Forest sabe quando está em dúvida: as previsões com confiança de até 70% são 20% do teste, mas concentram 91% dos erros. Dá para mandar só essas para revisão. O boosting acerta mais, mas é confiante demais: 21% dos erros saem com mais de 99,9% de confiança. E só a árvore de decisão tem regras que se pode ler.
+Acurácia não é tudo. Confiança é a probabilidade que o modelo dá para a classe que ele prevê: se 210 das 300 árvores da floresta votam EGFR, a confiança é de 70%. A árvore de decisão diz 100% de confiança em todas as previsões, mesmo errando uma em cada dez. A Random Forest sabe quando está em dúvida: as previsões com confiança de até 70% são 20% do teste, mas concentram 91% dos erros. Dá para mandar só essas para revisão. O boosting acerta mais, mas é confiante demais: 21% dos erros saem com mais de 99,9% de confiança. E só a árvore de decisão tem regras que se pode ler.
 
 **Para estudar** (apoio; não faz parte da fala)
 

@@ -125,8 +125,7 @@ def build_notes(d):
                 f"com divisão agrupada, a mesma busca de hiperparâmetros com validação cruzada que também respeita as "
                 f"gêmeas, e tudo repetido com 10 seeds. Cada modelo tem a sua busca: {grids['Árvore de decisão']} "
                 f"combinações para a árvore, {grids['Random Tree']} para a Random Tree, e buscas leves para a floresta e "
-                f"o boosting. Um detalhe: desligamos dois atalhos desses conjuntos, a estimativa out-of-bag e a parada "
-                f"antecipada, porque os dois sorteiam uma validação aleatória e deixariam gêmeas dos dois lados.",
+                f"o boosting.",
         "estudo": [
             f"Grids: árvore {grids['Árvore de decisão']} combinações (critério, profundidade, folha mínima, poda α); "
             f"Random Tree {grids['Random Tree']} (critério, fração sorteada 0,25/0,5/0,75, profundidade, folha mínima), "
@@ -143,6 +142,9 @@ def build_notes(d):
             ("A busca da floresta e do boosting não foi pequena demais?",
              "Foi leve de propósito. Na floresta, as melhores combinações ficam dentro de 0,4 ponto de validação; no "
              "boosting, deslocamos o grid quando o ótimo caiu no canto. O teto pode estar um pouco subestimado."),
+            ("Por que não usar a estimativa out-of-bag da floresta ou a parada antecipada do boosting?",
+             "Os dois sorteiam uma validação aleatória dentro do treino e deixariam gêmeas dos dois lados, o que infla "
+             "a estimativa. Por isso ficaram desligados, e toda escolha usa a validação cruzada agrupada."),
             ("Por que 10 seeds?",
              "Uma seed só pode dar sorte ou azar. Com 10, dá para ver se a diferença entre dois modelos é maior que a "
              "variação do sorteio."),
@@ -284,7 +286,8 @@ def build_notes(d):
     # 9 ------------------------------------------------------------------------------------------
     notes.append({
         "tempo": "0:50",
-        "fala": f"Acurácia não é tudo. A árvore de decisão diz 100% de confiança em todas as previsões, mesmo errando "
+        "fala": f"Acurácia não é tudo. Confiança é a probabilidade que o modelo dá para a classe que ele prevê: se 210 "
+                f"das 300 árvores da floresta votam EGFR, a confiança é de 70%. A árvore de decisão diz 100% de confiança em todas as previsões, mesmo errando "
                 f"uma em cada dez. A Random Forest sabe quando está em dúvida: as previsões com confiança de até 70% são "
                 f"{comma(rf_conf['previsoes_abaixo_70'], 0)}% do teste, mas concentram "
                 f"{comma(rf_conf['erros_abaixo_70'], 0)}% dos erros. Dá para mandar só essas para revisão. O boosting "
