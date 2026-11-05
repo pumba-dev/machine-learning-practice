@@ -42,8 +42,8 @@ GRAY_TINT = "EEF1F0"
 
 
 def points(value):
-    """Diferença em pontos, com sinal: +5,4 ou −1,9."""
-    return f"+{br(value)}" if value >= 0 else f"−{br(-value)}"
+    """Diferença de acurácia em %, com sinal: +5,4% ou −1,9%."""
+    return f"+{br(value)}%" if value >= 0 else f"−{br(-value)}%"
 
 
 # --- Peças deste deck --------------------------------------------------------------------------
@@ -208,7 +208,7 @@ def slide_models(deck, d):
     rows = [
         ["Modelo", "Árvores", "Atributos por nó", "Como combina"],
         ["Árvore de decisão", "1", "todos", "–"],
-        ["Random Tree (Weka)", "1", "K sorteados", "–"],
+        ["Random Tree", "1", "K sorteados", "–"],
         ["Random Forest", "300", "K sorteados", "voto; cada uma vê uma amostra"],
         ["Gradient boosting", "300", "todos", "soma; cada uma corrige as anteriores"],
     ]
@@ -261,13 +261,13 @@ def slide_results(deck, d):
     order = [("Gradient boosting (ajustado)", "Boosting ajustado"), ("Random Forest (ajustada)", "Floresta ajustada"),
              ("Random Forest (padrão)", "Floresta padrão"), ("Gradient boosting (padrão)", "Boosting padrão"),
              ("Árvore de decisão", "Árvore de decisão"),
-             ("Random Tree (ajustada)", "Random Tree ajustada"), ("Random Tree (padrão Weka)", "Random Tree (Weka)")]
+             ("Random Tree (ajustada)", "Random Tree ajustada"), ("Random Tree (padrão)", "Random Tree padrão")]
     values = [models[name]["acuracia"] for name, _ in order]
     colors = [GREEN, GREEN, GREEN, GREEN, GREEN_DK, GRAY_BAR, GRAY_BAR]
     gains = [models[name]["ganho_pontos"] for name in models if name not in ("Classe majoritária", "Árvore de decisão")
              and not name.startswith("Random Tree")]
     slide = deck.slide("Somente Título",
-                       f"Conjuntos ganham de {br(min(gains), 0)} a {br(max(gains), 0)} pontos; a Random Tree perde para a árvore")
+                       f"Conjuntos ganham de {br(min(gains), 0)}% a {br(max(gains), 0)}%; a Random Tree perde para a árvore")
     text_box(slide, 0.92, 2.0, 7.0, 0.45, ["Acurácia no teste, média de 10 seeds"], size=24, bold=True, color=GREEN_DK)
     hbar_chart(slide, 0.92, 2.5, 7.2, 4.3, [label for _, label in order], values, colors,
                "Gráfico de barras, eixo de 80% a 100%: " + "; ".join(
@@ -276,7 +276,7 @@ def slide_results(deck, d):
     gb = models["Gradient boosting (ajustado)"]
     text_box(slide, 8.5, 2.0, 3.5, 1.5, [
         {"text": points(gb["ganho_pontos"]), "size": 54, "bold": True, "color": GREEN, "space_after": 0},
-        {"text": "pontos: boosting ajustado sobre a árvore", "size": 20},
+        {"text": "de acurácia: boosting ajustado sobre a árvore", "size": 20},
     ], name="Ganho do boosting")
     text_box(slide, 8.5, 3.7, 3.5, 1.3, [
         {"text": "10 de 10", "size": 40, "bold": True, "color": GREEN, "space_after": 0},
@@ -285,7 +285,7 @@ def slide_results(deck, d):
     rt = models["Random Tree (ajustada)"]
     text_box(slide, 8.5, 5.15, 3.5, 1.3, [
         {"text": points(rt["ganho_pontos"]), "size": 40, "bold": True, "color": RED, "space_after": 0},
-        {"text": f"ponto: Random Tree ajustada contra a árvore ({br(tree['acuracia'])}%)", "size": 20},
+        {"text": "de acurácia: Random Tree ajustada contra a árvore", "size": 20},
     ], name="Perda da Random Tree")
     text_box(slide, 0.92, 6.82, 7.2, 0.4, ["Eixo a partir de 80%; piso (sempre EGFR): 29,3%"], size=18, name="Nota do eixo")
 
@@ -302,14 +302,14 @@ def slide_random_tree(deck, d):
     rt = d["seed42"]["random_tree"]["sementes"]
     slide = deck.slide("Somente Título", f"A Random Tree perde em {losses} de 6 cenários e varia com a semente")
     text_box(slide, 0.92, 2.0, 6.3, 0.45, ["Random Tree menos árvore (10 seeds)"], size=24, bold=True, color=GREEN_DK)
-    rows = [["Atributos", "Divisão", "Pontos"]]
+    rows = [["Atributos", "Divisão", "Diferença"]]
     for s in scenarios:
         diff = s["diferenca_pontos"]
         rows.append([SCENARIO_LABEL[s["features"]], s["split"],
-                     {"text": points(diff) if round(diff, 1) != 0 else "0,0", "bold": True,
+                     {"text": points(diff) if round(diff, 1) != 0 else "0,0%", "bold": True,
                       "color": RED if diff < -0.05 else INK}])
     table(slide, 0.92, 2.5, [2.55, 1.95, 1.6], 0.58, rows, "Tabela Random Tree contra árvore",
-          "Tabela: diferença de acurácia da Random Tree ajustada para a árvore de decisão, em pontos, média de 10 seeds. "
+          "Tabela: diferença de acurácia da Random Tree ajustada para a árvore de decisão, em %, média de 10 seeds. "
           + "; ".join(f"{SCENARIO_LABEL[s['features']]}, {s['split']}: {points(s['diferenca_pontos'])}" for s in scenarios)
           + ".")
 
@@ -342,13 +342,13 @@ def slide_bridge(deck, d):
     three = d["seed42"]["tres_arvores"]
     dt, rt, rf = (three[k]["acuracia"] for k in ("arvore", "random_tree", "random_forest"))
     slide = deck.slide("Somente Título", "Sozinha, a Random Tree perde; 300 delas formam a Random Forest")
-    width, gap, y = 2.9, 0.9, 2.6
+    width, gap, y = 2.75, 1.3, 2.6
     cells = [("Árvore de decisão", "1 árvore, sem sorteio", dt, GRAY_TINT, INK),
              ("Random Tree", "1 árvore, com sorteio", rt, GRAY_TINT, INK),
              ("Random Forest", "300 árvores, com sorteio", rf, GREEN, "FFFFFF")]
     for index, (name, caption, value, fill, color) in enumerate(cells):
         x = 0.92 + index * (width + gap)
-        text_box(slide, x, 2.0, width, 0.45, [caption], size=20, bold=True, color=GREEN_DK, align=PP_ALIGN.CENTER,
+        text_box(slide, x - 0.5, 2.0, width + 1.0, 0.45, [caption], size=20, bold=True, color=GREEN_DK, align=PP_ALIGN.CENTER,
                  name=f"Rótulo {name}")
         card(slide, x, y, width, 1.5, fill, [
             {"text": f"{br(value)}%", "size": 40, "bold": True, "color": color, "align": PP_ALIGN.CENTER, "space_after": 0},
@@ -384,7 +384,7 @@ def slide_tuning(deck, d):
         card(slide, 0.92, y, 4.6, 1.75, TINT if index else GRAY_TINT, [
             {"text": name, "size": 22, "bold": True, "space_after": 2},
             {"runs": [(f"{br(before)}% → {br(after)}%", {"size": 28, "bold": True, "color": GREEN_DK})], "space_after": 2},
-            {"text": "empate" if abs(diff) < 0.3 else f"{points(diff)} pontos", "size": 20, "bold": True,
+            {"text": "empate" if abs(diff) < 0.3 else points(diff), "size": 20, "bold": True,
              "color": MUTED if abs(diff) < 0.3 else GREEN},
         ], name=f"Ajuste {name}", anchor=MSO_ANCHOR.MIDDLE, pad=0.25)
 
@@ -430,8 +430,8 @@ def slide_conclusion(deck, d):
     slide = deck.slide("Somente Título", "Conclusões")
     cards = [
         (f"{br(models['Gradient boosting (ajustado)']['acuracia'])}%", "gradient boosting ajustado, o mais preciso"),
-        (points(models["Random Forest (padrão)"]["ganho_pontos"]), "pontos: Random Forest, 300 Random Trees juntas"),
-        (points(models["Random Tree (ajustada)"]["ganho_pontos"]), "ponto: a Random Tree sozinha perde para a árvore"),
+        (points(models["Random Forest (padrão)"]["ganho_pontos"]), "de acurácia: Random Forest, 300 Random Trees juntas"),
+        (points(models["Random Tree (ajustada)"]["ganho_pontos"]), "de acurácia: a Random Tree sozinha perde para a árvore"),
     ]
     for index, (number, caption) in enumerate(cards):
         card(slide, 0.92 + index * 3.78, 2.0, 3.55, 2.0, TINT, [

@@ -20,7 +20,7 @@
           "HDAC1": 86.6
         }
       },
-      "Random Tree (padrão Weka)": {
+      "Random Tree (padrão)": {
         "acuracia": 87.61,
         "desvio": 1.07,
         "f1_macro": 87.51,
@@ -154,7 +154,7 @@
   "seed42": {
     "seed": 42,
     "random_tree": {
-      "k_weka": 5,
+      "k_padrao": 5,
       "k_ajustada": 12,
       "params": {
         "criterion": "entropy",
@@ -162,7 +162,7 @@
         "max_features": 0.75,
         "min_samples_leaf": 1
       },
-      "acuracia_weka": 88.2,
+      "acuracia_padrao": 88.2,
       "acuracia_ajustada": 88.6,
       "folhas_ajustada": 1685,
       "curva_k": {

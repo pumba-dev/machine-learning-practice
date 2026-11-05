@@ -39,16 +39,17 @@ def multiseed_block():
     for label, row in table.iterrows():
         if label.startswith("Bagging"):  # o bagging fica só no notebook 07
             continue
-        models[label] = {
+        name = label.replace(" Weka", "")  # nos slides, só "padrão"
+        models[name] = {
             "acuracia": float(row["acurácia (%)"]),
             "desvio": float(row["desvio (pontos)"]),
             "f1_macro": float(row["F1 macro (%)"]),
         }
         if label in gain.index:
-            models[label]["ganho_pontos"] = float(gain.loc[label, "ganho médio (pontos)"])
-            models[label]["seeds_com_ganho"] = int(gain.loc[label, "seeds com ganho"])
+            models[name]["ganho_pontos"] = float(gain.loc[label, "ganho médio (pontos)"])
+            models[name]["seeds_com_ganho"] = int(gain.loc[label, "seeds com ganho"])
         if label in f1.index:
-            models[label]["f1_classes"] = {c: float(f1.loc[label, c]) for c in CLASSES}
+            models[name]["f1_classes"] = {c: float(f1.loc[label, c]) for c in CLASSES}
     rt = comparison.rt_vs_dt(MULTISEED).reset_index()
     scenarios = [{
         "features": r["features"], "split": r["split"],
@@ -103,10 +104,10 @@ def seed42_block(dados):
     variance = random_tree.seed_summary(random_tree.seed_variance(dados, rt_params))
     k_rt = rt_params["max_features"]
     out["random_tree"] = {
-        "k_weka": random_tree.weka_k(n_features),
+        "k_padrao": random_tree.weka_k(n_features),
         "k_ajustada": int(k_rt * n_features) if isinstance(k_rt, float) else k_rt,
         "params": {k: (None if v is None else v) for k, v in rt_params.items()},
-        "acuracia_weka": score(weka, dados),
+        "acuracia_padrao": score(weka, dados),
         "acuracia_ajustada": score(rt, dados),
         "folhas_ajustada": int(rt.get_n_leaves()),
         "curva_k": {int(k): float(v * 100) for k, v in curve["validação"].items()},

@@ -57,7 +57,7 @@ def build_notes(d):
                 "quanto se ganha e o que se perde.",
         "estudo": [
             "Disciplina: PPGCC010 – Aprendizagem de Máquina (UFPI, 2026.2), Prof. Vinicius Ponte Machado.",
-            "Quatro modelos no mesmo cenário: árvore de decisão, Random Tree (padrão do Weka e ajustada), Random "
+            "Quatro modelos no mesmo cenário: árvore de decisão, Random Tree (padrão e ajustada), Random "
             "Forest e gradient boosting (padrão e ajustados).",
             "Tudo no relatório atualizado (Seções 5.4, 6.6 e 6.7) e nos notebooks 04 a 07 do repositório.",
         ],
@@ -97,13 +97,13 @@ def build_notes(d):
         "tempo": "1:25",
         "fala": "Os quatro modelos são feitos da mesma peça, a árvore, e mudam em duas perguntas: quantas árvores e "
                 "quais atributos cada nó pode olhar. A árvore de decisão é uma árvore só, e em cada nó escolhe o melhor "
-                "corte entre todos os atributos. A Random Tree, do Weka, também é uma árvore só, mas em cada nó sorteia "
+                "corte entre todos os atributos. A Random Tree também é uma árvore só, mas em cada nó sorteia "
                 "alguns atributos e escolhe o melhor corte só entre eles. A Random Forest junta 300 Random Trees, cada "
                 "uma treinada numa amostra sorteada do treino, e faz a votação. E o gradient boosting também usa muitas árvores, mas em sequência: cada árvore "
                 "nova corrige o erro das anteriores.",
         "estudo": [
-            f"Random Tree do Weka: sorteia K atributos por nó, sem poda; K padrão = int(log2(n)) + 1, que dá "
-            f"K = {rt['k_weka']} com 17 atributos. No scikit-learn: DecisionTreeClassifier(max_features=K).",
+            f"Random Tree: sorteia K atributos por nó, sem poda; K padrão = int(log2(n)) + 1, que dá "
+            f"K = {rt['k_padrao']} com 17 atributos. No scikit-learn: DecisionTreeClassifier(max_features=K).",
             "Random Forest (Breiman, 2001): cada árvore vê uma amostra bootstrap (com reposição, do mesmo tamanho do "
             "treino; cerca de um terço das linhas fica de fora) e sorteia atributos em cada nó (padrão do scikit-learn: "
             "K = raiz de n, 4 com 17 atributos). Previsão = média dos votos.",
@@ -115,9 +115,6 @@ def build_notes(d):
             ("Random Tree e Random Forest são a mesma coisa?",
              "Não. A Random Tree é uma árvore só, com sorteio de atributos. A Random Forest são muitas dessas árvores, "
              "cada uma numa amostra bootstrap, votando."),
-            ("Por que usar o scikit-learn e não o próprio Weka?",
-             "Para manter o mesmo pipeline, a mesma divisão e a mesma validação dos outros modelos. O algoritmo é o "
-             "mesmo: sortear K atributos por nó, sem poda."),
         ],
     })
 
@@ -157,10 +154,10 @@ def build_notes(d):
         "tempo": "1:15",
         "fala": f"E o resultado. O gráfico mostra a acurácia média de 10 seeds, com o eixo começando em 80%. Os modelos "
                 f"formam dois grupos. Embaixo, as árvores únicas: a árvore de decisão com {tree}% e a Random Tree abaixo "
-                f"dela, {acc['Random Tree (ajustada)']}% ajustada e {acc['Random Tree (padrão Weka)']}% no padrão do "
-                f"Weka. Em cima, a Random Forest e o gradient boosting, com o boosting ajustado no topo, "
+                f"dela, {acc['Random Tree (ajustada)']}% ajustada e {acc['Random Tree (padrão)']}% com os "
+                f"valores padrão. Em cima, a Random Forest e o gradient boosting, com o boosting ajustado no topo, "
                 f"{acc['Gradient boosting (ajustado)']}%. Todos os conjuntos superam a árvore nas 10 seeds, por "
-                f"{comma(gain['Gradient boosting (padrão)'])} a {comma(gain['Gradient boosting (ajustado)'])} pontos. "
+                f"{comma(gain['Gradient boosting (padrão)'])}% a {comma(gain['Gradient boosting (ajustado)'])}%. "
                 f"A Random Tree sozinha perde.",
         "estudo": [
             "Médias ± desvio (10 seeds): " + "; ".join(
@@ -168,9 +165,9 @@ def build_notes(d):
             "Ganho sobre a árvore, seed a seed (pontos): " + "; ".join(
                 f"{name} {signed(gain[name])}" for name in models
                 if gain.get(name) is not None and name != "Classe majoritária") + ".",
-            f"Random Tree contra a árvore: a do padrão do Weka perde nas 10 seeds; a ajustada fica abaixo em "
+            f"Random Tree contra a árvore: a padrão perde nas 10 seeds; a ajustada fica abaixo em "
             f"{10 - models['Random Tree (ajustada)']['seeds_com_ganho']} das 10.",
-            "Desvio entre seeds: 0,3 a 0,4 ponto para quase todos; a Random Tree do Weka tem o maior (1,1 ponto).",
+            "Desvio entre seeds: 0,3 a 0,4 ponto para quase todos; a Random Tree padrão tem o maior (1,1 ponto).",
             f"F1 de HDAC1, a classe mais difícil: {comma(f1['Árvore de decisão']['HDAC1'])}% na árvore e "
             f"{comma(f1['Gradient boosting (ajustado)']['HDAC1'])}% no boosting ajustado; é a classe que mais ganha.",
         ],
@@ -189,7 +186,7 @@ def build_notes(d):
         "tempo": "1:15",
         "fala": f"Olhando a Random Tree mais de perto. À esquerda, ela contra a árvore de decisão nos seis cenários da "
                 f"primeira parte. Ela fica abaixo em {losses} dos 6, e perde mais com só os cinco descritores na divisão "
-                f"agrupada, {signed(worst['diferenca_pontos'])} pontos: com cinco atributos, sortear três em cada nó "
+                f"agrupada, {signed(worst['diferenca_pontos'])}%: com cinco atributos, sortear três em cada nó "
                 f"esconde quase metade das opções. À direita, outro problema: só trocando a semente, com os mesmos dados, "
                 f"a Random Tree varia de {comma(rt_seeds['min'])}% a {comma(rt_seeds['max'])}%. A árvore com os mesmos "
                 f"parâmetros varia bem menos. Sozinho, o sorteio de atributos só atrapalha: às vezes esconde o melhor "
@@ -206,7 +203,7 @@ def build_notes(d):
             f"A busca puxa a Random Tree de volta para a árvore: escolhe sortear 75% dos atributos (K = "
             f"{rt['k_ajustada']} de 17) em 5 dos 6 cenários. Na curva por K (seed 42), a validação sobe até K = 5 e "
             f"fica num platô; o melhor ponto, K = {rt['melhor_k']}, está dentro do ruído. K = 17 é a própria árvore.",
-            f"Seed 42 no teste: Random Tree do Weka {comma(rt['acuracia_weka'])}%, ajustada "
+            f"Seed 42 no teste: Random Tree padrão {comma(rt['acuracia_padrao'])}%, ajustada "
             f"{comma(rt['acuracia_ajustada'])}%, árvore {comma(s42['arvore']['acuracia'])}%.",
         ],
         "perguntas": [
@@ -225,7 +222,7 @@ def build_notes(d):
                 f"usam a mesma árvore base. A árvore de decisão acerta {comma(dt_single['acuracia'])}%. Com o sorteio "
                 f"de atributos, uma árvore só cai para {comma(rt_single['acuracia'])}%: o sorteio esconde o melhor "
                 f"corte do nó. Mas 300 dessas Random Trees, cada uma treinada numa amostra diferente do treino, formam "
-                f"a Random Forest, com {comma(forest_300['acuracia'])}%: {comma(total_gain)} pontos acima da árvore. "
+                f"a Random Forest, com {comma(forest_300['acuracia'])}%: {comma(total_gain)}% acima da árvore. "
                 f"Num conjunto, o sorteio deixa as árvores diferentes entre si, elas erram em moléculas diferentes, e a "
                 f"votação cancela os erros.",
         "estudo": [
@@ -243,7 +240,7 @@ def build_notes(d):
             "sem cerca de um terço das linhas, e só parte dos atributos em cada nó.",
         ],
         "perguntas": [
-            ("Por que a Random Tree aqui usa K = raiz de n e não o K do Weka?",
+            ("Por que a Random Tree aqui usa K = raiz de n e não o K padrão?",
              "Para as três usarem a mesma árvore base da Random Forest padrão do scikit-learn; assim a única diferença "
              "entre elas é o sorteio e o número de árvores."),
             ("Esse resultado vale com outras seeds?",
@@ -321,7 +318,7 @@ def build_notes(d):
     notes.append({
         "tempo": "0:40",
         "fala": f"Para fechar. O gradient boosting ajustado é o mais preciso, {acc['Gradient boosting (ajustado)']}%. "
-                f"A Random Forest, que junta 300 Random Trees, fica {comma(gain['Random Forest (padrão)'])} pontos acima "
+                f"A Random Forest, que junta 300 Random Trees, fica {comma(gain['Random Forest (padrão)'])}% acima "
                 f"da árvore, enquanto uma Random Tree sozinha perde para ela: o sorteio de atributos só ajuda dentro do "
                 f"conjunto. Na "
                 f"prática: para acertar mais, o boosting; para saber quando duvidar, a Random Forest; para explicar, a "
@@ -331,8 +328,7 @@ def build_notes(d):
             f"{sd['Gradient boosting (ajustado)']}%; Random Forest padrão {signed(gain['Random Forest (padrão)'])} pontos "
             f"sobre a árvore (10 seeds); Random "
             f"Tree ajustada {signed(gain['Random Tree (ajustada)'])} ponto em relação à árvore (10 seeds).",
-            "Limites: busca leve nos conjuntos e só no cenário principal; comparação árvore, Random Tree e Random Forest do slide 7 com uma seed; Random Tree "
-            "reproduzida no scikit-learn, sem rodar o Weka; os limites da primeira parte continuam (agrupamento só de "
+            "Limites: busca leve nos conjuntos e só no cenário principal; comparação árvore, Random Tree e Random Forest do slide 7 com uma seed; os limites da primeira parte continuam (agrupamento só de "
             "descritores idênticos, 4 classes fixas, sem validação externa).",
             "Trabalhos futuros: representações estruturais (fingerprints) para a confusão HDAC1 ↔ EGFR; divisão por "
             "esqueleto molecular; calibrar o boosting.",
