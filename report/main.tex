@@ -14,8 +14,10 @@
 
 % Números citados no texto, gerados por scripts/results_tables.py a partir de results/multiseed.csv.
 \input{results/numeros}
+% Números da parte de redes neurais, gerados por scripts/rn_report.py a partir de results/rn_dados.json.
+\input{results/numeros_rn}
 
-\title{Classificação de alvos proteicos a partir de descritores moleculares do ChEMBL com árvores de decisão}
+\title{Árvores de decisão e redes neurais em duas tarefas de classificação: alvos proteicos do ChEMBL e aprovação de empréstimos}
 
 \author{Bernan R. do Nascimento\inst{1}, Paulo E. R. Araujo\inst{1}, Thiago R. P. de Carvalho\inst{1}}
 
@@ -41,7 +43,11 @@
   descriptors in the training set; the grouped split keeps such twins on the same side. Weka's Random
   Tree, which samples the features tried at each node, falls \relRTEn\% below the decision tree, while
   tree ensembles gain \relHGBEn\% to \relGBajEn\%: feature sampling hurts a single tree but, across
-  300 trees, it is what makes the Random Forest work.
+  300 trees, it is what makes the Random Forest work. On a second dataset, \rnLinhasEn{} loan applications, a
+  multilayer perceptron reaches \rnAccRedeEn\%, above a one-threshold rule (\rnAccRegraEn\%) and logistic
+  regression (\rnAccLogEn\%) but below a decision tree (\rnAccArvEn\%), which also trains about
+  \rnRazaoTreino{} times faster. The labels follow a step on the credit score: the tree draws it with one cut,
+  while the network approximates it with a ramp, where its errors concentrate.
 \end{abstract}
 
 \begin{resumo}
@@ -55,7 +61,12 @@
   descritores idênticos no treino; a divisão agrupada mantém essas gêmeas do mesmo lado. A Random Tree
   do Weka, que sorteia os atributos de cada nó, fica \relRT\% abaixo da árvore, enquanto conjuntos de
   árvores ganham de \relHGB\% a \relGBaj\%: o sorteio de atributos piora uma árvore sozinha, mas,
-  somado em 300 árvores, é o que faz a Random Forest funcionar.
+  somado em 300 árvores, é o que faz a Random Forest funcionar. Numa segunda base, de \rnLinhas{} pedidos
+  de empréstimo, uma rede neural (perceptron de múltiplas camadas) acerta \rnAccRede\%, acima de uma regra de
+  um corte (\rnAccRegra\%) e da regressão logística (\rnAccLog\%), mas abaixo da árvore de decisão
+  (\rnAccArv\%), que ainda treina cerca de \rnRazaoTreino{} vezes mais rápido. Os rótulos seguem um degrau no
+  score de crédito: a árvore o representa com um corte, e a rede o aproxima com uma rampa, onde se concentram
+  seus erros.
 \end{resumo}
 
 \input{sections/01_introducao}
@@ -64,8 +75,9 @@
 \input{sections/04_eda}
 \input{sections/05_metodologia}
 \input{sections/06_resultados}
-\input{sections/07_limitacoes}
-\input{sections/08_conclusao}
+\input{sections/07_redes_neurais}
+\input{sections/08_limitacoes}
+\input{sections/09_conclusao}
 
 \bibliographystyle{sbc}
 \bibliography{refs}

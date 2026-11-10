@@ -9,5 +9,8 @@ Três pontos tornam o problema menos trivial do que parece. Primeiro, o conjunto
   \item uma base reconstruída do ChEMBL\_37, com 27.714 moléculas de quatro alvos e curadoria documentada passo a passo;
   \item 12 atributos obtidos apenas contando caracteres do SMILES, que, somados aos descritores, elevam a acurácia da árvore em \ganhoAmbos\% (ganho relativo);
   \item uma avaliação com divisão agrupada e 10 seeds, que mede o quanto a divisão aleatória superestima o resultado (de \gapMin\% a \gapMax\%, em termos relativos);
-  \item uma comparação da árvore com a Random Tree do Weka, a Random Forest e o \emph{gradient boosting}, que mostra por que o sorteio de atributos, que piora uma árvore sozinha, é a peça da Random Forest.
+  \item uma comparação da árvore com a Random Tree do Weka, a Random Forest e o \emph{gradient boosting}, que mostra por que o sorteio de atributos, que piora uma árvore sozinha, é a peça da Random Forest;
+  \item numa segunda base, de pedidos de empréstimo, uma comparação de uma rede neural com a árvore e com modelos de referência, incluindo o tempo de treino, que mostra quando a rede não compensa (Seção~\ref{sec:rn}).
 \end{itemize}
+
+Na última parte, o problema muda de domínio: prever se um pedido de empréstimo foi aprovado, a partir de 11 atributos do pedido e de quem o fez. A base é pequena, sem valores ausentes, e o rótulo depende quase só do score de crédito. Ela serve para estudar o treino de uma rede neural (padronização, número de neurônios, épocas e parada antecipada) e para comparar a rede com modelos mais simples num caso em que a forma da regra que gerou os rótulos é conhecida.

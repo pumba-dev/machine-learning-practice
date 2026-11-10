@@ -34,10 +34,13 @@ notebooks/
   05_random_forest.ipynb          etapa 5: Random Forest
   06_gradient_boosting.ipynb      etapa 6: gradient boosting por histogramas
   07_comparacao.ipynb             etapa 7: todos os modelos com 10 seeds e experimento-ponte
+emprestimos/    terceira parte: rede neural na base de empréstimos do Kaggle (dados, notebooks 01 a 04,
+                src/ e resultados/ próprios)
 report/         relatório (LaTeX, formato SBC), figuras e tabelas geradas
 scripts/        multiseed.py, tabelas e figuras do relatório, montagem dos slides
-slides/         apresentacao.pptx (primeira parte, árvore de decisão) e
-                apresentacao_random_tree.pptx (segunda parte, comparação de modelos), com roteiros em .md
+slides/         apresentacao.pptx (primeira parte, árvore de decisão),
+                apresentacao_random_tree.pptx (segunda parte, comparação de modelos) e
+                apresentacao_redes_neurais.pptx (terceira parte, rede neural), com roteiros em .md
 src/            código usado pelos notebooks, um módulo por etapa
 ```
 
@@ -75,6 +78,8 @@ python scripts/results_tables.py      # tabelas e números do relatório (report
 python scripts/export_figures.py      # figuras do relatório (report/figures/)
 python scripts/slides_data.py && python scripts/build_slides.py          # primeira apresentação
 python scripts/slides_rt_data.py && python scripts/build_slides_rt.py    # segunda apresentação
+python scripts/rn_data.py && python scripts/rn_report.py                 # terceira parte: números, figuras e tabela
+python scripts/build_slides_rn.py                                         # terceira apresentação
 powershell -File scripts/export_slides_pdf.ps1 slides/apresentacao_random_tree.pptx
 ```
 
