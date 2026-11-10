@@ -69,6 +69,11 @@ def treinar_e_medir(modelo, X_tr, y_tr, X_te, y_te):
         "tempo da busca (s)": tempo_busca,
         "tempo de previsão (ms)": 1000 * tempo_previsao,
     }
+    ultimo_passo = final.steps[-1][1] if hasattr(final, "steps") else final
+    if isinstance(getattr(ultimo_passo, "n_iter_", None), (int, np.integer)):  # só a rede neural
+        metricas["épocas"] = int(ultimo_passo.n_iter_)
+    if hasattr(modelo, "best_params_"):
+        metricas["hiperparâmetros"] = str(modelo.best_params_)
     return metricas, final
 
 
