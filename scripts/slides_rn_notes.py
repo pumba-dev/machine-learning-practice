@@ -230,7 +230,8 @@ def build_notes(d):
                 f"{comma(c['rede neural × regressão logística']['pontos'])} pontos: as camadas ocultas fazem diferença. "
                 f"Mas, contra a regra de um corte, a vantagem é de só {comma(c['rede neural × regra de um corte']['pontos'])} "
                 f"ponto, menor que a variação entre seeds. E a árvore de decisão, com {acc['árvore de decisão']}%, "
-                f"vence a rede em todas as 10 seeds. A Random Forest empata com a árvore.",
+                f"vence a rede em todas as 10 seeds. A Random Forest empata com a árvore. Na AUC, que mede se o "
+                f"modelo ordena bem os pedidos, a rede passa a árvore: o que ela erra é o corte em 50%.",
         "estudo": [
             f"Acurácias (10 seeds): classe majoritária {acc['classe majoritária']}%; regressão logística "
             f"{acc['regressão logística']} ± {sd['regressão logística']}%; regra de um corte {acc['regra de um corte']} ± "
@@ -268,7 +269,8 @@ def build_notes(d):
                 f"final leva cerca de {comma(m['rede neural']['treino_ms'] / 1000)} segundo, umas "
                 f"{comma(razao_treino, 0)} vezes a árvore, mas menos que a Random Forest. O custo maior está na busca "
                 f"de hiperparâmetros: {comma(m['rede neural']['busca_s'], 0)} segundos por seed, contra menos de um "
-                f"segundo da árvore. Para prever, a rede e a árvore levam menos de um milissegundo, e a floresta, que "
+                f"segundo da árvore. Nas 10 seeds, só a busca da rede soma uns "
+                f"{comma(10 * m['rede neural']['busca_s'] / 60, 0)} minutos. Para prever, a rede e a árvore levam menos de um milissegundo, e a floresta, que "
                 f"consulta 300 árvores, uns {comma(m['random forest']['previsao_ms'], 0)}.",
         "estudo": [
             "Máquina: AMD Ryzen 5 9600X (6 núcleos), 31 GB de memória, Windows 11, Python 3.14, scikit-learn 1.9.1.",

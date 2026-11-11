@@ -142,7 +142,7 @@ O segundo cuidado é quando parar o treino. A cada época a rede melhora no trei
 
 **Roteiro (o que falar)** · Bernan · 1:05
 
-Com a rede ajustada, comparamos seis modelos com a mesma régua das partes anteriores: 10 seeds, treino e teste estratificados, e busca de hiperparâmetros só dentro do treino. A rede acerta 96,4%. Ela supera a regressão logística nas 10 seeds, em 4,5 pontos: as camadas ocultas fazem diferença. Mas, contra a regra de um corte, a vantagem é de só 0,9 ponto, menor que a variação entre seeds. E a árvore de decisão, com 98,1%, vence a rede em todas as 10 seeds. A Random Forest empata com a árvore.
+Com a rede ajustada, comparamos seis modelos com a mesma régua das partes anteriores: 10 seeds, treino e teste estratificados, e busca de hiperparâmetros só dentro do treino. A rede acerta 96,4%. Ela supera a regressão logística nas 10 seeds, em 4,5 pontos: as camadas ocultas fazem diferença. Mas, contra a regra de um corte, a vantagem é de só 0,9 ponto, menor que a variação entre seeds. E a árvore de decisão, com 98,1%, vence a rede em todas as 10 seeds. A Random Forest empata com a árvore. Na AUC, que mede se o modelo ordena bem os pedidos, a rede passa a árvore: o que ela erra é o corte em 50%.
 
 **Para estudar** (apoio; não faz parte da fala)
 
@@ -163,7 +163,7 @@ Com a rede ajustada, comparamos seis modelos com a mesma régua das partes anter
 
 **Roteiro (o que falar)** · Bernan · 0:55
 
-Na apresentação anterior, o professor perguntou sobre o tempo de execução. Desta vez medimos: tudo num único núcleo, com uma rodada de aquecimento descartada e a mediana das 10 seeds. Treinar a rede final leva cerca de 0,2 segundo, umas 50 vezes a árvore, mas menos que a Random Forest. O custo maior está na busca de hiperparâmetros: 24 segundos por seed, contra menos de um segundo da árvore. Para prever, a rede e a árvore levam menos de um milissegundo, e a floresta, que consulta 300 árvores, uns 15.
+Na apresentação anterior, o professor perguntou sobre o tempo de execução. Desta vez medimos: tudo num único núcleo, com uma rodada de aquecimento descartada e a mediana das 10 seeds. Treinar a rede final leva cerca de 0,2 segundo, umas 50 vezes a árvore, mas menos que a Random Forest. O custo maior está na busca de hiperparâmetros: 24 segundos por seed, contra menos de um segundo da árvore. Nas 10 seeds, só a busca da rede soma uns 4 minutos. Para prever, a rede e a árvore levam menos de um milissegundo, e a floresta, que consulta 300 árvores, uns 15.
 
 **Para estudar** (apoio; não faz parte da fala)
 

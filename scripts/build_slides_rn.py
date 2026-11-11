@@ -278,11 +278,15 @@ def slide_results(deck, d):
     colors = [GREEN, GREEN, GREEN_DK, GRAY_BAR, GRAY_BAR]
     slide = deck.slide("Somente Título", "A rede supera a logística, mas não a árvore")
     text_box(slide, 0.92, 2.0, 7.0, 0.45, ["Acurácia no teste, média de 10 seeds"], size=24, bold=True, color=GREEN_DK)
-    hbar_chart(slide, 0.92, 2.5, 7.2, 4.1, [label for _, label in order], values, colors,
+    hbar_chart(slide, 0.92, 2.5, 7.2, 3.65, [label for _, label in order], values, colors,
                "Gráfico de barras, eixo de 85% a 100%: " + "; ".join(
                    f"{label} {br(value)}%" for (_, label), value in zip(order, values)) + ".", vmin=85, vmax=100)
-    text_box(slide, 0.92, 6.65, 7.2, 0.4, [f"Eixo a partir de 85%; piso (sempre ‘aprovado’): "
+    text_box(slide, 0.92, 6.2, 7.2, 0.4, [f"Eixo a partir de 85%; piso (sempre ‘aprovado’): "
                                            f"{br(m['classe majoritária']['acuracia'])}%"], size=18, name="Nota do eixo")
+    text_box(slide, 0.92, 6.65, 7.2, 0.45, [{"runs": [
+        ("AUC: ", {"bold": True, "color": GREEN_DK}),
+        (f"rede {br(m['rede neural']['auc'])}% · árvore {br(m['árvore de decisão']['auc'])}% · "
+         f"floresta {br(m['random forest']['auc'])}%", {})]}], size=18, name="AUC")
     for index, (key, label, color) in enumerate([
             ("rede neural × regressão logística", "rede sobre a logística", GREEN),
             ("rede neural × regra de um corte", "rede sobre a regra de um corte", GOLD),
@@ -313,8 +317,12 @@ def slide_time(deck, d):
           "Tabela de tempos (mediana de 10 seeds, um núcleo): " + "; ".join(
               f"{row[0]}: treino {row[1]}, busca {row[2]}, previsão {row[3]}" for row in rows[1:]) + ".",
           fills={5: TINT}, size=20)
-    text_box(slide, 0.92, 5.95, 7.6, 0.9, ["Mediana de 10 seeds · um núcleo · aquecimento descartado · "
-                                           "Ryzen 5 9600X"], size=18, color=MUTED, name="Como medimos")
+    total_min = 10 * m["rede neural"]["busca_s"] / 60
+    text_box(slide, 0.92, 5.95, 7.6, 0.9, [
+        {"runs": [("Busca em segundos, por seed (120 redes): ", {"bold": True}),
+                  (f"nas 10 seeds, ≈ {br(total_min, 0)} min", {})], "space_after": 2},
+        {"text": "Mediana de 10 seeds · um núcleo · aquecimento descartado · Ryzen 5 9600X", "color": MUTED},
+    ], size=18, name="Como medimos")
     treino = m["rede neural"]["treino_ms"] / m["árvore de decisão"]["treino_ms"]
     busca = m["rede neural"]["busca_s"] / m["árvore de decisão"]["busca_s"]
     text_box(slide, 9.0, 2.0, 3.0, 1.75, [
