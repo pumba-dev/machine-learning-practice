@@ -6,7 +6,10 @@ build_slides_rn.py (slides e roteiro). Duas fontes:
 - emprestimos/resultados/referencias.csv e rede.csv: as 10 seeds dos notebooks 03 e 04, sem refazer;
 - o que os notebooks mostram e não fica em CSV, refeito com as mesmas funções de emprestimos/src:
   a base (notebooks 01 e 02), a padronização (10 seeds), a curva de neurônios, as curvas por época e
-  os erros por faixa de score (seed 42).
+  os erros por faixa de score (seed 42);
+- a matriz de confusão da rede e da árvore: na seed 42 e nas 10 seeds. Nas 10 seeds, a rede é retreinada
+  com os hiperparâmetros que a busca escolheu (rede.csv) e a árvore refaz a sua busca (menos de 1 s); o
+  total de erros de cada seed é conferido com os CSVs, para garantir que são os mesmos modelos da tabela.
 
 Uso, a partir da raiz do projeto (cerca de 2 minutos):
 
@@ -24,10 +27,12 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "emprestimos"))  # o pacote `src` da atividade 3, não o da raiz
 
 from sklearn.exceptions import ConvergenceWarning  # noqa: E402
+from sklearn.metrics import confusion_matrix  # noqa: E402
 from sklearn.model_selection import GridSearchCV, cross_val_score, train_test_split  # noqa: E402
 from sklearn.tree import DecisionTreeClassifier  # noqa: E402
 
 from src import avaliacao, config, rede  # noqa: E402
+from threadpoolctl import threadpool_limits  # noqa: E402
 
 OUT = ROOT / "report" / "results" / "rn_dados.json"
 #: Ordem dos modelos nas tabelas e nos slides.
@@ -68,6 +73,8 @@ def base_block():
         "corr_prazo_alvo": float(correlacao.loc["loan_term", config.TARGET]),
         "corr_renda_valor": float(correlacao.loc["income_annum", "loan_amount"]),
         "corr_renda_luxo": float(correlacao.loc["income_annum", "luxury_assets_value"]),
+        "correlacao": {"rotulos": [config.NOMES[c] for c in correlacao.columns],
+                       "matriz": [[float(v) for v in linha] for linha in correlacao.to_numpy()]},
         "score_quartis": [float(q) for q in score.quantile([0.25, 0.5, 0.75])],
         "score_min_max": [int(score.min()), int(score.max())],
     }
@@ -178,6 +185,7 @@ def seed42_block(X, y):
                        "fora_excecao": int((erro & ~excecao).sum()),
                        "parametros": {k: str(v) for k, v in melhor_rede.best_params_.items()}
                        if nome == "rede neural" else {k: str(v) for k, v in melhor_arvore.best_params_.items()}}
+        erros[nome]["matriz"] = matriz(y_te, modelo.predict(X_te))
         dispersao[nome] = [round(float(p), 4) for p in modelo.predict_proba(X_te)[:, 1]]
     probabilidade = np.array(dispersao["rede neural"])
     perto = (X_te["cibil_score"].to_numpy() >= 500) & (X_te["cibil_score"].to_numpy() < 600)
@@ -189,6 +197,38 @@ def seed42_block(X, y):
     return bloco
 
 
+def matriz(y_real, previsto):
+    """Matriz de confusão com 1 = aprovado como classe positiva: VN, FP, FN, VP."""
+    vn, fp, fn, vp = confusion_matrix(y_real, previsto, labels=[0, 1]).ravel()
+    return {"vn": int(vn), "fp": int(fp), "fn": int(fn), "vp": int(vp)}
+
+
+def confusao_block(X, y):
+    """Matriz de confusão da rede e da árvore em cada uma das 10 seeds, conferida com os CSVs."""
+    rede_csv = pd.read_csv(config.RESULTS_DIR / "rede.csv").set_index("seed")
+    ref_csv = pd.read_csv(config.RESULTS_DIR / "referencias.csv")
+    arvore_csv = ref_csv[ref_csv["modelo"] == "árvore de decisão"].set_index("seed")
+    por_seed = {"rede neural": [], "árvore de decisão": []}
+    for seed in config.SEEDS:
+        X_tr, X_te, y_tr, y_te = avaliacao.dividir(X, y, seed)
+        parametros = eval(rede_csv.loc[seed, "hiperparâmetros"])
+        with threadpool_limits(1):
+            modelos = {
+                "rede neural": rede.rede(seed=seed).set_params(**parametros).fit(X_tr, y_tr),
+                "árvore de decisão": GridSearchCV(DecisionTreeClassifier(random_state=seed), GRADE_ARVORE,
+                                                  cv=avaliacao.validacao_cruzada(seed), n_jobs=1).fit(X_tr, y_tr),
+            }
+        for nome, modelo in modelos.items():
+            m = matriz(y_te, modelo.predict(X_te))
+            esperado = int((rede_csv if nome == "rede neural" else arvore_csv).loc[seed, "erros"])
+            assert m["fp"] + m["fn"] == esperado, f"{nome}, seed {seed}: {m['fp'] + m['fn']} erros, CSV {esperado}"
+            por_seed[nome].append(m)
+    return {nome: {"por_seed": linhas,
+                   "media": {k: float(np.mean([m[k] for m in linhas])) for k in ["vn", "fp", "fn", "vp"]},
+                   "seeds_mais_fn": int(sum(m["fn"] > m["fp"] for m in linhas))}
+            for nome, linhas in por_seed.items()}
+
+
 def main():
     X, y = avaliacao.carregar()
     dados = {"base": base_block(), "multiseed": seeds_block()}
@@ -197,6 +237,8 @@ def main():
     print("padronização:", {k: round(v["acuracia"], 1) for k, v in dados["padronizacao"].items()})
     dados["seed42"] = seed42_block(X, y)
     print("seed 42: ok")
+    dados["confusao"] = confusao_block(X, y)
+    print("matriz de confusão (média):", {k: v["media"] for k, v in dados["confusao"].items()})
     OUT.write_text(json.dumps(dados, ensure_ascii=False, indent=1), encoding="utf-8")
     print("gravado:", OUT)
 

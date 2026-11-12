@@ -35,7 +35,14 @@ A curadoria foi curta, porque a base não tem valores ausentes nem linhas repeti
 
 \subsection{Análise exploratória}\label{sec:rn_eda}
 
-\rnAprovados\% dos pedidos foram aprovados; responder sempre ``aprovado'' é o piso desta parte. Um atributo domina os demais: o score de crédito tem correlação de \rnCorrScore{} com a aprovação, enquanto o prazo tem \rnCorrPrazo{} e os outros nove ficam perto de zero. Os valores em dinheiro são redundantes entre si: a renda anual tem correlação de \rnCorrRendaValor{} com o valor do empréstimo e de \rnCorrRendaLuxo{} com os bens de luxo.
+\rnAprovados\% dos pedidos foram aprovados, cerca de \rnRazaoClasses{} aprovado para cada rejeitado: a base é moderadamente desbalanceada, e a acurácia sozinha engana, porque responder sempre ``aprovado'' já acerta \rnAprovados\%. Esse é o piso desta parte. Um atributo domina os demais: o score de crédito tem correlação de \rnCorrScore{} com a aprovação, enquanto o prazo tem \rnCorrPrazo{} e os outros nove ficam perto de zero. Os valores em dinheiro são redundantes entre si: a renda anual tem correlação de \rnCorrRendaValor{} com o valor do empréstimo e de \rnCorrRendaLuxo{} com os bens de luxo (Figura~\ref{fig:rn_corr}).
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=.8\textwidth]{figures/rn_correlacao.pdf}
+\caption{Correlação de Pearson entre os 11 atributos e a aprovação, na base inteira (\rnLinhas{} pedidos). Só o score de crédito se relaciona fortemente com a aprovação; os valores em dinheiro se correlacionam entre si e quase nada com o alvo.}
+\label{fig:rn_corr}
+\end{figure}
 
 A Figura~\ref{fig:rn_score} mostra a forma dessa relação, e ela não é gradual: abaixo de 550 pontos, cerca de \rnAprovAbaixo\% dos pedidos são aprovados, em qualquer faixa; a partir de 550, \rnAprovAcima\%. A regra ``aprovar se o score for de pelo menos 550'' acerta \rnRegraBase\% da base. Os aprovados abaixo de 550 têm todos prazo de 2 ou 4 anos (\rnAprovPrazoDois\% e \rnAprovPrazoQuatro\% de aprovação nesses prazos); com prazos maiores, nenhum pedido abaixo de 550 foi aprovado. Os rótulos seguem, portanto, quase uma regra explícita: um degrau no score, com uma exceção para prazos curtos.
 
@@ -50,7 +57,7 @@ A base parece sintética. O score e a renda se distribuem de forma quase uniform
 
 \subsection{Metodologia}\label{sec:rn_metodo}
 
-\textbf{Protocolo.} Os dados são divididos em treino (80\%, \rnTreino{} pedidos) e teste (20\%, \rnTeste), mantendo a proporção de aprovados, e o procedimento é repetido com 10 seeds (0 a 9), que mudam a divisão, as partes da validação cruzada e a semente dos modelos. Não há gêmeas como na base de moléculas, então a divisão é estratificada simples. Quando um modelo tem hiperparâmetros a escolher, uma busca em grade com validação cruzada estratificada de 5 partes, feita só dentro do treino, escolhe a combinação de maior acurácia. No teste, reportam-se acurácia, F1 macro e a área sob a curva ROC (AUC). A AUC usa a probabilidade prevista, e não a classe: é a chance de um pedido aprovado, sorteado ao acaso, receber probabilidade maior que um rejeitado. Ela mede, portanto, se o modelo ordena bem os pedidos, independentemente do corte em 50\%.
+\textbf{Protocolo.} Os dados são divididos em treino (80\%, \rnTreino{} pedidos) e teste (20\%, \rnTeste), mantendo a proporção de aprovados, e o procedimento é repetido com 10 seeds (0 a 9), que mudam a divisão, as partes da validação cruzada e a semente dos modelos. Não há gêmeas como na base de moléculas, então a divisão é estratificada simples. Quando um modelo tem hiperparâmetros a escolher, uma busca em grade com validação cruzada estratificada de 5 partes, feita só dentro do treino, escolhe a combinação de maior acurácia. No teste, reportam-se acurácia, F1 macro, a área sob a curva ROC (AUC) e, para a rede e a árvore, a matriz de confusão. O desbalanceamento é tratado pela divisão e pela validação estratificadas e por métricas que não favorecem a classe maior: o F1 macro, média simples do F1 das duas classes, a AUC, que não depende da proporção entre elas, e a matriz de confusão, que mostra o erro em cada uma. Não usamos reamostragem nem pesos por classe, porque a classe menor tem \rnRejeitadosBase{} pedidos e os modelos acertam bem as duas classes. A AUC usa a probabilidade prevista, e não a classe: é a chance de um pedido aprovado, sorteado ao acaso, receber probabilidade maior que um rejeitado. Ela mede, portanto, se o modelo ordena bem os pedidos, independentemente do corte em 50\%.
 
 \textbf{Modelos de referência.} Cinco modelos servem de régua: a classe majoritária; a \emph{regra de um corte}, uma árvore de profundidade 1 que escolhe sozinha, no treino, o melhor atributo e o melhor limiar (escolheu o score e 549,5 nas 10 seeds); a regressão logística com padronização, que equivale a uma rede de um único neurônio; a árvore de decisão com busca em grade (critério, profundidade máxima e mínimo por folha, \rnCombinacoesArv{} combinações); e a Random Forest com 300 árvores.
 
@@ -99,4 +106,13 @@ A base parece sintética. O score e a renda se distribuem de forma quase uniform
 \includegraphics[width=\textwidth]{figures/rn_rampa_degrau.pdf}
 \caption{Probabilidade de aprovação prevista para cada pedido de teste, por score de crédito (seed 42), colorida pela situação real. (a) Rede neural. (b) Árvore de decisão. A linha tracejada marca 550.}
 \label{fig:rn_rampa}
+\end{figure}
+
+\textbf{Tipos de erro.} Com a aprovação como classe positiva, um falso positivo é aprovar um pedido que foi rejeitado, o erro que expõe o banco a calote, e um falso negativo é recusar um pedido que foi aprovado, o que custa um bom cliente. Na seed 42 (Figura~\ref{fig:rn_confusao}), a rede tem \rnFPRedeSeed{} falsos positivos e \rnFNRedeSeed{} falsos negativos; a árvore, \rnFPArvSeed{} e \rnFNArvSeed. Quase toda a diferença está nos falsos negativos, a maioria deles entre 550 e 599 pontos, na rampa da rede. Na média das 10 seeds, porém, a rede erra mais dos dois lados: \rnFPRedeMed{} falsos positivos e \rnFNRedeMed{} falsos negativos por seed, contra \rnFPArvMed{} e \rnFNArvMed{} da árvore. Em proporção, a rede aprova \rnTaxaFPRede\% dos \rnTesteRej{} pedidos rejeitados do teste e recusa \rnTaxaFNRede\% dos \rnTesteAprov{} aprovados (árvore: \rnTaxaFPArv\% e \rnTaxaFNArv\%). Os dois modelos erram mais aprovando do que recusando: só em \rnSeedsFNRede{} das 10 seeds a rede tem mais falsos negativos que falsos positivos, e a árvore também em \rnSeedsFNArv. Se um calote custar mais que um cliente perdido, o corte de 50\% poderia ser elevado, escolhido na validação; não o fizemos, para manter o mesmo critério em todos os modelos.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=.62\textwidth]{figures/rn_confusao.pdf}
+\caption{Matriz de confusão no teste (seed 42, \rnTeste{} pedidos). (a) Rede neural. (b) Árvore de decisão. Cor pela proporção da classe real; número em contagem.}
+\label{fig:rn_confusao}
 \end{figure}

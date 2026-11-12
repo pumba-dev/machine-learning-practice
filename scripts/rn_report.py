@@ -6,6 +6,8 @@ Lê report/results/rn_dados.json (gerado por rn_data.py) e grava:
     report/figures/rn_neuronios.pdf         acurácia de validação por número de neurônios
     report/figures/rn_epocas.pdf            perda e acurácia por época; onde a paciência para o treino
     report/figures/rn_rampa_degrau.pdf      probabilidade de aprovação por score: rede (rampa) e árvore (degrau)
+    report/figures/rn_correlacao.pdf        correlação entre os 11 atributos e a aprovação (triângulo inferior)
+    report/figures/rn_confusao.pdf          matriz de confusão da rede e da árvore no teste (seed 42)
     report/results/tab_rn_modelos.tex       os seis modelos nas 10 seeds, com os tempos
     report/results/numeros_rn.tex           um \\newcommand por número citado no texto
 
@@ -142,6 +144,61 @@ def fig_rampa(d):
     return fig
 
 
+def fig_correlacao(d):
+    corr = np.array(d["base"]["correlacao"]["matriz"])
+    rotulos = d["base"]["correlacao"]["rotulos"]
+    k = len(rotulos)
+    # triângulo inferior sem a diagonal: linhas 1..k-1 contra colunas 0..k-2
+    valores = np.ma.masked_array(corr[1:, :-1], mask=np.triu(np.ones((k - 1, k - 1), dtype=bool), 1))
+    fig, ax = plt.subplots(figsize=(FULL, 4.3))
+    im = ax.imshow(valores, cmap="RdBu_r", vmin=-1, vmax=1)
+    for i in range(k - 1):
+        for j in range(i + 1):
+            v = corr[i + 1, j]
+            texto = "0" if abs(v) < 0.005 else fmt(v, 2).replace("-", "−")
+            ax.text(j, i, texto, ha="center", va="center", fontsize=6.5,
+                    color="white" if abs(v) > 0.6 else "black")
+    ax.set_xticks(range(k - 1), rotulos[:-1], rotation=45, ha="right", rotation_mode="anchor")
+    ax.set_yticks(range(k - 1), rotulos[1:])
+    ax.tick_params(length=0)
+    ax.grid(False)
+    for lado in ["left", "bottom"]:
+        ax.spines[lado].set_visible(False)
+    barra = fig.colorbar(im, ax=ax, fraction=0.04, pad=0.02)
+    barra.set_ticks([-1, -0.5, 0, 0.5, 1])
+    barra.ax.tick_params(labelsize=7)
+    barra.ax.yaxis.set_major_formatter(lambda v, _: fmt(v, 1).replace("-", "−"))
+    barra.outline.set_visible(False)
+    fig.tight_layout()
+    return fig
+
+
+def fig_confusao(d):
+    erros = d["seed42"]["erros"]
+    fig, eixos = plt.subplots(1, 2, figsize=(4.6, 1.85))
+    for ax, (nome, letra) in zip(eixos, [("rede neural", "a"), ("árvore de decisão", "b")]):
+        m = erros[nome]["matriz"]
+        contagem = np.array([[m["vn"], m["fp"]], [m["fn"], m["vp"]]])
+        proporcao = contagem / contagem.sum(axis=1, keepdims=True)
+        ax.imshow(proporcao, cmap="Blues", vmin=0, vmax=1)
+        for i in range(2):
+            for j in range(2):
+                ax.text(j, i, str(contagem[i, j]), ha="center", va="center", fontsize=8,
+                        color="white" if proporcao[i, j] > 0.5 else "black")
+        ax.set_xticks([0, 1], ["rejeitado", "aprovado"])
+        ax.set_yticks([0, 1], ["rejeitado", "aprovado"] if letra == "a" else ["", ""])
+        ax.set_xlabel("previsto")
+        if letra == "a":
+            ax.set_ylabel("real")
+        ax.set_title(f"({letra}) {nome}", loc="left")
+        ax.grid(False)
+        for lado in ["left", "bottom"]:
+            ax.spines[lado].set_visible(False)
+        ax.tick_params(length=0)
+    fig.tight_layout(w_pad=0.8)
+    return fig
+
+
 # --- Tabela e números --------------------------------------------------------------------------
 
 def tabela_modelos(d):
@@ -238,6 +295,19 @@ def numeros(d):
               "rnErrosRedeExc": str(e["rede neural"]["na_excecao"]), "rnErrosArvExc": str(e["árvore de decisão"]["na_excecao"]),
               "rnInterRede": fmt(e["rede_intermediarias_500_600"], 0),
               "rnInterArv": fmt(e["arvore_intermediarias_500_600"], 0)})
+    cf = d["confusao"]
+    for nome, suf in [("rede neural", "Rede"), ("árvore de decisão", "Arv")]:
+        m42, media = e[nome]["matriz"], cf[nome]["media"]
+        n[f"rnFP{suf}Seed"], n[f"rnFN{suf}Seed"] = str(m42["fp"]), str(m42["fn"])
+        n[f"rnFP{suf}Med"], n[f"rnFN{suf}Med"] = fmt(media["fp"]), fmt(media["fn"])
+        n[f"rnTaxaFP{suf}"] = fmt(100 * media["fp"] / (media["fp"] + media["vn"]))
+        n[f"rnTaxaFN{suf}"] = fmt(100 * media["fn"] / (media["fn"] + media["vp"]))
+        n[f"rnSeedsFN{suf}"] = str(cf[nome]["seeds_mais_fn"])
+    m42 = e["rede neural"]["matriz"]
+    n["rnTesteRej"], n["rnTesteAprov"] = str(m42["vn"] + m42["fp"]), str(m42["fn"] + m42["vp"])
+    rejeitados = round(base["linhas"] * (1 - base["aprovados"] / 100))
+    n["rnRejeitadosBase"] = f"{rejeitados:,}".replace(",", ".")
+    n["rnRazaoClasses"] = fmt(base["aprovados"] / (100 - base["aprovados"]))
     linhas = ["% Gerado por scripts/rn_report.py a partir de report/results/rn_dados.json; não editar."]
     linhas += [f"\\newcommand{{\\{k}}}{{{v}}}" for k, v in n.items()]
     return "\n".join(linhas) + "\n", n
@@ -250,7 +320,8 @@ def main():
     d = json.loads(DATA.read_text(encoding="utf-8"))
     plt.rcParams.update(RC)
     for nome, funcao in [("rn_aprovacao_score", fig_aprovacao), ("rn_neuronios", fig_neuronios),
-                         ("rn_epocas", fig_epocas), ("rn_rampa_degrau", fig_rampa)]:
+                         ("rn_epocas", fig_epocas), ("rn_rampa_degrau", fig_rampa),
+                         ("rn_correlacao", fig_correlacao), ("rn_confusao", fig_confusao)]:
         fig = funcao(d)
         fig.savefig(FIGURES / f"{nome}.pdf", bbox_inches="tight", pad_inches=0.02, dpi=300)
         if args.png:
