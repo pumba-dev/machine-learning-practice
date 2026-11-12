@@ -72,7 +72,7 @@ A análise exploratória mostrou que um atributo decide quase tudo: o score de c
 
 **Roteiro (o que falar)** · Paulo · 1:10
 
-Antes do resultado, como funciona a rede. Cada neurônio faz uma conta simples: multiplica cada entrada por um peso, soma tudo e passa o resultado por uma função de ativação. Nas camadas ocultas, usamos a ReLU, que deixa passar os positivos e zera os negativos. Na saída, um neurônio com sigmoide dá um número entre 0 e 1: a probabilidade de aprovação. Se for acima de 50%, a rede diz ‘aprovado’. Os pesos começam sorteados. No treino, a rede vê os pedidos, mede o erro e ajusta cada peso um pouco na direção que reduz o erro. Uma passada completa por todo o treino é uma época. Um detalhe: uma rede com um único neurônio sigmoide é exatamente a regressão logística, que também comparamos.
+Antes do resultado, como funciona a rede. Cada neurônio faz uma conta simples: multiplica cada entrada por um peso, soma tudo, acrescenta um valor fixo chamado viés e passa o resultado por uma função de ativação. Nas camadas ocultas, usamos a ReLU, que deixa passar os positivos e zera os negativos. Na saída, um neurônio com sigmoide dá um número entre 0 e 1: a probabilidade de aprovação. Se for acima de 50%, a rede diz ‘aprovado’. Os pesos começam sorteados. No treino, a rede vê os pedidos, mede o erro e ajusta cada peso um pouco na direção que reduz o erro. Uma passada completa por todo o treino é uma época. Um detalhe: uma rede com um único neurônio sigmoide é exatamente a regressão logística, que também comparamos.
 
 **Para estudar** (apoio; não faz parte da fala)
 
@@ -83,6 +83,9 @@ Antes do resultado, como funciona a rede. Cada neurônio faz uma conta simples: 
 - Neurônios (validação cruzada, seed 42): 1 neurônio → 93,4%; 4 numa camada → 97,2%; 8 em duas camadas → 98,0%; 64 numa camada → 95,4%. Mais neurônios não ajudam.
 
 **Perguntas prováveis**
+
+- **P:** O que é o viés?  
+  **R:** Um número que o neurônio soma no fim, sem multiplicar por nenhuma entrada; é aprendido no treino como os pesos. Faz o papel do intercepto b numa reta y = a·x + b: desloca o ponto em que o neurônio ‘liga’. Sem ele, com todas as entradas em zero, a soma seria sempre zero.
 
 - **P:** Por que ReLU e não sigmoide nas camadas ocultas?  
   **R:** A ReLU é simples de calcular e não ‘satura’ para valores positivos, o que facilita o treino. A sigmoide fica só na saída, onde precisamos de uma probabilidade.

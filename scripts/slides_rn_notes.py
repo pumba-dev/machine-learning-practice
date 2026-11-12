@@ -124,7 +124,8 @@ def build_notes(d):
     notes.append({
         "tempo": "1:10",
         "fala": "Antes do resultado, como funciona a rede. Cada neurônio faz uma conta simples: multiplica cada "
-                "entrada por um peso, soma tudo e passa o resultado por uma função de ativação. Nas camadas ocultas, "
+                "entrada por um peso, soma tudo, acrescenta um valor fixo chamado viés e passa o resultado por uma "
+                "função de ativação. Nas camadas ocultas, "
                 "usamos a ReLU, que deixa passar os positivos e zera os negativos. Na saída, um neurônio com sigmoide "
                 "dá um número entre 0 e 1: a probabilidade de aprovação. Se for acima de 50%, a rede diz ‘aprovado’. "
                 "Os pesos começam sorteados. No treino, a rede vê os pedidos, mede o erro e ajusta cada peso um "
@@ -143,6 +144,10 @@ def build_notes(d):
             f"{comma(neur['1_camada'][-1])}%. Mais neurônios não ajudam.",
         ],
         "perguntas": [
+            ("O que é o viés?",
+             "Um número que o neurônio soma no fim, sem multiplicar por nenhuma entrada; é aprendido no treino como "
+             "os pesos. Faz o papel do intercepto b numa reta y = a·x + b: desloca o ponto em que o neurônio "
+             "‘liga’. Sem ele, com todas as entradas em zero, a soma seria sempre zero."),
             ("Por que ReLU e não sigmoide nas camadas ocultas?",
              "A ReLU é simples de calcular e não ‘satura’ para valores positivos, o que facilita o treino. A sigmoide "
              "fica só na saída, onde precisamos de uma probabilidade."),

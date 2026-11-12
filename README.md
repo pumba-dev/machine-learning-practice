@@ -152,7 +152,7 @@ Média de 10 seeds (`emprestimos/resultados/`):
 - **Paciência 10 para cedo demais.** Com a taxa 0,001, a parada antecipada encerra o treino na época 37 com 92,1% de validação, quando a rede ainda chegaria a 96,5%. Por isso usamos paciência 30 e pusemos a taxa na busca; a taxa 0,01 venceu nas 10 seeds.
 - **Duas camadas ocultas.** A busca escolheu 32-16 (11 → 32 → 16 → 1) em 7 seeds, 64-32 em 2 e uma camada de 8 neurônios em 1.
 - **A rede supera a logística em todas as seeds, mas perde para a árvore em todas.** O motivo é a forma da regra: a aprovação cai como um degrau em score 550. A árvore representa isso com um corte; a rede desenha uma rampa e erra perto do degrau. Pela AUC, a rede ordena os pedidos melhor que a árvore; o que ela erra é o corte em 50%.
-- **Custo.** Treinar a rede final leva ~50 vezes o tempo da árvore, e a busca, ~36 vezes. Nas 10 seeds, só a busca da rede soma uns 4 minutos.
+- **Custo.** Treinar a rede final leva ~50 vezes o tempo de treinar a árvore. A busca de hiperparâmetros da rede (120 redes por seed) leva ~36 vezes o tempo da busca da árvore (150 árvores). Nas 10 seeds, só a busca da rede soma uns 4 minutos.
 
 Para regerar os números, figuras e tabela do relatório e a terceira apresentação, use os comandos de [Como executar](#como-executar). O roteiro da fala está em [`slides/notas_redes_neurais.md`](slides/notas_redes_neurais.md).
 

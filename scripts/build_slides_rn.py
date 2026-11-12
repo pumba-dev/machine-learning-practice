@@ -200,7 +200,7 @@ def slide_network(deck, d):
     text_box(slide, 0.92, 6.45, 6.6, 0.45, ["Entrada · 2 camadas ocultas (ReLU) · saída (sigmoide)"], size=18,
              color=MUTED, align=PP_ALIGN.CENTER, name="Legenda do diagrama")
     cards = [
-        ("Um neurônio", "soma ponderada das entradas + viés, depois a ativação ReLU"),
+        ("Um neurônio", "soma das entradas × pesos, mais o viés (um ajuste fixo aprendido), depois a ReLU"),
         ("A saída", "sigmoide: probabilidade de aprovação; acima de 50%, ‘aprovado’"),
         ("O treino", "pesos sorteados, ajustados a cada época para reduzir o erro"),
     ]
@@ -325,13 +325,13 @@ def slide_time(deck, d):
     ], size=18, name="Como medimos")
     treino = m["rede neural"]["treino_ms"] / m["árvore de decisão"]["treino_ms"]
     busca = m["rede neural"]["busca_s"] / m["árvore de decisão"]["busca_s"]
-    text_box(slide, 9.0, 2.0, 3.0, 1.75, [
+    text_box(slide, 9.0, 2.0, 3.1, 2.0, [
         {"text": f"{br(treino, 0)}×", "size": 54, "bold": True, "color": GREEN_DK, "space_after": 0},
-        {"text": "treino da rede sobre a árvore", "size": 20},
+        {"text": "mais tempo para treinar a rede final do que a árvore", "size": 18},
     ], name="Razão de treino")
-    text_box(slide, 9.0, 4.0, 3.0, 1.75, [
+    text_box(slide, 9.0, 4.2, 3.1, 2.0, [
         {"text": f"{br(busca, 0)}×", "size": 54, "bold": True, "color": RED, "space_after": 0},
-        {"text": "busca da rede sobre a árvore", "size": 20},
+        {"text": "mais tempo na busca de hiperparâmetros da rede do que na da árvore", "size": 18},
     ], name="Razão de busca")
 
 
