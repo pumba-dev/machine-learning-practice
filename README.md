@@ -49,7 +49,7 @@ report/         relatório (LaTeX, formato SBC), figuras e tabelas geradas
 scripts/        multiseed.py, tabelas e figuras do relatório, montagem dos slides
 slides/         apresentacao.pptx (primeira parte, árvore de decisão),
                 apresentacao_random_tree.pptx (segunda parte, comparação de modelos) e
-                apresentacao_redes_neurais.pptx (terceira parte, rede neural), com roteiros em .md
+                apresentacao_redes_neurais.pptx e .pdf (terceira parte, rede neural), com roteiros em .md
 src/            código usado pelos notebooks, um módulo por etapa
 ```
 
@@ -135,7 +135,7 @@ Base [Loan Approval Prediction](https://www.kaggle.com/datasets/architsharma01/l
 | [`03_referencias`](emprestimos/notebooks/03_referencias.ipynb) | Define o protocolo e os pontos de referência: classe majoritária, regra de um corte, regressão logística, árvore e Random Forest |
 | [`04_rede_neural`](emprestimos/notebooks/04_rede_neural.ipynb) | Rede neural: padronização, neurônios, épocas e paciência, busca em grade, comparação, tempo e erros |
 
-**Protocolo.** 10 seeds; em cada uma, divisão estratificada 80/20 e busca de hiperparâmetros só no treino, com validação cruzada de 5 partes. A rede é um `MLPClassifier` (ReLU, Adam) num Pipeline com `StandardScaler`, com parada antecipada e paciência 30. A busca testa 24 combinações: 6 arquiteturas, 2 valores de regularização L2 e 2 taxas de aprendizado. Os tempos são medianas num único núcleo, com aquecimento descartado e a busca medida à parte.
+**Protocolo.** 10 seeds; em cada uma, divisão estratificada 80/20 e busca de hiperparâmetros só no treino, com validação cruzada de 5 partes. A rede é um `MLPClassifier` (ReLU, Adam) num Pipeline com `StandardScaler`, com parada antecipada e paciência 30. A busca testa 24 combinações: 6 arquiteturas, 2 valores de regularização L2 e 2 taxas de aprendizado. Os tempos são medianas num único núcleo, com aquecimento descartado e a busca medida à parte. A base é moderadamente desbalanceada (62,2% aprovados, cerca de 1,6 por rejeitado): isso é tratado com divisão e validação estratificadas e com métricas que não favorecem a classe maior (F1 macro, AUC e matriz de confusão), sem reamostragem.
 
 Média de 10 seeds (`emprestimos/resultados/`):
 
@@ -152,6 +152,7 @@ Média de 10 seeds (`emprestimos/resultados/`):
 - **Paciência 10 para cedo demais.** Com a taxa 0,001, a parada antecipada encerra o treino na época 37 com 92,1% de validação, quando a rede ainda chegaria a 96,5%. Por isso usamos paciência 30 e pusemos a taxa na busca; a taxa 0,01 venceu nas 10 seeds.
 - **Duas camadas ocultas.** A busca escolheu 32-16 (11 → 32 → 16 → 1) em 7 seeds, 64-32 em 2 e uma camada de 8 neurônios em 1.
 - **A rede supera a logística em todas as seeds, mas perde para a árvore em todas.** O motivo é a forma da regra: a aprovação cai como um degrau em score 550. A árvore representa isso com um corte; a rede desenha uma rampa e erra perto do degrau. Pela AUC, a rede ordena os pedidos melhor que a árvore; o que ela erra é o corte em 50%.
+- **Tipos de erro.** Pela matriz de confusão, a rede erra mais dos dois lados: em média, 16,5 falsos positivos (aprova quem seria rejeitado) e 14,4 falsos negativos (recusa quem seria aprovado) por seed, contra 9,4 e 6,6 da árvore. Os dois modelos erram mais aprovando do que recusando.
 - **Custo.** Treinar a rede final leva ~50 vezes o tempo de treinar a árvore. A busca de hiperparâmetros da rede (120 redes por seed) leva ~36 vezes o tempo da busca da árvore (150 árvores). Nas 10 seeds, só a busca da rede soma uns 4 minutos.
 
 Para regerar os números, figuras e tabela do relatório e a terceira apresentação, use os comandos de [Como executar](#como-executar). O roteiro da fala está em [`slides/notas_redes_neurais.md`](slides/notas_redes_neurais.md).
