@@ -112,6 +112,8 @@ def treinar_e_medir(modelo, X_tr, y_tr, X_te, y_te):
     ultimo_passo = final.steps[-1][1] if hasattr(final, "steps") else final
     if hasattr(ultimo_passo, "support_"):  # só a SVM com kernel
         metricas["vetores de suporte"] = int(len(ultimo_passo.support_))
+    if hasattr(ultimo_passo, "loss_curve_"):  # só a rede neural
+        metricas["épocas"] = int(ultimo_passo.n_iter_)
     if hasattr(modelo, "best_params_"):
         metricas["hiperparâmetros"] = str(modelo.best_params_)
     return metricas, final
