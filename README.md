@@ -24,49 +24,54 @@ As seções a seguir, até "Resultado", tratam das partes 1 e 2.
 
 A base foi inspirada no dataset do Kaggle [MultiTarget Bioactivity ChEMBL](https://www.kaggle.com/datasets/xjoannax88/multitarget-bioactivity-chembl). O CSV publicado lá está incompleto (1.333 linhas, sem EGFR, 95,5% DRD2), então a base foi reconstruída direto da API do ChEMBL.
 
-Dicionário de atributos, origem, hashes e problemas de qualidade: [`DATASET.md`](DATASET.md).
+Dicionário de atributos, origem, hashes e problemas de qualidade: [`proteinas/DATASET.md`](proteinas/DATASET.md).
 
 ## Estrutura
 
 ```
-data/
-  raw/          dados brutos baixados (ChEMBL e CSV original do Kaggle)
-  processed/    chembl_4targets.csv, a base final para modelagem
-notebooks/
-  01_curadoria.ipynb              etapa 1: download e curadoria
-  02_analise_exploratoria.ipynb   etapa 2: análise exploratória da base final
-  03_decision_tree.ipynb          etapa 3: treino, ajuste e avaliação da árvore
-  04_random_tree.ipynb            etapa 4: Random Tree (RandomTree do Weka)
-  05_random_forest.ipynb          etapa 5: Random Forest
-  06_gradient_boosting.ipynb      etapa 6: gradient boosting por histogramas
-  07_comparacao.ipynb             etapa 7: todos os modelos com 10 seeds e experimento-ponte
-emprestimos/    terceira parte, autocontida (detalhes na seção da parte 3):
+proteinas/      partes 1 e 2, autocontida:
+  DATASET.md    dicionário de atributos, origem, hashes e problemas de qualidade
+  data/
+    raw/        dados brutos baixados (ChEMBL e CSV original do Kaggle)
+    processed/  chembl_4targets.csv, a base final para modelagem
+  notebooks/
+    01_curadoria.ipynb              etapa 1: download e curadoria
+    02_analise_exploratoria.ipynb   etapa 2: análise exploratória da base final
+    03_decision_tree.ipynb          etapa 3: treino, ajuste e avaliação da árvore
+    04_random_tree.ipynb            etapa 4: Random Tree (RandomTree do Weka)
+    05_random_forest.ipynb          etapa 5: Random Forest
+    06_gradient_boosting.ipynb      etapa 6: gradient boosting por histogramas
+    07_comparacao.ipynb             etapa 7: todos os modelos com 10 seeds e experimento-ponte
+  src/          código usado pelos notebooks, um módulo por etapa
+  report/       relatório das partes 1 e 2 (LaTeX, formato SBC), figuras e tabelas geradas
+  scripts/      multiseed.py, tabelas e figuras do relatório, montagem dos slides
+  slides/       apresentacao.pptx (parte 1, árvore de decisão) e
+                apresentacao_random_tree.pptx (parte 2, comparação de modelos), com PDF e roteiros em .md
+emprestimos/    parte 3, autocontida (detalhes na seção da parte 3):
   data/         loan_approval_dataset.csv (bruto, do Kaggle) e emprestimos.csv (processado)
   notebooks/    01_curadoria, 02_analise_exploratoria, 03_referencias, 04_rede_neural
   src/          config.py, avaliacao.py (protocolo e tempos), rede.py (MLP, grade e curvas por época)
   resultados/   referencias.csv e rede.csv, uma linha por seed e modelo
-report/         relatório (LaTeX, formato SBC), figuras e tabelas geradas
-scripts/        multiseed.py, tabelas e figuras do relatório, montagem dos slides
-slides/         apresentacao.pptx (primeira parte, árvore de decisão),
-                apresentacao_random_tree.pptx (segunda parte, comparação de modelos) e
-                apresentacao_redes_neurais.pptx e .pdf (terceira parte, rede neural), com roteiros em .md
-src/            código usado pelos notebooks, um módulo por etapa
+  report/       relatório da parte 3 (LaTeX, formato SBC), figuras e tabelas geradas
+  scripts/      rn_data.py (números), rn_report.py (figuras e tabela), montagem dos slides
+  slides/       apresentacao_redes_neurais.pptx e .pdf, com roteiro em .md
+comum/          slides_common.py (peças dos três decks), template SBC dos slides e export_slides_pdf.ps1
 ```
 
 | Módulo | Conteúdo |
 |---|---|
-| `src/config.py` | Caminhos, alvos, filtros e constantes |
-| `src/chembl_api.py` | Cliente da API do ChEMBL |
-| `src/download.py` | Download com cache em `data/raw/` |
-| `src/inspection.py` | Inspeção das atividades brutas |
-| `src/curation.py` | Curadoria e montagem da base final |
-| `src/eda.py` | Tabelas da análise exploratória |
-| `src/modeling.py` | Features, splits, ajuste e avaliação, comuns a todos os modelos |
-| `src/random_tree.py` | Random Tree: padrão do Weka, curva de K, variância entre sementes |
-| `src/random_forest.py` | Random Forest: grid e curva por número de árvores |
-| `src/gradient_boosting.py` | Gradient boosting: grid e curva por iteração |
-| `src/comparison.py` | Tabelas do multiseed e experimento-ponte |
-| `src/plots.py` | Gráficos |
+| `proteinas/src/config.py` | Caminhos, alvos, filtros e constantes |
+| `proteinas/src/chembl_api.py` | Cliente da API do ChEMBL |
+| `proteinas/src/download.py` | Download com cache em `proteinas/data/raw/` |
+| `proteinas/src/inspection.py` | Inspeção das atividades brutas |
+| `proteinas/src/curation.py` | Curadoria e montagem da base final |
+| `proteinas/src/eda.py` | Tabelas da análise exploratória |
+| `proteinas/src/modeling.py` | Features, splits, ajuste e avaliação, comuns a todos os modelos |
+| `proteinas/src/random_tree.py` | Random Tree: padrão do Weka, curva de K, variância entre sementes |
+| `proteinas/src/random_forest.py` | Random Forest: grid e curva por número de árvores |
+| `proteinas/src/gradient_boosting.py` | Gradient boosting: grid e curva por iteração |
+| `proteinas/src/comparison.py` | Tabelas do multiseed e experimento-ponte |
+| `proteinas/src/plots.py` | Gráficos |
 
 ## Como executar
 
@@ -75,22 +80,28 @@ Testado com Python 3.13.
 ```bash
 python -m venv .venv
 .venv/Scripts/python -m pip install -r requirements.txt   # Linux/macOS: .venv/bin/python
-.venv/Scripts/python -m jupyter notebook notebooks/
+.venv/Scripts/python -m jupyter notebook proteinas/notebooks/
 ```
 
-Rode os notebooks na ordem (01 a 07). O 07 lê `report/results/multiseed.csv`; para gerar de novo, rode `python scripts/multiseed.py` (cerca de 1 hora com 10 seeds). Os dados já estão no repositório, então nada precisa ser baixado. Para baixar tudo de novo do ChEMBL, mude `REFRESH = True` na primeira célula do notebook 01.
+Rode os notebooks na ordem (01 a 07). O 07 lê `proteinas/report/results/multiseed.csv`; para gerar de novo, rode `python proteinas/scripts/multiseed.py` (cerca de 1 hora com 10 seeds). Os dados já estão no repositório, então nada precisa ser baixado. Para baixar tudo de novo do ChEMBL, mude `REFRESH = True` na primeira célula do notebook 01.
 
-Relatório e slides, a partir da raiz (os slides precisam de `python-pptx`; o PDF, do PowerPoint):
+Relatórios e slides, a partir da raiz (os slides precisam de `python-pptx`; o PDF, do PowerPoint). Cada script grava no `report/` ou `slides/` da própria análise:
 
 ```bash
-python scripts/results_tables.py      # tabelas e números do relatório (report/results/)
-python scripts/export_figures.py      # figuras do relatório (report/figures/)
-python scripts/slides_data.py && python scripts/build_slides.py          # primeira apresentação
-python scripts/slides_rt_data.py && python scripts/build_slides_rt.py    # segunda apresentação
-python scripts/rn_data.py && python scripts/rn_report.py                 # terceira parte: números, figuras e tabela
-python scripts/build_slides_rn.py                                         # terceira apresentação
-powershell -File scripts/export_slides_pdf.ps1 slides/apresentacao_random_tree.pptx
+# proteínas (partes 1 e 2)
+python proteinas/scripts/results_tables.py      # tabelas e números do relatório (proteinas/report/results/)
+python proteinas/scripts/export_figures.py      # figuras do relatório (proteinas/report/figures/)
+python proteinas/scripts/slides_data.py && python proteinas/scripts/build_slides.py          # primeira apresentação
+python proteinas/scripts/slides_rt_data.py && python proteinas/scripts/build_slides_rt.py    # segunda apresentação
+
+# empréstimos (parte 3)
+python emprestimos/scripts/rn_data.py && python emprestimos/scripts/rn_report.py   # números, figuras e tabela
+python emprestimos/scripts/build_slides_rn.py                                       # terceira apresentação
+
+powershell -File comum/export_slides_pdf.ps1 proteinas/slides/apresentacao_random_tree.pptx
 ```
+
+Para compilar um relatório, rode `latexmk -pdf main.tex` dentro de `proteinas/report/` ou `emprestimos/report/`.
 
 ## Etapas
 
@@ -105,7 +116,7 @@ powershell -File scripts/export_slides_pdf.ps1 slides/apresentacao_random_tree.p
 
 ## Resultado
 
-Todos os modelos usam as 5 propriedades físico-químicas mais 12 contagens de caracteres do `SMILES` e são avaliados num split que impede moléculas de descritores idênticos de cair nos dois lados. Média e desvio de 10 seeds (`scripts/multiseed.py`):
+Todos os modelos usam as 5 propriedades físico-químicas mais 12 contagens de caracteres do `SMILES` e são avaliados num split que impede moléculas de descritores idênticos de cair nos dois lados. Média e desvio de 10 seeds (`proteinas/scripts/multiseed.py`):
 
 | Modelo | Acurácia (%) | F1 macro (%) |
 |---|---|---|
@@ -119,10 +130,12 @@ Todos os modelos usam as 5 propriedades físico-químicas mais 12 contagens de c
 | Gradient boosting padrão | 94,8 ± 0,3 | 94,7 |
 | Gradient boosting ajustado | 96,6 ± 0,3 | 96,6 |
 
-- As contagens de caracteres do `SMILES` valem cerca de 10 pontos de acurácia para a árvore, e sozinhas superam os 5 descritores ([`03_decision_tree.ipynb`](notebooks/03_decision_tree.ipynb)).
-- A Random Tree sozinha perde para a árvore de decisão e varia mais com a semente: o sorteio de atributos esconde o melhor corte de cada nó ([`04_random_tree.ipynb`](notebooks/04_random_tree.ipynb)).
-- Mesmo assim, é ela que faz a Random Forest funcionar. Cerca de 80% do ganho da floresta sobre a árvore vem da média de muitas árvores; o sorteio de atributos traz o resto, mas só dentro do conjunto ([`07_comparacao.ipynb`](notebooks/07_comparacao.ipynb)).
+- As contagens de caracteres do `SMILES` valem cerca de 10 pontos de acurácia para a árvore, e sozinhas superam os 5 descritores ([`03_decision_tree.ipynb`](proteinas/notebooks/03_decision_tree.ipynb)).
+- A Random Tree sozinha perde para a árvore de decisão e varia mais com a semente: o sorteio de atributos esconde o melhor corte de cada nó ([`04_random_tree.ipynb`](proteinas/notebooks/04_random_tree.ipynb)).
+- Mesmo assim, é ela que faz a Random Forest funcionar. Cerca de 80% do ganho da floresta sobre a árvore vem da média de muitas árvores; o sorteio de atributos traz o resto, mas só dentro do conjunto ([`07_comparacao.ipynb`](proteinas/notebooks/07_comparacao.ipynb)).
 - O gradient boosting ajustado é o mais preciso. A Random Forest não precisa de ajuste e é a única cuja confiança separa acertos de erros. Só a árvore de decisão tem regras legíveis.
+
+O relatório das partes 1 e 2 está em [`proteinas/report/main.pdf`](proteinas/report/main.pdf).
 
 ## Parte 3: rede neural na aprovação de empréstimos
 
@@ -155,7 +168,7 @@ Média de 10 seeds (`emprestimos/resultados/`):
 - **Tipos de erro.** Pela matriz de confusão, a rede erra mais dos dois lados: em média, 16,5 falsos positivos (aprova quem seria rejeitado) e 14,4 falsos negativos (recusa quem seria aprovado) por seed, contra 9,4 e 6,6 da árvore. Os dois modelos erram mais aprovando do que recusando.
 - **Custo.** Treinar a rede final leva ~50 vezes o tempo de treinar a árvore. A busca de hiperparâmetros da rede (120 redes por seed) leva ~36 vezes o tempo da busca da árvore (150 árvores). Nas 10 seeds, só a busca da rede soma uns 4 minutos.
 
-Para regerar os números, figuras e tabela do relatório e a terceira apresentação, use os comandos de [Como executar](#como-executar). O roteiro da fala está em [`slides/notas_redes_neurais.md`](slides/notas_redes_neurais.md).
+Para regerar os números, figuras e tabela do relatório e a terceira apresentação, use os comandos de [Como executar](#como-executar). O relatório está em [`emprestimos/report/main.pdf`](emprestimos/report/main.pdf), e o roteiro da fala, em [`emprestimos/slides/notas_redes_neurais.md`](emprestimos/slides/notas_redes_neurais.md).
 
 ## Licença dos dados
 
