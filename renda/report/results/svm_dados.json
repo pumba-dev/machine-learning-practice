@@ -1,0 +1,608 @@
+{
+ "base": {
+  "brutas": 32561,
+  "positivos_brutos": 24.081,
+  "duplicadas": 24,
+  "com_ausente": 2398,
+  "positivos_com_ausente": 13.8866,
+  "linhas": 30139,
+  "positivos": 24.9046,
+  "n_positivos": 7506,
+  "piso": 75.0954,
+  "colunas_modelo": 80,
+  "correlacao_fnlwgt": -0.009,
+  "perfis_conflito": 673,
+  "linhas_conflito": 2404,
+  "erros_irredutiveis": 867,
+  "teto": 97.12,
+  "estado_civil": {
+   "casado(a)": 45.5011,
+   "divorciado(a)": 10.7312,
+   "viúvo(a)": 9.6735,
+   "separado(a)": 7.0288,
+   "nunca casou": 4.8399
+  },
+  "faixas": {
+   "age": [
+    17,
+    90
+   ],
+   "education.num": [
+    1,
+    16
+   ],
+   "capital.gain": [
+    0,
+    99999
+   ],
+   "capital.loss": [
+    0,
+    4356
+   ],
+   "hours.per.week": [
+    1,
+    99
+   ]
+  }
+ },
+ "modelos": {
+  "classe majoritária": {
+   "acuracia": 75.0995,
+   "desvio": 0.0,
+   "f1": 42.8896,
+   "f1_pos": 0.0,
+   "auc": 50.0,
+   "fp": 0.0,
+   "fn": 1501.0,
+   "treino_s": 0.0148,
+   "busca_s": null,
+   "previsao_ms": 4.34
+  },
+  "regra de um corte": {
+   "acuracia": 75.0995,
+   "desvio": 0.0,
+   "f1": 42.8896,
+   "f1_pos": 0.0,
+   "auc": 75.6013,
+   "fp": 0.0,
+   "fn": 1501.0,
+   "treino_s": 0.0216,
+   "busca_s": null,
+   "previsao_ms": 4.8
+  },
+  "regressão logística": {
+   "acuracia": 84.7976,
+   "desvio": 0.3041,
+   "f1": 78.3332,
+   "f1_pos": 66.4986,
+   "auc": 90.1989,
+   "fp": 324.9,
+   "fn": 591.5,
+   "treino_s": 0.0618,
+   "busca_s": null,
+   "previsao_ms": 4.54
+  },
+  "árvore de decisão": {
+   "acuracia": 85.1676,
+   "desvio": 0.4489,
+   "f1": 78.4207,
+   "f1_pos": 66.3635,
+   "auc": 89.9589,
+   "fp": 277.4,
+   "fn": 616.7,
+   "treino_s": 0.0551,
+   "busca_s": 7.29,
+   "previsao_ms": 5.1
+  },
+  "random forest": {
+   "acuracia": 84.2502,
+   "desvio": 0.4137,
+   "f1": 78.102,
+   "f1_pos": 66.4992,
+   "auc": 89.1177,
+   "fp": 390.7,
+   "fn": 558.7,
+   "treino_s": 2.8409,
+   "busca_s": null,
+   "previsao_ms": 179.99
+  },
+  "SVM linear": {
+   "acuracia": 84.8159,
+   "desvio": 0.2987,
+   "f1": 78.2059,
+   "f1_pos": 66.2041,
+   "auc": 90.1761,
+   "fp": 310.8,
+   "fn": 604.5,
+   "treino_s": 0.0493,
+   "busca_s": 1.16,
+   "previsao_ms": 4.5
+  },
+  "SVM RBF": {
+   "acuracia": 85.3865,
+   "desvio": 0.3779,
+   "f1": 79.0275,
+   "f1_pos": 67.4802,
+   "auc": 88.8692,
+   "fp": 293.9,
+   "fn": 587.0,
+   "treino_s": 5.7291,
+   "busca_s": 477.39,
+   "previsao_ms": 2015.72,
+   "vetores": 8764
+  },
+  "SVM polinomial": {
+   "acuracia": 85.1576,
+   "desvio": 0.3658,
+   "f1": 78.6715,
+   "f1_pos": 66.9106,
+   "auc": 90.2108,
+   "fp": 298.3,
+   "fn": 596.4,
+   "treino_s": 3.5506,
+   "busca_s": 130.44,
+   "previsao_ms": 487.64,
+   "vetores": 8128
+  },
+  "SVM RBF com pesos": {
+   "acuracia": 80.924,
+   "desvio": 0.3116,
+   "f1": 77.6157,
+   "f1_pos": 69.0109,
+   "auc": 89.7717,
+   "fp": 929.3,
+   "fn": 220.6,
+   "treino_s": 6.2507,
+   "busca_s": null,
+   "previsao_ms": 2283.07,
+   "vetores": 9995
+  },
+  "rede neural": {
+   "acuracia": 85.1642,
+   "desvio": 0.6163,
+   "f1": 79.3508,
+   "f1_pos": 68.3978,
+   "auc": 90.834,
+   "fp": 361.5,
+   "fn": 532.8,
+   "treino_s": 1.0126,
+   "busca_s": 104.15,
+   "previsao_ms": 5.59,
+   "epocas": [
+    33,
+    86
+   ]
+  }
+ },
+ "comparacoes": {
+  "SVM RBF × SVM linear": {
+   "acuracia": {
+    "pontos": 0.57,
+    "seeds": 10
+   },
+   "f1": {
+    "pontos": 0.82,
+    "seeds": 10
+   },
+   "auc": {
+    "pontos": -1.31,
+    "seeds": 0
+   }
+  },
+  "SVM RBF × random forest": {
+   "acuracia": {
+    "pontos": 1.14,
+    "seeds": 10
+   },
+   "f1": {
+    "pontos": 0.93,
+    "seeds": 10
+   },
+   "auc": {
+    "pontos": -0.25,
+    "seeds": 5
+   }
+  },
+  "SVM RBF × árvore de decisão": {
+   "acuracia": {
+    "pontos": 0.22,
+    "seeds": 6
+   },
+   "f1": {
+    "pontos": 0.61,
+    "seeds": 8
+   },
+   "auc": {
+    "pontos": -1.09,
+    "seeds": 0
+   }
+  },
+  "SVM polinomial × SVM RBF": {
+   "acuracia": {
+    "pontos": -0.23,
+    "seeds": 2
+   },
+   "f1": {
+    "pontos": -0.36,
+    "seeds": 1
+   },
+   "auc": {
+    "pontos": 1.34,
+    "seeds": 10
+   }
+  },
+  "SVM linear × regressão logística": {
+   "acuracia": {
+    "pontos": 0.02,
+    "seeds": 7
+   },
+   "f1": {
+    "pontos": -0.13,
+    "seeds": 1
+   },
+   "auc": {
+    "pontos": -0.02,
+    "seeds": 3
+   }
+  },
+  "rede neural × SVM RBF": {
+   "acuracia": {
+    "pontos": -0.22,
+    "seeds": 2
+   },
+   "f1": {
+    "pontos": 0.32,
+    "seeds": 7
+   },
+   "auc": {
+    "pontos": 1.96,
+    "seeds": 10
+   }
+  },
+  "rede neural × SVM linear": {
+   "acuracia": {
+    "pontos": 0.35,
+    "seeds": 9
+   },
+   "f1": {
+    "pontos": 1.14,
+    "seeds": 10
+   },
+   "auc": {
+    "pontos": 0.66,
+    "seeds": 10
+   }
+  },
+  "rede neural × árvore de decisão": {
+   "acuracia": {
+    "pontos": -0.0,
+    "seeds": 5
+   },
+   "f1": {
+    "pontos": 0.93,
+    "seeds": 10
+   },
+   "auc": {
+    "pontos": 0.88,
+    "seeds": 10
+   }
+  }
+ },
+ "escolhas": {
+  "SVM linear": {
+   "{\"C\": 0.1}": 7,
+   "{\"C\": 1}": 1,
+   "{\"C\": 0.01}": 1,
+   "{\"C\": 10}": 1
+  },
+  "SVM RBF": {
+   "{\"C\": 1, \"gamma\": 0.3}": 5,
+   "{\"C\": 1, \"gamma\": 0.1}": 4,
+   "{\"C\": 10, \"gamma\": 0.03}": 1
+  },
+  "SVM polinomial": {
+   "{\"C\": 1, \"degree\": 2}": 9,
+   "{\"C\": 1, \"degree\": 3}": 1
+  },
+  "rede neural": {
+   "{\"alpha\": 0.0001, \"hidden_layer_sizes\": [32, 16], \"learning_rate_init\": 0.001}": 1,
+   "{\"alpha\": 0.01, \"hidden_layer_sizes\": [16], \"learning_rate_init\": 0.001}": 1,
+   "{\"alpha\": 0.01, \"hidden_layer_sizes\": [64, 32], \"learning_rate_init\": 0.01}": 1,
+   "{\"alpha\": 0.01, \"hidden_layer_sizes\": [16], \"learning_rate_init\": 0.01}": 1,
+   "{\"alpha\": 0.0001, \"hidden_layer_sizes\": [64], \"learning_rate_init\": 0.001}": 1,
+   "{\"alpha\": 0.0001, \"hidden_layer_sizes\": [64, 32], \"learning_rate_init\": 0.001}": 1,
+   "{\"alpha\": 0.01, \"hidden_layer_sizes\": [32], \"learning_rate_init\": 0.01}": 1,
+   "{\"alpha\": 0.01, \"hidden_layer_sizes\": [64, 32], \"learning_rate_init\": 0.001}": 1,
+   "{\"alpha\": 0.0001, \"hidden_layer_sizes\": [16], \"learning_rate_init\": 0.01}": 1,
+   "{\"alpha\": 0.01, \"hidden_layer_sizes\": [64], \"learning_rate_init\": 0.01}": 1
+  },
+  "árvore de decisão": {
+   "combinacoes": 8,
+   "profundidade_min": 8,
+   "sem_limite": 2
+  }
+ },
+ "gamma_rbf": {
+  "0.03": {
+   "seeds": 1,
+   "acuracia": 85.5839,
+   "auc": 89.8586,
+   "vetores": 8123
+  },
+  "0.1": {
+   "seeds": 4,
+   "acuracia": 85.5425,
+   "auc": 89.6885,
+   "vetores": 8340
+  },
+  "0.3": {
+   "seeds": 5,
+   "acuracia": 85.2223,
+   "auc": 88.0158,
+   "vetores": 9232
+  }
+ },
+ "mapa": {
+  "C": [
+   0.01,
+   0.1,
+   1.0,
+   10.0,
+   100.0
+  ],
+  "gamma": [
+   0.001,
+   0.003,
+   0.01,
+   0.03,
+   0.1,
+   0.3,
+   1.0
+  ],
+  "acuracia": [
+   [
+    75.0944,
+    75.5921,
+    76.6538,
+    81.4068,
+    82.9829,
+    79.9179,
+    75.5298
+   ],
+   [
+    76.9317,
+    81.7967,
+    84.111,
+    84.7456,
+    84.9571,
+    84.4967,
+    79.8059
+   ],
+   [
+    83.9451,
+    84.6211,
+    85.0234,
+    85.1603,
+    85.3635,
+    85.4548,
+    83.4681
+   ],
+   [
+    84.9115,
+    84.9903,
+    85.2059,
+    85.3013,
+    85.1354,
+    84.7995,
+    82.3856
+   ],
+   [
+    85.0317,
+    85.1313,
+    85.2142,
+    85.0856,
+    84.6004,
+    83.3395,
+    81.4358
+   ]
+  ],
+  "melhor": {
+   "C": 1.0,
+   "gamma": 0.3,
+   "acuracia": 85.4548
+  },
+  "perto_do_melhor": 13,
+  "combinacoes": 35,
+  "gamma1_C1": {
+   "treino": 90.55,
+   "validacao": 83.4681
+  }
+ },
+ "tempo_por_tamanho": {
+  "LinearSVC": {
+   "n": [
+    1000,
+    2000,
+    4000,
+    8000,
+    16000,
+    24111
+   ],
+   "tempo_s": [
+    0.0055,
+    0.0063,
+    0.0104,
+    0.0203,
+    0.0434,
+    0.0681
+   ],
+   "inclinacao": 1.05
+  },
+  "SVC RBF": {
+   "n": [
+    1000,
+    2000,
+    4000,
+    8000,
+    16000,
+    24111
+   ],
+   "tempo_s": [
+    0.0127,
+    0.0444,
+    0.1784,
+    0.542,
+    2.134,
+    5.8391
+   ],
+   "inclinacao": 1.93
+  },
+  "SVC linear": {
+   "n": [
+    1000,
+    2000,
+    4000,
+    8000,
+    16000,
+    24111
+   ],
+   "tempo_s": [
+    0.0118,
+    0.0312,
+    0.127,
+    0.4763,
+    1.883,
+    4.226
+   ],
+   "inclinacao": 1.95
+  },
+  "random forest": {
+   "n": [
+    1000,
+    2000,
+    4000,
+    8000,
+    16000,
+    24111
+   ],
+   "tempo_s": [
+    0.2057,
+    0.2965,
+    0.5185,
+    0.9435,
+    1.8287,
+    2.836
+   ],
+   "inclinacao": 0.94
+  },
+  "regressão logística": {
+   "n": [
+    1000,
+    2000,
+    4000,
+    8000,
+    16000,
+    24111
+   ],
+   "tempo_s": [
+    0.007,
+    0.0094,
+    0.016,
+    0.0211,
+    0.0405,
+    0.0606
+   ],
+   "inclinacao": 0.75
+  },
+  "árvore de decisão": {
+   "n": [
+    1000,
+    2000,
+    4000,
+    8000,
+    16000,
+    24111
+   ],
+   "tempo_s": [
+    0.0054,
+    0.0071,
+    0.0107,
+    0.0186,
+    0.0355,
+    0.0525
+   ],
+   "inclinacao": 0.89
+  }
+ },
+ "seed0": {
+  "kernels": {
+   "LinearSVC": {
+    "acuracia": 84.572,
+    "f1_pos": 66.4744,
+    "auc": 89.808,
+    "treino_s": 0.075,
+    "vetores": null
+   },
+   "SVC linear": {
+    "acuracia": 84.5056,
+    "f1_pos": 66.5951,
+    "auc": 89.6773,
+    "treino_s": 4.736,
+    "vetores": 8515
+   },
+   "SVC RBF": {
+    "acuracia": 84.9038,
+    "f1_pos": 66.6667,
+    "auc": 89.061,
+    "treino_s": 4.67,
+    "vetores": 8231
+   },
+   "SVC polinomial grau 2": {
+    "acuracia": 84.9536,
+    "f1_pos": 67.3389,
+    "auc": 89.9024,
+    "treino_s": 3.807,
+    "vetores": 8076
+   },
+   "SVC polinomial grau 3": {
+    "acuracia": 85.0863,
+    "f1_pos": 67.6502,
+    "auc": 88.812,
+    "treino_s": 4.925,
+    "vetores": 8048
+   }
+  },
+  "padronizacao": {
+   "RBF com": {
+    "acuracia": 84.9867,
+    "f1_pos": 67.5511,
+    "auc": 87.5939,
+    "treino_s": 6.284,
+    "vetores": 9147
+   },
+   "RBF sem": {
+    "acuracia": 80.574,
+    "f1_pos": 50.7776,
+    "auc": 82.4309,
+    "treino_s": 30.624,
+    "vetores": 16995
+   },
+   "LinearSVC com": {
+    "acuracia": 84.572,
+    "f1_pos": 66.4744,
+    "auc": 89.808,
+    "treino_s": 0.075,
+    "vetores": null
+   },
+   "LinearSVC sem": {
+    "acuracia": 84.6384,
+    "f1_pos": 66.5221,
+    "auc": 89.5722,
+    "treino_s": 0.056,
+    "vetores": null
+   }
+  },
+  "treino": 24111,
+  "teste": 6028
+ }
+}
