@@ -4,7 +4,7 @@ Trabalhos da disciplina de Aprendizagem de Máquina (PPGCC010, UFPI). Cada famí
 
 - **`proteinas/`**: base 1, molécula → proteína-alvo (ChEMBL 37, 27.714 moléculas, 4 classes). Árvore de decisão e variações: Random Tree, Random Forest, Gradient Boosting. Concluída.
 - **`emprestimos/`**: base 2, cliente → aprovação de empréstimo (Kaggle, 4.269 pedidos, binária). Redes neurais. Concluída.
-- **`renda/`** (a criar): base 3, pessoa → renda anual acima de 50 mil dólares ([Adult Census Income](https://www.kaggle.com/datasets/uciml/adult-census-income), censo dos EUA de 1994, 32.561 pessoas, binária). SVM. Próxima etapa.
+- **`renda/`**: base 3, pessoa → renda anual acima de 50 mil dólares ([Adult Census Income](https://www.kaggle.com/datasets/uciml/adult-census-income), censo dos EUA de 1994, 30.139 pessoas após a curadoria, binária). SVM, comparada com a rede neural da base 2. Notebooks e resultados concluídos; relatório e slides em andamento.
 - **`comum/`**: o que os slides das bases compartilham (`slides_common.py`, template SBC, `export_slides_pdf.ps1`).
 
 O README explica as bases e os resultados. Este arquivo trata de como trabalhar no código.
@@ -42,25 +42,16 @@ Todas as bases têm um pacote chamado `src`. Nunca importe duas delas no mesmo p
 - **Seeds.** Os resultados finais usam 10 seeds (0 a 9). Análises de uma seed só usam 42.
 - **Base 1, divisão agrupada.** Moléculas com os mesmos 5 descritores ficam do mesmo lado da divisão (`modeling.descriptor_groups`). A divisão aleatória existe só para medir o vazamento.
 - **Base 2, protocolo comum.** Todo modelo novo passa por `emprestimos/src/avaliacao.py`: `rodar_seeds(fabrica, X, y)` faz a divisão estratificada 80/20, a busca com validação cruzada de 5 partes dentro do treino e mede os tempos num único núcleo. `resumir` agrega as seeds. Os resultados ficam em `emprestimos/resultados/` (`referencias.csv`, `rede.csv`), uma linha por seed e modelo.
+- **Base 3, mesmo protocolo.** `renda/src/avaliacao.py` é uma cópia adaptada do da base 2: `preprocessador()` faz o one-hot dos categóricos e a padronização dos numéricos dentro do `Pipeline` (80 colunas), e `treinar_e_medir` grava também F1 da classe >50K, falsos positivos e negativos, vetores de suporte (SVC) e épocas (rede). Resultados em `renda/resultados/`: `referencias.csv`, `svm.csv`, `rede.csv`, uma linha por seed e modelo; os demais CSVs são do estudo numa seed (`svm_mapa.csv`, `svm_tempo_por_tamanho.csv`) e dos erros por grupo.
+- **Base 3, raça e sexo.** `race` e `sex` ficam em `renda.csv`, mas fora de `config.FEATURES`: nenhum modelo os usa. Servem só à análise exploratória e à comparação de erros entre grupos depois da previsão (`carregar_sensiveis`).
+- **Base 3, notebooks demorados.** O `04_svm_estudo` leva cerca de 45 min, o `05_svm_comparacao` cerca de 2 h e o `06_rede_comparacao` cerca de 20 min. O 06 não treina as SVMs de novo: lê `svm.csv`. Rode em segundo plano.
 
-## Próxima etapa: SVM na base 3
+## Próxima etapa: relatório e slides da base 3
 
-A SVM é estudada numa base nova, não na de empréstimos. Siga o formato de `emprestimos/`:
+Seguem o padrão da base 2 (`emprestimos/report/` e `emprestimos/scripts/`):
 
-- `renda/` com a mesma estrutura das outras bases; CSV do Kaggle em `renda/data/raw/`, conferido por `RAW_SHA256` em `renda/src/config.py`;
-- notebooks na ordem: curadoria, análise exploratória, pontos de referência e SVM;
-- protocolo de avaliação como o de `emprestimos/src/avaliacao.py` (copiado para `renda/src/`, já que os pacotes `src` não se misturam): 10 seeds, divisão estratificada 80/20, busca com validação cruzada de 5 partes no treino, tempo num único núcleo;
-- resultados em `renda/resultados/`, uma linha por seed e modelo.
-
-O que a base traz de diferente e precisa de decisão no notebook:
-
-- valores ausentes marcados com `?` em `workclass`, `occupation` e `native.country`;
-- atributos categóricos, que a SVM só aceita depois de codificados (one-hot dentro do `Pipeline`, com a padronização dos numéricos);
-- classes desbalanceadas (cerca de 24% com renda acima de 50 mil), o que pede F1 macro e AUC além da acurácia;
-- tamanho: com cerca de 26 mil pedidos de treino, o `SVC` com kernel é lento (o custo cresce mais que linearmente com o número de exemplos); a busca precisa caber no tempo;
-- `fnlwgt` é um peso amostral do censo, não um atributo da pessoa.
-
-O relatório e os slides da SVM ainda não têm formato definido. Pergunte antes de criá-los.
+- relatório em LaTeX no formato SBC, em `renda/report/`, com números, tabelas e figuras gerados por scripts em `renda/scripts/` a partir de `renda/resultados/`;
+- slides gerados por `build_slides_*.py` com `comum/slides_common.py`, roteiro em `notas_*.md`; podem passar de 10 slides.
 
 ## Ambiente (Windows)
 
