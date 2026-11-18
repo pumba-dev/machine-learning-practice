@@ -9,7 +9,7 @@ Trabalhos da disciplina de Aprendizagem de Máquina (PPGCC010, UFPI). Cada famí
 | Origem | API do [ChEMBL](https://www.ebi.ac.uk/chembl/) (versão 37) | [Kaggle](https://www.kaggle.com/datasets/architsharma01/loan-approval-prediction-dataset) | [Kaggle](https://www.kaggle.com/datasets/uciml/adult-census-income) (UCI Adult, censo dos EUA de 1994) |
 | Tamanho | 27.714 moléculas, 17 atributos | 4.269 pedidos, 11 atributos | 32.561 pessoas, 14 atributos |
 | Modelos estudados | Árvore de decisão e variações: Random Tree, Random Forest, Gradient Boosting | Redes neurais (MLP) | SVM |
-| Pasta | [`proteinas/`](proteinas/) | [`emprestimos/`](emprestimos/) | `renda/` (a criar) |
+| Pasta | [`proteinas/`](proteinas/) | [`emprestimos/`](emprestimos/) | [`renda/`](renda/) |
 
 Cada pasta é autocontida: tem os dados, os notebooks, o código, os resultados, o relatório e os slides da sua base.
 
@@ -179,9 +179,24 @@ Média de 10 seeds ([`emprestimos/resultados/`](emprestimos/resultados/)):
 
 ## Base 3: renda e SVM
 
-A fazer. A quarta análise estuda a SVM (máquina de vetores de suporte) numa base nova: o [Adult Census Income](https://www.kaggle.com/datasets/uciml/adult-census-income), extraído do censo dos EUA de 1994 e publicado pela UCI. São 32.561 pessoas, com 14 atributos (idade, escolaridade, ocupação, estado civil, horas trabalhadas por semana, ganhos e perdas de capital, entre outros), e o alvo `income` diz se a renda anual passa de 50 mil dólares (cerca de 24% passam).
+Em andamento. A quarta análise estuda a SVM (máquina de vetores de suporte) numa base nova, seguindo o formato da base 2: curadoria, análise exploratória, pontos de referência e a SVM, pelo mesmo protocolo de 10 seeds e com o tempo medido num único núcleo.
 
-A base traz o que as anteriores não tinham: atributos categóricos, valores ausentes (marcados com `?`) e um tamanho em que a SVM com kernel fica lenta. A análise vai seguir o formato da base 2: curadoria, análise exploratória, pontos de referência e a SVM, pelo mesmo protocolo de 10 seeds e com o tempo medido num único núcleo.
+### Os dados
+
+[Adult Census Income](https://www.kaggle.com/datasets/uciml/adult-census-income) do Kaggle (UCI Machine Learning, versão 3, licença CC0): a base *Adult* da UCI, extraída do censo dos EUA de 1994. São 32.561 pessoas e 14 atributos; o alvo `income` diz se a renda anual passa de 50 mil dólares (24,1% passam).
+
+A base traz o que as anteriores não tinham: atributos categóricos, valores ausentes (marcados com `?`) e um tamanho em que a SVM com kernel fica lenta.
+
+A curadoria mantém as linhas com valores ausentes (o `?` vira célula vazia; quem tem o tipo de vínculo ausente passa de 50 mil em 10,4% dos casos, contra 24,1% no geral), remove 24 linhas repetidas e converte o alvo em 0/1. A base final tem 32.537 pessoas. Dos 14 atributos, 12 entram nos modelos: `education` repete `education.num` em texto, e `fnlwgt` é um peso amostral do censo, não um dado da pessoa.
+
+### Notebooks
+
+| Notebook | O que faz |
+|---|---|
+| [`01_curadoria`](renda/notebooks/01_curadoria.ipynb) | Confere o hash do CSV, trata `?` e linhas repetidas, escolhe os atributos e grava `renda.csv` |
+| `02_analise_exploratoria` | A fazer |
+| `03_referencias` | A fazer |
+| `04_svm` | A fazer |
 
 ---
 

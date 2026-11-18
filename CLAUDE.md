@@ -4,7 +4,7 @@ Trabalhos da disciplina de Aprendizagem de Máquina (PPGCC010, UFPI). Cada famí
 
 - **`proteinas/`**: base 1, molécula → proteína-alvo (ChEMBL 37, 27.714 moléculas, 4 classes). Árvore de decisão e variações: Random Tree, Random Forest, Gradient Boosting. Concluída.
 - **`emprestimos/`**: base 2, cliente → aprovação de empréstimo (Kaggle, 4.269 pedidos, binária). Redes neurais. Concluída.
-- **`renda/`** (a criar): base 3, pessoa → renda anual acima de 50 mil dólares ([Adult Census Income](https://www.kaggle.com/datasets/uciml/adult-census-income), censo dos EUA de 1994, 32.561 pessoas, binária). SVM. Próxima etapa.
+- **`renda/`**: base 3, pessoa → renda anual acima de 50 mil dólares ([Adult Census Income](https://www.kaggle.com/datasets/uciml/adult-census-income), censo dos EUA de 1994, 32.561 pessoas, binária). SVM. Próxima etapa.
 - **`comum/`**: o que os slides das bases compartilham (`slides_common.py`, template SBC, `export_slides_pdf.ps1`).
 
 O README explica as bases e os resultados. Este arquivo trata de como trabalhar no código.
@@ -47,18 +47,24 @@ Todas as bases têm um pacote chamado `src`. Nunca importe duas delas no mesmo p
 
 A SVM é estudada numa base nova, não na de empréstimos. Siga o formato de `emprestimos/`:
 
-- `renda/` com a mesma estrutura das outras bases; CSV do Kaggle em `renda/data/raw/`, conferido por `RAW_SHA256` em `renda/src/config.py`;
-- notebooks na ordem: curadoria, análise exploratória, pontos de referência e SVM;
+- `renda/` com a mesma estrutura das outras bases; CSV do Kaggle em `renda/data/raw/adult.csv`, conferido por `RAW_SHA256` em `renda/src/config.py`;
+- notebooks na ordem: curadoria (feita), análise exploratória, pontos de referência e SVM;
 - protocolo de avaliação como o de `emprestimos/src/avaliacao.py` (copiado para `renda/src/`, já que os pacotes `src` não se misturam): 10 seeds, divisão estratificada 80/20, busca com validação cruzada de 5 partes no treino, tempo num único núcleo;
 - resultados em `renda/resultados/`, uma linha por seed e modelo.
 
-O que a base traz de diferente e precisa de decisão no notebook:
+Decisões da curadoria (`renda/notebooks/01_curadoria.ipynb`):
 
-- valores ausentes marcados com `?` em `workclass`, `occupation` e `native.country`;
+- os `?` de `workclass`, `occupation` e `native.country` viram células vazias em `renda.csv`, e as linhas ficam (a ausência se relaciona com o alvo). O tratamento do vazio (por exemplo, uma categoria "ausente") fica no `Pipeline` de cada modelo;
+- as 24 linhas repetidas saem; a base processada tem 32.537 pessoas;
+- `education` (texto de `education.num`) e `fnlwgt` (peso amostral do censo) ficam na base, mas fora dos modelos (`config.FORA`). Os modelos usam `config.FEATURES`: 5 numéricos (`config.NUMERICOS`) e 7 categóricos (`config.CATEGORICOS`);
+- o alvo `income` vira 1 para renda acima de 50 mil (24,1%).
+
+O que ainda precisa de decisão:
+
 - atributos categóricos, que a SVM só aceita depois de codificados (one-hot dentro do `Pipeline`, com a padronização dos numéricos);
-- classes desbalanceadas (cerca de 24% com renda acima de 50 mil), o que pede F1 macro e AUC além da acurácia;
-- tamanho: com cerca de 26 mil pedidos de treino, o `SVC` com kernel é lento (o custo cresce mais que linearmente com o número de exemplos); a busca precisa caber no tempo;
-- `fnlwgt` é um peso amostral do censo, não um atributo da pessoa.
+- ganho e perda de capital, zerados para mais de 90% das pessoas e muito assimétricos, o que pesa na padronização;
+- classes desbalanceadas, o que pede F1 macro e AUC além da acurácia;
+- tamanho: com cerca de 26 mil pessoas no treino, o `SVC` com kernel é lento (o custo cresce mais que linearmente com o número de exemplos); a busca precisa caber no tempo.
 
 O relatório e os slides da SVM ainda não têm formato definido. Pergunte antes de criá-los.
 
