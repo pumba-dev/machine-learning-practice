@@ -1,0 +1,51 @@
+\section{Resultados}\label{sec:rn_resultados}
+
+\textbf{Padronização.} A mesma rede, com 16 neurônios numa camada, acerta \rnSemPadAcc~$\pm$~\rnSemPadSd\% sem padronização, abaixo do piso de \rnAprovados\%, com AUC de \rnSemPadAuc\%, o mesmo que sortear. Com padronização, acerta \rnComPadAcc~$\pm$~\rnComPadSd\%. Sem ela, a renda e os patrimônios, na casa dos milhões, dominam a soma ponderada de cada neurônio, e o passo do otimizador, do mesmo tamanho para todos os pesos, não serve ao mesmo tempo para atributos de 0 a 5 e de 0 a 40 milhões~\cite{lecun:98}. A árvore não sofre com isso, porque compara cada atributo apenas com um limiar.
+
+\textbf{Neurônios.} A Figura~\ref{fig:rn_neuronios} mostra a acurácia de validação cruzada (seed 42) por número de neurônios. Com 1 neurônio por camada, a rede fica perto da regressão logística (\rnNeurUm\% com uma camada). Com 2 a 8 neurônios, já passa de 97\%, e o melhor ponto, duas camadas de 8, chega a \rnNeurOitoDuas\%, perto da árvore. Mais neurônios não ajudam: com 64 numa camada, a acurácia cai para \rnNeurSessentaQuatro\%. A curva é irregular porque cada ponto é uma única rede, e o resultado depende dos pesos iniciais sorteados.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=.5\textwidth]{figures/rn_neuronios.pdf}
+\caption{Acurácia de validação cruzada (5 partes, seed 42) por número de neurônios em cada camada oculta, com taxa de aprendizado de $10^{-2}$ e sem parada antecipada. As linhas horizontais são a acurácia de teste da árvore e da regra de um corte (média de 10 seeds).}
+\label{fig:rn_neuronios}
+\end{figure}
+
+\textbf{Épocas e paciência.} Cada época é uma passada completa pelo treino. A Figura~\ref{fig:rn_epocas} acompanha uma rede de 32 neurônios por 400 épocas, sem parada antecipada. A perda de treino continua caindo, enquanto a de validação se estabiliza: a partir daí, a rede passa a ajustar detalhes do treino que não se repetem na validação (Figura~\ref{fig:rn_epocas}a). Com taxa de aprendizado de $10^{-3}$, a rede aprende devagar, e a acurácia de validação passa longos trechos sem melhorar. Com paciência 10, o treino pararia na época \rnParadaLentaDez{}, com \rnParadaAccLentaDez\% de validação, quando a mesma rede chegaria a \rnMelhorLenta\%; com paciência 30, para na época \rnParadaLentaTrinta{}, com \rnParadaAccLentaTrinta\% (Figura~\ref{fig:rn_epocas}b). Com taxa de $10^{-2}$, chega a 97\% em menos de 100 épocas. A busca em grade confirmou o quadro: escolheu a taxa de $10^{-2}$ em \rnSeedsTaxa{} das 10 seeds e duas camadas ocultas em \rnSeedsDuas{} (32 e 16 neurônios em \rnSeedsTrintaDezesseis), e a rede final treinou de \rnEpocasMin{} a \rnEpocasMax{} épocas.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\textwidth]{figures/rn_epocas.pdf}
+\caption{Uma rede de 32 neurônios treinada por 400 épocas (seed 42; 80\% do treino para ajustar e 20\% para validar). (a) Perda no treino e na validação, com taxa de aprendizado de $10^{-3}$. (b) Acurácia de validação com as duas taxas; as linhas verticais marcam onde a parada antecipada interromperia a rede de taxa $10^{-3}$ com paciência de 10 e de 30 épocas.}
+\label{fig:rn_epocas}
+\end{figure}
+
+\textbf{Comparação com os modelos de referência.} A Tabela~\ref{tab:rn_modelos} reúne os seis modelos. A rede acerta \rnAccRede~$\pm$~\rnSdRede\%. Comparando seed a seed, ela supera a regressão logística em todas as 10 seeds (\rnDifRedeLog{} pontos), o que mostra o ganho das camadas ocultas sobre um neurônio só, e supera a regra de um corte em \rnSeedsRedeRegra{} das 10 (\rnDifRedeRegra{} ponto, menos que o desvio entre seeds). Perde para a árvore de decisão em todas as seeds (\rnDifRedeArv{} ponto) e para a Random Forest em 9 (\rnDifRedeRF{} ponto). Também é o modelo menos estável: o desvio de \rnSdRede{} ponto é quase três vezes o da árvore. A AUC conta outra parte da história. A da rede (\rnAucRede\%) é maior que a da árvore (\rnAucArv\%), assim como a da regressão logística (\rnAucLog\%) é maior que a da regra de um corte (\rnAucRegra\%), que acerta mais: os modelos de saída suave ordenam bem os pedidos, e o que erram é o corte em 50\%. Árvore e Random Forest empatam (\rnDifRFArv{} ponto, a floresta melhor em \rnSeedsRFArv{} das 10 seeds).
+
+\begin{table}[ht]
+\centering
+\caption{Os seis modelos na base de empréstimos (média $\pm$ desvio em 10 seeds; erros em \rnTeste{} pedidos de teste). Tempos: mediana das 10 seeds, num único núcleo. Treino: o do modelo final; busca: a busca em grade com validação cruzada de 5 partes; previsão: os \rnTeste{} pedidos de teste.}
+\label{tab:rn_modelos}
+\footnotesize
+\input{results/tab_rn_modelos}
+\end{table}
+
+\textbf{Tempo.} Treinar a rede final leva \rnTreinoRedeMs{} ms, cerca de \rnRazaoTreino{} vezes os \rnTreinoArvMs{} ms da árvore, e menos da metade dos \rnTreinoRFMs{} ms da Random Forest. O maior custo da rede está na escolha dos hiperparâmetros: a busca leva \rnBuscaRede{} s por seed, contra \rnBuscaArv{} s da árvore (\rnRazaoBusca{} vezes mais), porque cada uma das \rnCombinacoes{} combinações treina 5 redes por dezenas de épocas. Prever é rápido para quase todos: \rnPrevRedeMs{} ms para a rede e menos de 1 ms para a árvore, contra \rnPrevRFMs{} ms da Random Forest, que consulta 300 árvores.
+
+\textbf{Onde a rede erra.} Na seed 42, a rede comete \rnErrosRedeSeed{} erros no teste, e a árvore, \rnErrosArvSeed. Os erros da rede se concentram logo acima do degrau: entre 550 e 599 pontos há \rnPedidosFaixa{} pedidos de teste, e a rede erra \rnErrosRedeFaixa{}, contra \rnErrosArvFaixa{} da árvore. A árvore, por sua vez, erra sobretudo na exceção dos prazos curtos (score abaixo de 550 e prazo de até 4 anos, \rnExcecao{} pedidos): \rnErrosArvExc{} dos seus \rnErrosArvSeed{} erros, contra \rnErrosRedeExc{} da rede. A Figura~\ref{fig:rn_rampa} mostra a causa. A árvore representa o degrau com uma pergunta e dá probabilidades de 0 ou 100\% em quase todos os pedidos. A rede desenha uma rampa: entre 500 e 599 pontos, \rnInterRede\% das suas probabilidades ficam entre 10\% e 90\%, contra \rnInterArv\% na árvore, e é nessa rampa que estão os seus erros. Redes neurais tendem a aprender funções suaves, e uma relação em degrau é justamente o caso em que modelos de árvore costumam levar vantagem em dados tabulares~\cite{grinsztajn:22}.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\textwidth]{figures/rn_rampa_degrau.pdf}
+\caption{Probabilidade de aprovação prevista para cada pedido de teste, por score de crédito (seed 42), colorida pela situação real. (a) Rede neural. (b) Árvore de decisão. A linha tracejada marca 550.}
+\label{fig:rn_rampa}
+\end{figure}
+
+\textbf{Tipos de erro.} Com a aprovação como classe positiva, um falso positivo é aprovar um pedido que foi rejeitado, o erro que expõe o banco a calote, e um falso negativo é recusar um pedido que foi aprovado, o que custa um bom cliente. Na seed 42 (Figura~\ref{fig:rn_confusao}), a rede tem \rnFPRedeSeed{} falsos positivos e \rnFNRedeSeed{} falsos negativos; a árvore, \rnFPArvSeed{} e \rnFNArvSeed. Quase toda a diferença está nos falsos negativos, a maioria deles entre 550 e 599 pontos, na rampa da rede. Na média das 10 seeds, porém, a rede erra mais dos dois lados: \rnFPRedeMed{} falsos positivos e \rnFNRedeMed{} falsos negativos por seed, contra \rnFPArvMed{} e \rnFNArvMed{} da árvore. Em proporção, a rede aprova \rnTaxaFPRede\% dos \rnTesteRej{} pedidos rejeitados do teste e recusa \rnTaxaFNRede\% dos \rnTesteAprov{} aprovados (árvore: \rnTaxaFPArv\% e \rnTaxaFNArv\%). Os dois modelos erram mais aprovando do que recusando: só em \rnSeedsFNRede{} das 10 seeds a rede tem mais falsos negativos que falsos positivos, e a árvore também em \rnSeedsFNArv. Se um calote custar mais que um cliente perdido, o corte de 50\% poderia ser elevado, escolhido na validação; não o fizemos, para manter o mesmo critério em todos os modelos.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=.62\textwidth]{figures/rn_confusao.pdf}
+\caption{Matriz de confusão no teste (seed 42, \rnTeste{} pedidos). (a) Rede neural. (b) Árvore de decisão. Cor pela proporção da classe real; número em contagem.}
+\label{fig:rn_confusao}
+\end{figure}

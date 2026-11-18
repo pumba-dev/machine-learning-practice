@@ -1,0 +1,11 @@
+\section{Introdução}
+
+Este trabalho trata da previsão de aprovação de pedidos de empréstimo: dado um pedido, descrito por 11 atributos do pedido e de quem o fez, prever se ele foi aprovado. A base, publicada no Kaggle~\cite{kaggle:loan}, é pequena, sem valores ausentes, e o rótulo depende quase só do score de crédito. Ela serve para estudar o treino de uma rede neural (padronização, número de neurônios, épocas e parada antecipada) e para comparar a rede com modelos mais simples num caso em que a forma da regra que gerou os rótulos é conhecida.
+
+O modelo principal é uma rede neural do tipo perceptron de múltiplas camadas (MLP), comparada com cinco modelos de referência: a classe majoritária, uma regra de um corte, a regressão logística, a árvore de decisão e a Random Forest. Além da acurácia, registramos o tempo de treino, de busca de hiperparâmetros e de previsão de cada modelo. As contribuições são:
+\begin{itemize}
+  \item uma análise exploratória que mostra que os rótulos seguem quase um degrau no score de crédito, com uma exceção para prazos curtos (Seção~\ref{sec:rn_eda});
+  \item um estudo do treino da rede: o efeito da padronização, do número de neurônios e da paciência da parada antecipada (Seção~\ref{sec:rn_resultados});
+  \item uma comparação da rede com os modelos de referência em 10 seeds, com acurácia, F1 macro, AUC e tempo num único núcleo, que mostra quando a rede não compensa;
+  \item uma análise de onde cada modelo erra, que liga os erros da rede à rampa com que ela aproxima o degrau.
+\end{itemize}

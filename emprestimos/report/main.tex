@@ -1,0 +1,66 @@
+\documentclass[12pt]{article}
+
+\usepackage{sbc-template}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[english,brazilian]{babel}
+\usepackage{graphicx,url}
+\usepackage{booktabs}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning}
+
+\sloppy
+\hyphenation{SMILES}
+
+% Números citados no texto, gerados por scripts/rn_report.py a partir de results/rn_dados.json.
+\input{results/numeros_rn}
+
+\title{Redes neurais na aprovação de empréstimos: comparação com árvore de decisão e modelos de referência}
+
+\author{Bernan R. do Nascimento\inst{1}, Paulo E. R. Araujo\inst{1}, Thiago R. P. de Carvalho\inst{1}}
+
+\address{Universidade Federal do Piauí (UFPI)\\
+  Programa de Pós-Graduação em Ciência da Computação -- Teresina -- PI -- Brasil\\
+  PPGCC010 -- Aprendizagem de Máquina (2026.2) -- Prof. Vinicius Ponte Machado
+  \email{bernanr7@gmail.com, pauloaraujo@ufpi.edu.br}
+  \email{thiago.rafael.pc@gmail.com}
+}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+  We predict whether a loan application is approved from 11 attributes of the application and the
+  applicant, on a public dataset of \rnLinhasEn{} applications, and use it to study how a multilayer
+  perceptron is trained and to compare it with simpler models, including execution time. The network
+  reaches \rnAccRedeEn\%, above a one-threshold rule (\rnAccRegraEn\%) and logistic regression
+  (\rnAccLogEn\%) but below a decision tree (\rnAccArvEn\%), which also trains about \rnRazaoTreino{}
+  times faster. The labels follow a step on the credit score: the tree draws it with one cut, while the
+  network approximates it with a ramp, where its errors concentrate.
+\end{abstract}
+
+\begin{resumo}
+  Prevemos se um pedido de empréstimo foi aprovado a partir de 11 atributos do pedido e de quem o fez,
+  numa base pública de \rnLinhas{} pedidos, e a usamos para estudar o treino de uma rede neural e
+  compará-la com modelos mais simples, incluindo o tempo de execução. Sem padronização dos atributos, a
+  rede não aprende (\rnSemPadAcc\%). Com ela, uma rede neural (perceptron de múltiplas camadas) acerta
+  \rnAccRede\%, acima de uma regra de um corte (\rnAccRegra\%) e da regressão logística (\rnAccLog\%),
+  mas abaixo da árvore de decisão (\rnAccArv\%), que ainda treina cerca de \rnRazaoTreino{} vezes mais
+  rápido. Os rótulos seguem um degrau no score de crédito: a árvore o representa com um corte, e a rede
+  o aproxima com uma rampa, onde se concentram seus erros.
+\end{resumo}
+
+\input{sections/01_introducao}
+\input{sections/02_fundamentacao}
+\input{sections/03_dados}
+\input{sections/04_eda}
+\input{sections/05_metodologia}
+\input{sections/06_resultados}
+\input{sections/07_limitacoes}
+\input{sections/08_conclusao}
+
+\bibliographystyle{sbc}
+\bibliography{refs}
+
+\end{document}

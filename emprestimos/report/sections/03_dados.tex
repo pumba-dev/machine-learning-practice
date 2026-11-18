@@ -1,0 +1,30 @@
+\section{Dados e curadoria}\label{sec:rn_dados}
+
+A base é o \emph{Loan-Approval-Prediction-Dataset}, publicado no Kaggle~\cite{kaggle:loan}: \rnLinhas{} pedidos, cada um com um identificador, 11 atributos e o rótulo (aprovado ou rejeitado). A Tabela~\ref{tab:rn_atributos} lista os atributos com os nomes usados neste trabalho. A página não informa a moeda; como o score é o do CIBIL, o birô de crédito da Índia, os valores devem estar em rúpias. Isso não afeta os modelos, que só comparam valores entre si.
+
+\begin{table}[ht]
+\centering
+\caption{Atributos da base de empréstimos: nome no arquivo original, nome usado neste trabalho e faixa de valores. Valores em dinheiro em milhões, na moeda da base.}
+\label{tab:rn_atributos}
+\footnotesize
+\begin{tabular}{lll}
+\toprule
+Coluna original & Nome neste trabalho & Valores \\
+\midrule
+\texttt{no\_of\_dependents} & dependentes & 0 a 5 \\
+\texttt{education} & graduado & 1 = \emph{Graduate}, 0 = \emph{Not Graduate} \\
+\texttt{self\_employed} & autônomo & 1 = \emph{Yes}, 0 = \emph{No} \\
+\texttt{income\_annum} & renda anual & 0,2 a 9,9 \\
+\texttt{loan\_amount} & valor do empréstimo & 0,3 a 39,5 \\
+\texttt{loan\_term} & prazo (anos) & 2 a 20, de 2 em 2 \\
+\texttt{cibil\_score} & score de crédito & 300 a 900 \\
+\texttt{residential\_assets\_value} & patrimônio residencial & 0 a 29,1 \\
+\texttt{commercial\_assets\_value} & patrimônio comercial & 0 a 19,4 \\
+\texttt{luxury\_assets\_value} & bens de luxo & 0,3 a 39,2 \\
+\texttt{bank\_asset\_value} & saldo bancário & 0 a 14,7 \\
+\texttt{loan\_status} & aprovado (rótulo) & 1 = \emph{Approved}, 0 = \emph{Rejected} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+A curadoria foi curta, porque a base não tem valores ausentes nem linhas repetidas. O arquivo baixado é conferido pelo seu \emph{hash} SHA-256, para garantir que todos os experimentos partem do mesmo arquivo. Os nomes de colunas e os textos vinham com espaços no início, que foram removidos. \rnNegativos{} pedidos tinham patrimônio residencial de $-$100 mil, um valor impossível. Como a taxa de aprovação nessas linhas (57\%) é próxima da geral (\rnAprovados\%), o valor parece um erro de digitação, e não um sinal sobre o pedido; as linhas foram mantidas e o valor foi trocado por 0, que já aparece em outros 45 pedidos. Por fim, os três textos (escolaridade, autônomo e situação) viraram 0 e 1.

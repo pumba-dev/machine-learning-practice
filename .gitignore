@@ -5,12 +5,12 @@ __pycache__/
 .vscode/
 
 # LaTeX
-report/*.aux
-report/*.bbl
-report/*.blg
-report/*.log
-report/*.out
-report/*.fls
-report/*.fdb_latexmk
-report/*.synctex.gz
-report/build.out
+**/report/*.aux
+**/report/*.bbl
+**/report/*.blg
+**/report/*.log
+**/report/*.out
+**/report/*.fls
+**/report/*.fdb_latexmk
+**/report/*.synctex.gz
+**/report/build.out
