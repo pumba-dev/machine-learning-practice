@@ -22,6 +22,50 @@
    "separado(a)": 7.0288,
    "nunca casou": 4.8399
   },
+  "por_anos_de_estudo": {
+   "1": 0.0,
+   "2": 4.0268,
+   "3": 4.1812,
+   "4": 6.295,
+   "5": 5.4945,
+   "6": 7.1951,
+   "7": 5.6298,
+   "8": 7.6923,
+   "9": 16.4328,
+   "10": 20.018,
+   "11": 26.3198,
+   "12": 25.3968,
+   "13": 42.1658,
+   "14": 56.4576,
+   "15": 74.9077,
+   "16": 74.6667
+  },
+  "pessoas_por_anos_de_estudo": {
+   "1": 44,
+   "2": 149,
+   "3": 287,
+   "4": 556,
+   "5": 455,
+   "6": 820,
+   "7": 1048,
+   "8": 377,
+   "9": 9834,
+   "10": 6669,
+   "11": 1307,
+   "12": 1008,
+   "13": 5042,
+   "14": 1626,
+   "15": 542,
+   "16": 375
+  },
+  "correlacao_alvo": {
+   "age": 0.242,
+   "education.num": 0.335,
+   "capital.gain": 0.221,
+   "capital.loss": 0.15,
+   "hours.per.week": 0.229
+  },
+  "repetem_perfil": 5057,
   "faixas": {
    "age": [
     17,
@@ -50,6 +94,8 @@
    "acuracia": 75.0995,
    "desvio": 0.0,
    "f1": 42.8896,
+   "desvio_f1": 0.0,
+   "desvio_auc": 0.0,
    "f1_pos": 0.0,
    "auc": 50.0,
    "fp": 0.0,
@@ -62,6 +108,8 @@
    "acuracia": 75.0995,
    "desvio": 0.0,
    "f1": 42.8896,
+   "desvio_f1": 0.0,
+   "desvio_auc": 0.5916,
    "f1_pos": 0.0,
    "auc": 75.6013,
    "fp": 0.0,
@@ -74,6 +122,8 @@
    "acuracia": 84.7976,
    "desvio": 0.3041,
    "f1": 78.3332,
+   "desvio_f1": 0.3808,
+   "desvio_auc": 0.4061,
    "f1_pos": 66.4986,
    "auc": 90.1989,
    "fp": 324.9,
@@ -86,18 +136,23 @@
    "acuracia": 85.1676,
    "desvio": 0.4489,
    "f1": 78.4207,
+   "desvio_f1": 0.7683,
+   "desvio_auc": 0.379,
    "f1_pos": 66.3635,
    "auc": 89.9589,
    "fp": 277.4,
    "fn": 616.7,
    "treino_s": 0.0551,
    "busca_s": 7.29,
-   "previsao_ms": 5.1
+   "previsao_ms": 5.1,
+   "busca_total_min": 1.2
   },
   "random forest": {
    "acuracia": 84.2502,
    "desvio": 0.4137,
    "f1": 78.102,
+   "desvio_f1": 0.5504,
+   "desvio_auc": 0.4883,
    "f1_pos": 66.4992,
    "auc": 89.1177,
    "fp": 390.7,
@@ -110,18 +165,23 @@
    "acuracia": 84.8159,
    "desvio": 0.2987,
    "f1": 78.2059,
+   "desvio_f1": 0.3464,
+   "desvio_auc": 0.3854,
    "f1_pos": 66.2041,
    "auc": 90.1761,
    "fp": 310.8,
    "fn": 604.5,
    "treino_s": 0.0493,
    "busca_s": 1.16,
-   "previsao_ms": 4.5
+   "previsao_ms": 4.5,
+   "busca_total_min": 0.2
   },
   "SVM RBF": {
    "acuracia": 85.3865,
    "desvio": 0.3779,
    "f1": 79.0275,
+   "desvio_f1": 0.4415,
+   "desvio_auc": 0.968,
    "f1_pos": 67.4802,
    "auc": 88.8692,
    "fp": 293.9,
@@ -129,12 +189,15 @@
    "treino_s": 5.7291,
    "busca_s": 477.39,
    "previsao_ms": 2015.72,
-   "vetores": 8764
+   "vetores": 8764,
+   "busca_total_min": 82.2
   },
   "SVM polinomial": {
    "acuracia": 85.1576,
    "desvio": 0.3658,
    "f1": 78.6715,
+   "desvio_f1": 0.438,
+   "desvio_auc": 0.6469,
    "f1_pos": 66.9106,
    "auc": 90.2108,
    "fp": 298.3,
@@ -142,12 +205,15 @@
    "treino_s": 3.5506,
    "busca_s": 130.44,
    "previsao_ms": 487.64,
-   "vetores": 8128
+   "vetores": 8128,
+   "busca_total_min": 22.1
   },
   "SVM RBF com pesos": {
    "acuracia": 80.924,
    "desvio": 0.3116,
    "f1": 77.6157,
+   "desvio_f1": 0.3289,
+   "desvio_auc": 0.803,
    "f1_pos": 69.0109,
    "auc": 89.7717,
    "fp": 929.3,
@@ -161,6 +227,8 @@
    "acuracia": 85.1642,
    "desvio": 0.6163,
    "f1": 79.3508,
+   "desvio_f1": 0.7749,
+   "desvio_auc": 0.4546,
    "f1_pos": 68.3978,
    "auc": 90.834,
    "fp": 361.5,
@@ -171,7 +239,8 @@
    "epocas": [
     33,
     86
-   ]
+   ],
+   "busca_total_min": 17.4
   }
  },
  "comparacoes": {
@@ -285,6 +354,62 @@
    "auc": {
     "pontos": 0.88,
     "seeds": 10
+   }
+  },
+  "rede neural × SVM polinomial": {
+   "acuracia": {
+    "pontos": 0.01,
+    "seeds": 5
+   },
+   "f1": {
+    "pontos": 0.68,
+    "seeds": 9
+   },
+   "auc": {
+    "pontos": 0.62,
+    "seeds": 10
+   }
+  },
+  "rede neural × regressão logística": {
+   "acuracia": {
+    "pontos": 0.37,
+    "seeds": 9
+   },
+   "f1": {
+    "pontos": 1.02,
+    "seeds": 10
+   },
+   "auc": {
+    "pontos": 0.64,
+    "seeds": 10
+   }
+  },
+  "random forest × árvore de decisão": {
+   "acuracia": {
+    "pontos": -0.92,
+    "seeds": 0
+   },
+   "f1": {
+    "pontos": -0.32,
+    "seeds": 3
+   },
+   "auc": {
+    "pontos": -0.84,
+    "seeds": 0
+   }
+  },
+  "árvore de decisão × regressão logística": {
+   "acuracia": {
+    "pontos": 0.37,
+    "seeds": 8
+   },
+   "f1": {
+    "pontos": 0.09,
+    "seeds": 7
+   },
+   "auc": {
+    "pontos": -0.24,
+    "seeds": 2
    }
   }
  },
@@ -404,6 +529,100 @@
     84.6004,
     83.3395,
     81.4358
+   ]
+  ],
+  "treino": [
+   [
+    75.0944,
+    75.5921,
+    76.6434,
+    81.4742,
+    83.1063,
+    80.0413,
+    75.5537
+   ],
+   [
+    76.997,
+    81.8527,
+    84.1722,
+    84.8689,
+    85.1344,
+    85.1582,
+    80.6281
+   ],
+   [
+    83.9824,
+    84.7259,
+    85.1904,
+    85.4859,
+    86.2324,
+    87.8873,
+    90.55
+   ],
+   [
+    85.0162,
+    85.2381,
+    85.6145,
+    86.1806,
+    88.0003,
+    90.439,
+    93.3143
+   ],
+   [
+    85.2878,
+    85.6155,
+    86.1484,
+    87.3481,
+    89.7899,
+    92.2795,
+    94.8188
+   ]
+  ],
+  "tempo_s": [
+   [
+    3.82,
+    3.59,
+    3.73,
+    3.54,
+    3.4,
+    3.58,
+    6.47
+   ],
+   [
+    3.5,
+    3.24,
+    3.06,
+    2.84,
+    2.98,
+    3.37,
+    8.6
+   ],
+   [
+    3.16,
+    2.92,
+    2.79,
+    3.35,
+    2.8,
+    3.34,
+    12.55
+   ],
+   [
+    2.72,
+    3.09,
+    3.17,
+    3.31,
+    3.77,
+    7.66,
+    16.76
+   ],
+   [
+    3.13,
+    3.35,
+    3.69,
+    5.7,
+    9.05,
+    12.76,
+    41.58
    ]
   ],
   "melhor": {
@@ -540,35 +759,35 @@
     "acuracia": 84.572,
     "f1_pos": 66.4744,
     "auc": 89.808,
-    "treino_s": 0.075,
+    "treino_s": 0.078,
     "vetores": null
    },
    "SVC linear": {
     "acuracia": 84.5056,
     "f1_pos": 66.5951,
     "auc": 89.6773,
-    "treino_s": 4.736,
+    "treino_s": 4.624,
     "vetores": 8515
    },
    "SVC RBF": {
     "acuracia": 84.9038,
     "f1_pos": 66.6667,
     "auc": 89.061,
-    "treino_s": 4.67,
+    "treino_s": 4.824,
     "vetores": 8231
    },
    "SVC polinomial grau 2": {
     "acuracia": 84.9536,
     "f1_pos": 67.3389,
     "auc": 89.9024,
-    "treino_s": 3.807,
+    "treino_s": 3.973,
     "vetores": 8076
    },
    "SVC polinomial grau 3": {
     "acuracia": 85.0863,
     "f1_pos": 67.6502,
     "auc": 88.812,
-    "treino_s": 4.925,
+    "treino_s": 5.064,
     "vetores": 8048
    }
   },
@@ -577,32 +796,40 @@
     "acuracia": 84.9867,
     "f1_pos": 67.5511,
     "auc": 87.5939,
-    "treino_s": 6.284,
+    "treino_s": 6.625,
     "vetores": 9147
    },
    "RBF sem": {
     "acuracia": 80.574,
     "f1_pos": 50.7776,
     "auc": 82.4309,
-    "treino_s": 30.624,
+    "treino_s": 28.964,
     "vetores": 16995
    },
    "LinearSVC com": {
     "acuracia": 84.572,
     "f1_pos": 66.4744,
     "auc": 89.808,
-    "treino_s": 0.075,
+    "treino_s": 0.077,
     "vetores": null
    },
    "LinearSVC sem": {
     "acuracia": 84.6384,
     "f1_pos": 66.5221,
     "auc": 89.5722,
-    "treino_s": 0.056,
+    "treino_s": 0.066,
     "vetores": null
    }
   },
+  "margem": {
+   "dentro_da_margem": 30.4247,
+   "vetores_por_classe": [
+    4232,
+    3999
+   ]
+  },
   "treino": 24111,
-  "teste": 6028
+  "teste": 6028,
+  "positivos_teste": 1501
  }
 }

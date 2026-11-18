@@ -4,7 +4,7 @@ Trabalhos da disciplina de Aprendizagem de Máquina (PPGCC010, UFPI). Cada famí
 
 - **`proteinas/`**: base 1, molécula → proteína-alvo (ChEMBL 37, 27.714 moléculas, 4 classes). Árvore de decisão e variações: Random Tree, Random Forest, Gradient Boosting. Concluída.
 - **`emprestimos/`**: base 2, cliente → aprovação de empréstimo (Kaggle, 4.269 pedidos, binária). Redes neurais. Concluída.
-- **`renda/`**: base 3, pessoa → renda anual acima de 50 mil dólares ([Adult Census Income](https://www.kaggle.com/datasets/uciml/adult-census-income), censo dos EUA de 1994, 30.139 pessoas após a curadoria, binária). SVM, comparada com a rede neural da base 2. Notebooks e resultados concluídos; relatório e slides em andamento.
+- **`renda/`**: base 3, pessoa → renda anual acima de 50 mil dólares ([Adult Census Income](https://www.kaggle.com/datasets/uciml/adult-census-income), censo dos EUA de 1994, 30.139 pessoas após a curadoria, binária). SVM, comparada com a rede neural da base 2. Notebooks, slides e relatório concluídos.
 - **`comum/`**: o que os slides das bases compartilham (`slides_common.py`, template SBC, `export_slides_pdf.ps1`).
 
 O README explica as bases e os resultados. Este arquivo trata de como trabalhar no código.
@@ -46,16 +46,13 @@ Todas as bases têm um pacote chamado `src`. Nunca importe duas delas no mesmo p
 - **Base 3, raça e sexo.** `race` e `sex` ficam em `renda.csv`, mas fora de `config.FEATURES`: nenhum modelo os usa. Servem só à análise exploratória e à comparação de erros entre grupos depois da previsão (`carregar_sensiveis`).
 - **Base 3, notebooks demorados.** O `04_svm_estudo` leva cerca de 45 min, o `05_svm_comparacao` cerca de 2 h e o `06_rede_comparacao` cerca de 20 min. O 06 não treina as SVMs de novo: lê `svm.csv`. Rode em segundo plano.
 
-## Próxima etapa: relatório e slides da base 3
-
-Seguem o padrão da base 2 (`emprestimos/report/` e `emprestimos/scripts/`):
-
-- relatório em LaTeX no formato SBC, em `renda/report/`, com números, tabelas e figuras gerados por scripts em `renda/scripts/` a partir de `renda/resultados/`;
-- slides gerados por `build_slides_*.py` com `comum/slides_common.py`, roteiro em `notas_*.md`; podem passar de 10 slides.
+- **O relatório entregue é cumulativo.** Cada atividade acrescenta uma parte ao mesmo documento, sem reescrever as anteriores: título, resumo, introdução, fundamentação, limitações e conclusão só ganham trechos sobre a parte nova. O relatório atual, com as quatro partes, fica em `renda/report/`, partindo da última versão única (commit 5b6d62d), com a SVM na seção 8. `proteinas/report/` e `emprestimos/report/` são versões por base, feitas na reorganização. Em `renda/report/`, só `numeros_svm.tex`, `tab_svm_*.tex`, `svm_dados.json` e `figures/svm_*.pdf` são gerados ali (`renda/scripts/svm_data.py` e `svm_report.py`); os arquivos das partes 1 a 3 são cópias dos gerados em `proteinas/` e `emprestimos/`, e precisam ser copiados de novo se algum deles mudar.
+- **Base 3, slides.** `renda/scripts/build_slides_svm.py` e `slides_svm_notes.py` montam `renda/slides/apresentacao_svm.pptx` (15 slides, 10 min) a partir de `svm_dados.json`. Raça e sexo ficam fora dos slides por decisão do grupo.
 
 ## Ambiente (Windows)
 
 - `.venv` com Python 3.13 e `requirements.txt`. O `.venv` não tem `python-pptx`; os scripts de slides rodam com o Python do sistema (`python`), que tem.
 - PDF dos slides: `powershell -File comum/export_slides_pdf.ps1 <arquivo.pptx>` (exige PowerPoint).
-- LaTeX: MiKTeX. Pelo Bash, `latexmk` falha com erro do MiKTeX; compile pelo PowerShell, dentro de `report/`: `pdflatex main`, `bibtex main`, `pdflatex main` duas vezes.
+- LaTeX: MiKTeX. Pelo Bash, `latexmk` falha com erro do MiKTeX; compile pelo PowerShell, dentro de `report/`: `pdflatex main`, `bibtex main`, `pdflatex main` duas vezes. Na máquina do Thiago, o MiKTeX está em `%LOCALAPPDATA%\Programs\MiKTeX\miktex\bin\x64` (instalação por usuário).
+- Sem PowerPoint instalado, o PDF dos slides pode ser exportado pelo PowerPoint online.
 - Para testar um notebook sem alterar o arquivo: `jupyter nbconvert --to notebook --execute <nb> --output-dir <pasta temporária>`, rodado de dentro de `notebooks/`.

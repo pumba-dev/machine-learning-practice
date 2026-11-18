@@ -73,6 +73,10 @@ def base_block():
         "teto": round(100 - 100 * irredutivel / len(base), 2),
         "estado_civil": {rotulo: pct(alvo[base["marital.status"] == chave].mean())
                          for chave, rotulo in ESTADO_CIVIL.items()},
+        "por_anos_de_estudo": {str(int(k)): pct(v) for k, v in alvo.groupby(base["education.num"]).mean().items()},
+        "pessoas_por_anos_de_estudo": {str(int(k)): int(v) for k, v in base["education.num"].value_counts().sort_index().items()},
+        "correlacao_alvo": {c: round(float(base[c].corr(alvo)), 3) for c in config.NUMERICAS},
+        "repetem_perfil": int(len(base) - len(estatisticas)),
         "faixas": {coluna: [int(numericos.loc["min", coluna]), int(numericos.loc["max", coluna])]
                    for coluna in config.NUMERICAS},
     }
@@ -90,7 +94,8 @@ def modelos_block(todos):
         g = grupos.get_group(nome)
         info = {
             "acuracia": pct(g["acurácia"].mean()), "desvio": pct(g["acurácia"].std()),
-            "f1": pct(g["F1 macro"].mean()), "f1_pos": pct(g["F1 >50K"].mean()), "auc": pct(g["AUC"].mean()),
+            "f1": pct(g["F1 macro"].mean()), "desvio_f1": pct(g["F1 macro"].std()),
+            "desvio_auc": pct(g["AUC"].std()), "f1_pos": pct(g["F1 >50K"].mean()), "auc": pct(g["AUC"].mean()),
             "fp": round(float(g["falsos positivos"].mean()), 1), "fn": round(float(g["falsos negativos"].mean()), 1),
             "treino_s": round(float(g["tempo de treino (s)"].median()), 4),
             "busca_s": None if g["tempo da busca (s)"].isna().all() else round(float(g["tempo da busca (s)"].median()), 2),
@@ -100,6 +105,8 @@ def modelos_block(todos):
             info["vetores"] = int(round(g["vetores de suporte"].mean()))
         if "épocas" in g and g["épocas"].notna().any():
             info["epocas"] = [int(g["épocas"].min()), int(g["épocas"].max())]
+        if info["busca_s"] is not None:
+            info["busca_total_min"] = round(float(g["tempo da busca (s)"].sum()) / 60, 1)
         saida[nome] = info
     return saida
 
@@ -107,7 +114,9 @@ def modelos_block(todos):
 def comparacoes_block(todos):
     pares = [("SVM RBF", "SVM linear"), ("SVM RBF", "random forest"), ("SVM RBF", "árvore de decisão"),
              ("SVM polinomial", "SVM RBF"), ("SVM linear", "regressão logística"), ("rede neural", "SVM RBF"),
-             ("rede neural", "SVM linear"), ("rede neural", "árvore de decisão")]
+             ("rede neural", "SVM linear"), ("rede neural", "árvore de decisão"), ("rede neural", "SVM polinomial"),
+             ("rede neural", "regressão logística"), ("random forest", "árvore de decisão"),
+             ("árvore de decisão", "regressão logística")]
     saida = {}
     for a, b in pares:
         saida[f"{a} × {b}"] = {}
@@ -152,6 +161,10 @@ def mapa_block():
     return {
         "C": [float(c) for c in tabela.index], "gamma": [float(g) for g in tabela.columns],
         "acuracia": [[pct(v) for v in linha] for linha in tabela.to_numpy()],
+        "treino": [[pct(v) for v in linha] for linha in
+                   mapa.pivot(index="C", columns="gamma", values="mean_train_score").to_numpy()],
+        "tempo_s": [[round(float(v), 2) for v in linha] for linha in
+                    mapa.pivot(index="C", columns="gamma", values="mean_fit_time").to_numpy()],
         "melhor": {"C": float(melhor["C"]), "gamma": float(melhor["gamma"]), "acuracia": pct(melhor["mean_test_score"])},
         "perto_do_melhor": int((mapa["mean_test_score"] >= melhor["mean_test_score"] - 0.005).sum()),
         "combinacoes": int(len(mapa)),
@@ -182,6 +195,10 @@ def seed0_block():
                 "treino_s": round(metricas["tempo de treino (s)"], 3), "vetores": metricas.get("vetores de suporte")}
 
     medir(svm.svm())  # aquecimento, descartado
+    padrao = svm.svm().fit(X_tr, y_tr)  # RBF, C = 1, gamma padrão: a distância à fronteira (notebook 04, seção 1)
+    distancia = padrao.decision_function(X_te)
+    margem = {"dentro_da_margem": pct(np.mean(np.abs(distancia) < 1)),
+              "vetores_por_classe": [int(v) for v in padrao.named_steps["modelo"].n_support_]}
     kernels = {
         "LinearSVC": medir(svm.svm_linear(C=1)),
         "SVC linear": medir(svm.svm("linear", C=1)),
@@ -194,7 +211,8 @@ def seed0_block():
         "RBF com": medir(svm.svm(**parametros)), "RBF sem": medir(svm.svm(padronizar=False, **parametros)),
         "LinearSVC com": medir(svm.svm_linear(C=1)), "LinearSVC sem": medir(svm.svm_linear(padronizar=False, C=1)),
     }
-    return {"kernels": kernels, "padronizacao": padronizacao, "treino": int(len(X_tr)), "teste": int(len(X_te))}
+    return {"kernels": kernels, "padronizacao": padronizacao, "margem": margem, "treino": int(len(X_tr)),
+            "teste": int(len(X_te)), "positivos_teste": int(y_te.sum())}
 
 
 def main():
