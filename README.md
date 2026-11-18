@@ -1,28 +1,29 @@
-# Prática de Machine Learning: duas bases, duas famílias de modelos
+# Prática de Machine Learning: três bases, três famílias de modelos
 
 Trabalhos da disciplina de Aprendizagem de Máquina (PPGCC010, UFPI). Cada família de modelos é estudada numa base própria, escolhida para o tipo de problema que esses modelos resolvem:
 
-| | Base 1: molécula → proteína | Base 2: cliente → empréstimo |
-|---|---|---|
-| Pergunta | A qual de 4 proteínas-alvo uma molécula está associada? | Um pedido de empréstimo foi aprovado? |
-| Tarefa | Classificação multiclasse (4 classes) | Classificação binária |
-| Origem | API do [ChEMBL](https://www.ebi.ac.uk/chembl/) (versão 37) | [Kaggle](https://www.kaggle.com/datasets/architsharma01/loan-approval-prediction-dataset) |
-| Tamanho | 27.714 moléculas, 17 atributos | 4.269 pedidos, 11 atributos |
-| Modelos estudados | Árvore de decisão e variações: Random Tree, Random Forest, Gradient Boosting | Redes neurais (MLP) e SVM |
-| Pasta | [`proteinas/`](proteinas/) | [`emprestimos/`](emprestimos/) |
+| | Base 1: molécula → proteína | Base 2: cliente → empréstimo | Base 3: pessoa → renda |
+|---|---|---|---|
+| Pergunta | A qual de 4 proteínas-alvo uma molécula está associada? | Um pedido de empréstimo foi aprovado? | A renda anual de uma pessoa passa de 50 mil dólares? |
+| Tarefa | Classificação multiclasse (4 classes) | Classificação binária | Classificação binária |
+| Origem | API do [ChEMBL](https://www.ebi.ac.uk/chembl/) (versão 37) | [Kaggle](https://www.kaggle.com/datasets/architsharma01/loan-approval-prediction-dataset) | [Kaggle](https://www.kaggle.com/datasets/uciml/adult-census-income) (UCI Adult, censo dos EUA de 1994) |
+| Tamanho | 27.714 moléculas, 17 atributos | 4.269 pedidos, 11 atributos | 32.561 pessoas, 14 atributos |
+| Modelos estudados | Árvore de decisão e variações: Random Tree, Random Forest, Gradient Boosting | Redes neurais (MLP) | SVM |
+| Pasta | [`proteinas/`](proteinas/) | [`emprestimos/`](emprestimos/) | `renda/` (a criar) |
 
 Cada pasta é autocontida: tem os dados, os notebooks, o código, os resultados, o relatório e os slides da sua base.
 
 - [Base 1: moléculas e árvores de decisão](#base-1-moléculas-e-árvores-de-decisão)
-- [Base 2: empréstimos, redes neurais e SVM](#base-2-empréstimos-redes-neurais-e-svm)
+- [Base 2: empréstimos e redes neurais](#base-2-empréstimos-e-redes-neurais)
+- [Base 3: renda e SVM](#base-3-renda-e-svm)
 - [Como executar](#como-executar)
 
 ## Organização do repositório
 
-As duas pastas seguem o mesmo formato:
+As pastas das bases seguem o mesmo formato:
 
 ```
-proteinas/ ou emprestimos/
+proteinas/, emprestimos/ ou renda/
   data/raw/         dados como foram baixados
   data/processed/   base final, depois da curadoria
   notebooks/        análise passo a passo, numerada na ordem de execução
@@ -30,7 +31,7 @@ proteinas/ ou emprestimos/
   report/           relatório em LaTeX (formato SBC), com main.pdf, figuras e tabelas geradas
   scripts/          geram os números, figuras e tabelas do relatório e montam os slides
   slides/           apresentações (.pptx e .pdf) e roteiros de fala (.md)
-comum/              o que as apresentações das duas bases compartilham: slides_common.py,
+comum/              o que as apresentações das bases compartilham: slides_common.py,
                     template SBC e export_slides_pdf.ps1
 ```
 
@@ -108,7 +109,7 @@ Os 17 atributos, divisão agrupada, média e desvio de 10 seeds ([`proteinas/scr
 
 ---
 
-## Base 2: empréstimos, redes neurais e SVM
+## Base 2: empréstimos e redes neurais
 
 ### Os dados
 
@@ -119,7 +120,7 @@ Os 17 atributos, divisão agrupada, média e desvio de 10 seeds ([`proteinas/scr
 
 A curadoria tira os espaços dos nomes e valores, converte em 0/1 as duas colunas de texto e o alvo, e zera 28 valores negativos de patrimônio residencial. O código e os dados mantêm os nomes de coluna originais; gráficos e relatório usam os nomes em português.
 
-**O que a base tem de especial.** O score de crédito decide quase tudo: abaixo de 550 pontos, 10,4% dos pedidos são aprovados; acima, 99,5%. O rótulo segue quase um degrau, e uma árvore representa um degrau com um único corte. Isso torna a base um bom teste para modelos de fronteira suave, como redes neurais e SVM.
+**O que a base tem de especial.** O score de crédito decide quase tudo: abaixo de 550 pontos, 10,4% dos pedidos são aprovados; acima, 99,5%. O rótulo segue quase um degrau, e uma árvore representa um degrau com um único corte. Isso torna a base um bom teste para modelos de fronteira suave, como redes neurais.
 
 ### Protocolo de avaliação
 
@@ -140,7 +141,6 @@ Cinco modelos de referência servem de régua: classe majoritária, regra de um 
 | [`02_analise_exploratoria`](emprestimos/notebooks/02_analise_exploratoria.ipynb) | Mostra o degrau no score de crédito e a correlação entre os atributos |
 | [`03_referencias`](emprestimos/notebooks/03_referencias.ipynb) | Define o protocolo e roda os modelos de referência |
 | [`04_rede_neural`](emprestimos/notebooks/04_rede_neural.ipynb) | Rede neural: padronização, neurônios, épocas e paciência, busca em grade, comparação, tempo e erros |
-| `05_svm` | A fazer |
 
 | Módulo em `emprestimos/src/` | Conteúdo |
 |---|---|
@@ -170,14 +170,18 @@ Média de 10 seeds ([`emprestimos/resultados/`](emprestimos/resultados/)):
 - **Tipos de erro.** A rede erra mais dos dois lados: em média, 16,5 falsos positivos (aprova quem seria rejeitado) e 14,4 falsos negativos (recusa quem seria aprovado) por seed, contra 9,4 e 6,6 da árvore.
 - **Custo.** Treinar a rede final leva cerca de 50 vezes o tempo de treinar a árvore, e a busca de hiperparâmetros da rede, cerca de 36 vezes o da busca da árvore.
 
-### SVM
-
-A fazer. A SVM vai passar pelo mesmo protocolo e ser comparada com a rede neural e com os modelos de referência acima.
-
 ### Material
 
 - Relatório (redes neurais): [`emprestimos/report/main.pdf`](emprestimos/report/main.pdf)
 - Apresentação 3, redes neurais: [`emprestimos/slides/apresentacao_redes_neurais.pdf`](emprestimos/slides/apresentacao_redes_neurais.pdf), roteiro em [`notas_redes_neurais.md`](emprestimos/slides/notas_redes_neurais.md)
+
+---
+
+## Base 3: renda e SVM
+
+A fazer. A quarta análise estuda a SVM (máquina de vetores de suporte) numa base nova: o [Adult Census Income](https://www.kaggle.com/datasets/uciml/adult-census-income), extraído do censo dos EUA de 1994 e publicado pela UCI. São 32.561 pessoas, com 14 atributos (idade, escolaridade, ocupação, estado civil, horas trabalhadas por semana, ganhos e perdas de capital, entre outros), e o alvo `income` diz se a renda anual passa de 50 mil dólares (cerca de 24% passam).
+
+A base traz o que as anteriores não tinham: atributos categóricos, valores ausentes (marcados com `?`) e um tamanho em que a SVM com kernel fica lenta. A análise vai seguir o formato da base 2: curadoria, análise exploratória, pontos de referência e a SVM, pelo mesmo protocolo de 10 seeds e com o tempo medido num único núcleo.
 
 ---
 
