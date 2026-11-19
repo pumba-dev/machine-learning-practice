@@ -7,8 +7,8 @@ Trabalhos da disciplina de Aprendizagem de Máquina (PPGCC010, UFPI). Cada famí
 | Pergunta | A qual de 4 proteínas-alvo uma molécula está associada? | Um pedido de empréstimo foi aprovado? | A renda anual de uma pessoa passa de 50 mil dólares? |
 | Tarefa | Classificação multiclasse (4 classes) | Classificação binária | Classificação binária |
 | Origem | API do [ChEMBL](https://www.ebi.ac.uk/chembl/) (versão 37) | [Kaggle](https://www.kaggle.com/datasets/architsharma01/loan-approval-prediction-dataset) | [Kaggle](https://www.kaggle.com/datasets/uciml/adult-census-income) (UCI Adult, censo dos EUA de 1994) |
-| Tamanho | 27.714 moléculas, 17 atributos | 4.269 pedidos, 11 atributos | 32.561 pessoas, 14 atributos |
-| Modelos estudados | Árvore de decisão e variações: Random Tree, Random Forest, Gradient Boosting | Redes neurais (MLP) | SVM |
+| Tamanho | 27.714 moléculas, 17 atributos | 4.269 pedidos, 11 atributos | 32.561 pessoas, 14 atributos (30.139 e 10 atributos após a curadoria) |
+| Modelos estudados | Árvore de decisão e variações: Random Tree, Random Forest, Gradient Boosting | Redes neurais (MLP) | SVM, comparada com a rede neural |
 | Pasta | [`proteinas/`](proteinas/) | [`emprestimos/`](emprestimos/) | [`renda/`](renda/) |
 
 Cada pasta é autocontida: tem os dados, os notebooks, o código, os resultados, o relatório e os slides da sua base.
@@ -179,24 +179,89 @@ Média de 10 seeds ([`emprestimos/resultados/`](emprestimos/resultados/)):
 
 ## Base 3: renda e SVM
 
-Em andamento. A quarta análise estuda a SVM (máquina de vetores de suporte) numa base nova, seguindo o formato da base 2: curadoria, análise exploratória, pontos de referência e a SVM, pelo mesmo protocolo de 10 seeds e com o tempo medido num único núcleo.
-
 ### Os dados
 
-[Adult Census Income](https://www.kaggle.com/datasets/uciml/adult-census-income) do Kaggle (UCI Machine Learning, versão 3, licença CC0): a base *Adult* da UCI, extraída do censo dos EUA de 1994. São 32.561 pessoas e 14 atributos; o alvo `income` diz se a renda anual passa de 50 mil dólares (24,1% passam).
+[Adult Census Income](https://www.kaggle.com/datasets/uciml/adult-census-income) do Kaggle, a base Adult da UCI, extraída do censo dos EUA de 1994: 32.561 pessoas, 24,1% com renda anual acima de 50 mil dólares.
 
-A base traz o que as anteriores não tinham: atributos categóricos, valores ausentes (marcados com `?`) e um tamanho em que a SVM com kernel fica lenta.
+- **Alvo:** `income` (`<=50K` ou `>50K`).
+- **Atributos usados (10):**
+  - 5 numéricos: idade, anos de estudo (`education.num`), ganho de capital, perda de capital e horas por semana;
+  - 5 categóricos: classe de trabalho, estado civil, ocupação, relacionamento e país de origem.
 
-A curadoria mantém as linhas com valores ausentes (o `?` vira célula vazia; quem tem o tipo de vínculo ausente passa de 50 mil em 10,4% dos casos, contra 24,1% no geral), remove 24 linhas repetidas e converte o alvo em 0/1. A base final tem 32.537 pessoas. Dos 14 atributos, 12 entram nos modelos: `education` repete `education.num` em texto, e `fnlwgt` é um peso amostral do censo, não um dado da pessoa.
+**Curadoria** ([`01_curadoria`](renda/notebooks/01_curadoria.ipynb)):
+
+- remove 24 linhas duplicadas e 2.398 linhas com `?` (valores ausentes). Sobram 30.139 pessoas, 24,9% com renda acima de 50 mil;
+- tira `fnlwgt`, um peso amostral do censo e não um atributo da pessoa (correlação de −0,009 com o alvo);
+- tira `education`, que é o texto de `education.num` (uma correspondência de 1 para 1).
+
+Raça e sexo ficam fora dos modelos. Só voltam depois da previsão, para comparar os erros entre grupos.
+
+**O que a base tem de especial.**
+
+- **Nenhum atributo decide sozinho.** A regra de um corte pergunta se a pessoa é casada, mas responde `<=50K` dos dois lados.
+- **Há um erro que nenhum modelo evita.** 673 perfis (2.404 pessoas, 8%) aparecem com as duas rendas, o que limita a acurácia a 97,1%.
+- **O tamanho pesa.** Com 24 mil pessoas no treino, a SVM com kernel já é cara.
+
+### Protocolo de avaliação
+
+O mesmo da base 2 ([`renda/src/avaliacao.py`](renda/src/avaliacao.py)), com 10 seeds, divisão estratificada 80/20, validação cruzada de 5 partes no treino e tempos num único núcleo.
+
+- **Pré-processamento:** o one-hot dos categóricos e a padronização dos numéricos ficam dentro do `Pipeline` e resultam em 80 colunas.
+- **Métricas:** acurácia, F1 macro, F1 da classe `>50K`, AUC, falsos positivos e falsos negativos.
+- **Desbalanceamento:** como há 3 pessoas `<=50K` para cada `>50K`, o chute fica em 75,1%.
 
 ### Notebooks
 
 | Notebook | O que faz |
 |---|---|
-| [`01_curadoria`](renda/notebooks/01_curadoria.ipynb) | Confere o hash do CSV, trata `?` e linhas repetidas, escolhe os atributos e grava `renda.csv` |
-| `02_analise_exploratoria` | A fazer |
-| `03_referencias` | A fazer |
-| `04_svm` | A fazer |
+| [`01_curadoria`](renda/notebooks/01_curadoria.ipynb) | Confere o hash, remove duplicatas e `?`, escolhe os atributos e mede o erro irredutível |
+| [`02_analise_exploratoria`](renda/notebooks/02_analise_exploratoria.ipynb) | Classes, atributos numéricos e categóricos, raça e sexo, regras simples |
+| [`03_referencias`](renda/notebooks/03_referencias.ipynb) | Protocolo e modelos de referência |
+| [`04_svm_estudo`](renda/notebooks/04_svm_estudo.ipynb) | Estudo numa seed: distância à fronteira, kernels, mapa C × gamma, padronização, vetores de suporte, tempo por tamanho, pesos por classe (cerca de 45 min) |
+| [`05_svm_comparacao`](renda/notebooks/05_svm_comparacao.ipynb) | SVM linear, RBF, polinomial e RBF com pesos em 10 seeds, erros por sexo e raça (cerca de 2 h) |
+| [`06_rede_comparacao`](renda/notebooks/06_rede_comparacao.ipynb) | Rede neural da base 2 em 10 seeds e comparação final (cerca de 20 min) |
+
+| Módulo em `renda/src/` | Conteúdo |
+|---|---|
+| `config.py` | Caminhos, atributos, nomes em português, hash do CSV, seeds |
+| `avaliacao.py` | Pré-processamento e protocolo (cópia adaptada do da base 2) |
+| `svm.py` | Pipelines da SVC e da LinearSVC e as grades de busca |
+| `rede.py` | A rede neural da base 2, com o pré-processamento desta base |
+
+### Resultados
+
+Média de 10 seeds ([`renda/resultados/`](renda/resultados/)). A busca e a previsão estão em mediana por seed, e a previsão cobre as 6.028 pessoas do teste.
+
+| Modelo | Grade da busca | Acurácia (%) | F1 macro (%) | AUC (%) | Busca | Previsão |
+|---|---|---|---|---|---|---|
+| Classe majoritária | – | 75,1 ± 0,0 | 42,9 | 50,0 | – | – |
+| Regressão logística | – | 84,8 ± 0,3 | 78,3 | 90,2 | – | 4,5 ms |
+| Árvore de decisão | critério × profundidade × folha mínima (30) | 85,2 ± 0,4 | 78,4 | 90,0 | 7 s | 5 ms |
+| Random Forest | – (300 árvores, padrão) | 84,3 ± 0,4 | 78,1 | 89,1 | – | 180 ms |
+| SVM linear (LinearSVC) | C ∈ {0,001 … 10} | 84,8 ± 0,3 | 78,2 | 90,2 | 1 s | 4,5 ms |
+| **SVM RBF** | C ∈ {0,1; 1; 10; 100} × gamma ∈ {0,01; 0,03; 0,1; 0,3} | **85,4 ± 0,4** | 79,0 | 88,9 | 8 min | 2,0 s |
+| SVM polinomial | grau ∈ {2, 3} × C ∈ {0,1; 1; 10} | 85,2 ± 0,4 | 78,7 | 90,2 | 2 min | 0,5 s |
+| SVM RBF com pesos por classe | C e gamma do RBF | 80,9 ± 0,3 | 77,6 | 89,8 | – | 2,3 s |
+| **Rede neural** | 6 arquiteturas × 2 alphas × 2 taxas | 85,2 ± 0,6 | **79,4** | **90,8** | 1,7 min | 5,6 ms |
+
+- **A SVM RBF tem a melhor acurácia**, à frente da SVM linear e da Random Forest nas 10 seeds. Contra a árvore ajustada é empate: vence em 6 das 10 seeds, por 0,2 ponto.
+- **A SVM linear é, na prática, a regressão logística.** A diferença é de 0,02 ponto. As duas traçam uma reta nas mesmas 80 colunas.
+- **Na AUC, a SVM RBF fica atrás da SVM linear nas 10 seeds.**
+  - A busca escolhe pela acurácia e prefere gamma alto, o que acerta o lado da fronteira mas ordena mal as pessoas longe dela.
+  - Nas seeds em que a busca escolheu gamma = 0,3, a AUC foi 88,0%; com gamma = 0,1, foi 89,7%.
+- **A rede neural tem o melhor F1 macro e a melhor AUC**, esta à frente de todos os modelos nas 10 seeds. Busca em 1,7 min e prevê 360 vezes mais rápido que a SVM RBF.
+- **Padronização:** essencial para o RBF (85,0% contra 80,6% sem ela) e indiferente para a SVM linear.
+- **Custo da SVC:** o tempo de treino cresce com o quadrado do número de pessoas (inclinação de 1,9 no gráfico log-log). A previsão cresce com o número de vetores de suporte, cerca de 8.800 no RBF.
+- **Pesos por classe:** os falsos negativos caem de 587 para 221 e os falsos positivos sobem de 294 para 929.
+- **Erros por sexo:**
+  - a SVM RBF deixa passar 47,6% das mulheres de renda alta, contra 37,6% dos homens, sem usar o sexo como atributo;
+  - a rede repete a diferença (43,6% contra 34,0%);
+  - a diferença vem dos atributos relacionados ao sexo, como o relacionamento (`Husband` e `Wife`).
+
+### Material
+
+- Relatório cumulativo, com as quatro partes (árvores, Random Tree e conjuntos, redes neurais e SVM): [`renda/report/main.pdf`](renda/report/main.pdf)
+- Apresentação 4, SVM: [`renda/slides/apresentacao_svm.pdf`](renda/slides/apresentacao_svm.pdf), roteiro em [`notas_svm.md`](renda/slides/notas_svm.md)
 
 ---
 
@@ -227,12 +292,16 @@ python proteinas/scripts/slides_rt_data.py && python proteinas/scripts/build_sli
 python emprestimos/scripts/rn_data.py && python emprestimos/scripts/rn_report.py   # números, figuras e tabela
 python emprestimos/scripts/build_slides_rn.py                                       # apresentação 3
 
+# base 3: renda
+python renda/scripts/svm_data.py && python renda/scripts/svm_report.py   # números, figuras e tabelas da parte 4
+python renda/scripts/build_slides_svm.py                                 # apresentação 4
+
 # PDF de uma apresentação
 powershell -File comum/export_slides_pdf.ps1 proteinas/slides/apresentacao_random_tree.pptx
 ```
 
-Para compilar um relatório, rode `latexmk -pdf main.tex` dentro de `proteinas/report/` ou `emprestimos/report/`.
+Para compilar um relatório, rode `latexmk -pdf main.tex` dentro da pasta `report/` da base.
 
 ## Licença dos dados
 
-Os dados do ChEMBL e o dataset de moléculas do Kaggle são distribuídos sob [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/). A base de empréstimos do Kaggle é distribuída sob licença MIT.
+Os dados do ChEMBL e o dataset de moléculas do Kaggle são distribuídos sob [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/). A base de empréstimos do Kaggle é distribuída sob licença MIT. A base Adult da UCI é distribuída sob [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).

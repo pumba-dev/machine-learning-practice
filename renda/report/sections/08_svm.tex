@@ -1,0 +1,142 @@
+\section{Máquinas de vetores de suporte na previsão de renda}\label{sec:svm}
+
+Na quarta parte, o problema muda de novo: prever se a renda anual de uma pessoa passa de 50 mil dólares, a partir de 10 atributos do censo dos EUA de 1994. Ao contrário da base de empréstimos, nenhum atributo separa as classes sozinho, há atributos categóricos e valores ausentes, e o tamanho da base (cerca de 30 mil pessoas) torna visível o custo de treinar uma SVM com kernel. A SVM é comparada com os mesmos modelos de referência da Seção~\ref{sec:rn} e com a rede neural daquela seção.
+
+\subsection{Dados e curadoria}\label{sec:sv_dados}
+
+A base Adult~\cite{uci:adult} foi extraída do censo dos EUA de 1994 por Becker e Kohavi~\cite{kohavi:96}. A versão do Kaggle~\cite{kaggle:adult} tem \svLinhasBrutas{} registros, um por pessoa, com 14 atributos e o rótulo \texttt{income}, que diz se a renda anual passa de 50 mil dólares (\svPositivosBrutos\% passam). O arquivo é conferido pelo seu \emph{hash} SHA-256, para garantir que todos os experimentos partem do mesmo arquivo. A Tabela~\ref{tab:sv_atributos} lista os 10 atributos usados, com os nomes deste trabalho.
+
+\begin{table}[ht]
+\centering
+\caption{Atributos usados: nome no arquivo original, nome neste trabalho e valores, após a curadoria.}
+\label{tab:sv_atributos}
+\footnotesize
+\begin{tabular}{lll}
+\toprule
+Coluna original & Nome neste trabalho & Valores \\
+\midrule
+\texttt{age} & idade & 17 a 90 anos \\
+\texttt{education.num} & anos de estudo & 1 a 16 \\
+\texttt{capital.gain} & ganho de capital & 0 a \svGanhoMax{} dólares \\
+\texttt{capital.loss} & perda de capital & 0 a 4.356 dólares \\
+\texttt{hours.per.week} & horas por semana & 1 a 99 \\
+\texttt{workclass} & classe de trabalho & 7 categorias \\
+\texttt{marital.status} & estado civil & 7 categorias \\
+\texttt{occupation} & ocupação & 14 categorias \\
+\texttt{relationship} & relacionamento & 6 categorias \\
+\texttt{native.country} & país de origem & 41 países \\
+\texttt{income} & renda acima de 50 mil (rótulo) & 1 = \texttt{>50K}, 0 = \texttt{<=50K} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Linhas.} \svDuplicadas{} linhas eram cópias exatas de outras, inclusive no peso amostral, e foram removidas. Outras \svAusentes{} tinham valor ausente, marcado com ``?'', quase sempre na classe de trabalho e na ocupação ao mesmo tempo, ou no país. Nessas linhas, \svPositivosAusentes\% ganham mais de 50 mil, contra \svPositivos\% no resto; como são 7\% da base e preencher a ocupação inventaria um dado num dos atributos mais informativos, foram removidas. Restam \svLinhas{} pessoas, \svPositivos\% com renda acima de 50 mil.
+
+\textbf{Atributos.} O \texttt{fnlwgt} é um peso amostral, quantas pessoas da população cada registro representa, e não uma característica da pessoa; sua correlação com o rótulo é de \svCorrFnlwgt, e ele foi removido. O \texttt{education} é a escolaridade em texto e corresponde, nível a nível, ao \texttt{education.num}; ficou só o número. Raça e sexo foram mantidos no arquivo, mas ficaram fora dos atributos de todos os modelos. Foi uma decisão do grupo: o objetivo do trabalho é estudar a SVM, e não queríamos um modelo que usasse raça ou sexo para prever a renda de alguém. Isso não garante, porém, que o modelo ignore essas características (Seção~\ref{sec:limitacoes}).
+
+\textbf{Perfis repetidos e erro inevitável.} Sem o peso amostral, pessoas diferentes passam a ter os mesmos 10 atributos: \svRepetemPerfil{} linhas repetem o perfil de outra. \svPerfisConflito{} desses perfis aparecem com as duas rendas, em \svLinhasConflito{} linhas (\svPctConflito\% da base). Qualquer modelo dá a mesma resposta a pessoas com os mesmos dados; o melhor possível é responder, em cada perfil, a renda mais comum, o que deixa no mínimo \svErrosIrred{} erros (\svIrredPct\% da base). Nenhum modelo pode, portanto, passar de \svTeto\% de acurácia.
+
+\subsection{Análise exploratória}\label{sec:sv_eda}
+
+\svPositivos\% das pessoas ganham mais de 50 mil, cerca de \svRazaoClasses{} pessoas abaixo para cada uma acima: responder sempre ``até 50 mil'' já acerta \svPiso\%, e esse é o piso. Entre os numéricos, os anos de estudo têm a maior correlação com o rótulo (\svCorrEstudo), seguidos da idade (\svCorrIdade), das horas por semana (\svCorrHoras), do ganho de capital (\svCorrGanho) e da perda de capital (\svCorrPerda). Entre os categóricos, o estado civil é o que mais separa: entre os casados, \svCasados\% ganham mais de 50 mil; entre quem nunca casou, \svNuncaCasou\% (Figura~\ref{fig:sv_eda}a). A renda alta cresce com os anos de estudo: \svEstudoNove\% com 9 anos, \svEstudoTreze\% com 13 e \svEstudoQuinze\% com 15 (Figura~\ref{fig:sv_eda}b).
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\textwidth]{figures/svm_eda.pdf}
+\caption{Proporção de pessoas que ganham mais de 50 mil (a) por estado civil, nas cinco categorias mais comuns, e (b) por anos de estudo, na base inteira (\svLinhas{} pessoas). A linha tracejada é a proporção geral.}
+\label{fig:sv_eda}
+\end{figure}
+
+Mesmo o atributo mais forte não basta: nem entre os casados a renda alta passa da metade. É o oposto da base de empréstimos, em que um corte no score acertava \rnAccRegra\%. Aqui, separar as classes exige combinar vários atributos, e a distância entre o piso (\svPiso\%) e o teto (\svTeto\%) é o espaço em que os modelos competem.
+
+\subsection{Metodologia}\label{sec:sv_metodo}
+
+\textbf{Pré-processamento.} Os cinco atributos categóricos viram colunas 0/1, uma por categoria (\emph{one-hot}), e os cinco numéricos são padronizados (subtrai-se a média e divide-se pelo desvio padrão). São \svColunas{} colunas no total. Codificação, padronização e modelo ficam num único \emph{pipeline} do scikit-learn~\cite{pedregosa:11}, de modo que a média e o desvio vêm só do treino de cada divisão, e de cada parte da validação cruzada.
+
+\textbf{Protocolo.} O mesmo da Seção~\ref{sec:rn_metodo}. Os dados são divididos em treino (80\%, \svTreino{} pessoas) e teste (20\%, \svTeste, das quais \svPositivosTeste{} acima de 50 mil), mantendo a proporção das classes, com 10 seeds (0 a 9). Quando um modelo tem hiperparâmetros, uma busca em grade com validação cruzada estratificada de 5 partes, só no treino, escolhe a combinação de maior acurácia, e o modelo é treinado de novo no treino inteiro. No teste, reportam-se a acurácia, o F1 macro (média do F1 das duas classes), o F1 da classe acima de 50 mil, a AUC e os falsos positivos e negativos, com a classe acima de 50 mil como positiva. A AUC usa a probabilidade prevista ou, na SVM, a distância à fronteira: mede se o modelo ordena bem as pessoas, independentemente do corte.
+
+\textbf{Modelos.} As referências são a classe majoritária, a regra de um corte, a regressão logística, a árvore de decisão com busca em grade e a Random Forest com 300 árvores. A SVM aparece em quatro versões: a SVM linear, pelo LIBLINEAR (\texttt{LinearSVC}); a SVM com kernel RBF e a com kernel polinomial ($c_0 = 1$), pelo LIBSVM (\texttt{SVC}); e a SVM RBF com pesos por classe (\texttt{class\_weight="balanced"}, que faz o erro na classe menor custar cerca de 3 vezes mais), com os $C$ e $\gamma$ escolhidos para a RBF em cada seed. A rede neural é a da Seção~\ref{sec:rn}, com a mesma grade. As grades da SVM saíram de um estudo numa única divisão (a seed 0), apresentado na Seção~\ref{sec:sv_estudo}; a Tabela~\ref{tab:sv_grades} reúne todas.
+
+\begin{table}[ht]
+\centering
+\caption{Grades da busca (número de combinações após os dois-pontos) e o que a busca escolheu nas 10 seeds.}
+\label{tab:sv_grades}
+\footnotesize
+\input{results/tab_svm_grades}
+\end{table}
+
+\textbf{Tempo de execução.} Tudo roda num único núcleo (\texttt{n\_jobs=1} e as bibliotecas de álgebra linear limitadas a uma \emph{thread}), com uma rodada de aquecimento descartada. Nos modelos com busca, o tempo da busca é medido à parte do treino final. O resumo usa a mediana das 10 seeds. A máquina é um AMD Ryzen 5 9600X (6 núcleos) com 31 GB de memória, Windows 11 e scikit-learn 1.9.1.
+
+\subsection{Resultados}\label{sec:sv_resultados}
+
+\subsubsection{Estudo da SVM numa divisão}\label{sec:sv_estudo}
+
+Na seed 0, a SVM RBF com $C = 1$ e o $\gamma$ padrão do scikit-learn usa \svVetNeg{} vetores de suporte da classe até 50 mil e \svVetPos{} da classe acima: a classe menor, um quarto do treino, é metade dos vetores, porque boa parte dela fica perto da fronteira. \svMargem\% das pessoas do teste caem dentro da margem, com distância à fronteira entre $-1$ e $+1$.
+
+\textbf{Kernels.} Com $C = 1$ e sem ajuste, os cinco modelos da Tabela~\ref{tab:sv_seed0} ficam entre \svKSVCLin\% e \svKPoliTres\% de acurácia; as fronteiras curvas ganham cerca de meio ponto das retas. A LinearSVC e a SVC com kernel linear chegam à mesma fronteira (\svKLinSVC\% e \svKSVCLin\%), mas a LinearSVC treina cerca de \svRazaoLinear{} vezes mais rápido, e por isso é a SVM linear das comparações seguintes. Na AUC a ordem já se inverte: \svKAucLinSVC\% para a LinearSVC, \svKAucRBF\% para a RBF.
+
+\begin{table}[ht]
+\centering
+\caption{Seed 0: os kernels com $C = 1$ e o efeito da padronização (\svTreino{} pessoas no treino, \svTeste{} no teste).}
+\label{tab:sv_seed0}
+\footnotesize
+\input{results/tab_svm_seed0}
+\end{table}
+
+\textbf{C e $\gamma$.} A Figura~\ref{fig:sv_mapa} mostra a acurácia de validação cruzada da SVM RBF em 5 valores de $C$ e 7 de $\gamma$ (175 treinos). A melhor combinação, $C = \svMapaMelhorC$ e $\gamma = \svMapaMelhorG$, chega a \svMapaMelhor\%, mas \svMapaPerto{} das \svMapaComb{} combinações ficam a até meio ponto dela: os bons resultados formam um platô na diagonal, em que um $\gamma$ menor pede um $C$ maior. Os dois compensam um ao outro: $\gamma$ pequeno deixa a fronteira suave, e $C$ grande a obriga a se ajustar mais. Nos cantos o modelo falha. Com $C$ e $\gamma$ pequenos, responde ``até 50 mil'' para quase todos (\svMapaCanto\%, o piso). Com $\gamma = 1$, sobreajusta em qualquer $C$: a acurácia no treino chega a \svGammaUmTreino\%, e a de validação cai para \svGammaUmVal\% (Figura~\ref{fig:sv_gamma}). A grade das 10 seeds cobre o platô e deixa de fora esses cantos (Tabela~\ref{tab:sv_grades}).
+
+\begin{figure}[ht]
+\centering
+\begin{minipage}[b]{.55\textwidth}
+\centering
+\includegraphics[width=\textwidth]{figures/svm_mapa.pdf}
+\caption{Acurácia de validação cruzada (5 partes, seed 0) da SVM RBF por $C$ e $\gamma$. O quadro marca a melhor combinação.}
+\label{fig:sv_mapa}
+\end{minipage}\hfill
+\begin{minipage}[b]{.42\textwidth}
+\centering
+\includegraphics[width=\textwidth]{figures/svm_gamma.pdf}
+\caption{Acurácia no treino e na validação por $\gamma$, com $C = 1$ (seed 0).}
+\label{fig:sv_gamma}
+\end{minipage}
+\end{figure}
+
+\textbf{Padronização.} Sem padronização, a SVM RBF cai de \svPadCom\% para \svPadSem\% de acurácia, e o F1 da classe acima de 50 mil, de \svPadFCom\% para \svPadFSem\%; o modelo passa a usar \svPadVetSem{} vetores de suporte (\svPadVetSemPct\% do treino) e leva \svPadTempoSem{} s para treinar, contra \svPadTempoCom{} s (Tabela~\ref{tab:sv_seed0}). O kernel RBF mede a distância entre pessoas somando as diferenças em todos os atributos, e o ganho de capital, que vai até \svGanhoMax, domina essa soma quando não é padronizado~\cite{hsu:03}. A LinearSVC não muda (\svLinPadCom\% e \svLinPadSem\%): o modelo linear dá um peso a cada atributo, e um atributo de escala grande só recebe um peso menor.
+
+\textbf{Tempo por tamanho do treino.} A Figura~\ref{fig:sv_tempo} mede o tempo de treino de cada modelo com 1.000 a \svTreino{} pessoas. Em escala log, a inclinação da reta diz como o tempo cresce. A da SVC é \svInclSVC{} com kernel RBF e \svInclSVCLin{} com kernel linear: dobrar o treino quadruplica o tempo. A da LinearSVC é \svInclLinSVC, tempo proporcional ao treino. Com o treino inteiro, a SVC RBF leva \svTempoSVC{} s, e a LinearSVC, \svTempoLinSVC{} s. A Random Forest é mais lenta que a SVC nos tamanhos pequenos, mas as curvas se cruzam entre 8 e 16 mil pessoas. Pela mesma inclinação, a SVC levaria cerca de 100 s com 100 mil pessoas e horas com um milhão.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=.8\textwidth]{figures/svm_tempo.pdf}
+\caption{Tempo de treino (um núcleo, seed 0) por número de pessoas no treino, em escala log nos dois eixos. Entre parênteses, a inclinação da reta ajustada de 4.000 pessoas para cima.}
+\label{fig:sv_tempo}
+\end{figure}
+
+\subsubsection{Comparação em 10 seeds}\label{sec:sv_seeds}
+
+A Tabela~\ref{tab:sv_modelos} e a Figura~\ref{fig:sv_acc_auc} reúnem os dez modelos. Nas referências, a regressão logística (\svLogAcc\%) e a árvore ajustada (\svArvAcc\%) ficam a menos de meio ponto uma da outra, e a Random Forest (\svRFAcc\%) fica abaixo da árvore em todas as seeds (\svDifRFArvAcc{} ponto): na configuração padrão, cada árvore cresce até folhas de uma pessoa e decora o ruído dos perfis em conflito. A regra de um corte pergunta, nas 10 seeds, se a pessoa é casada, mas responde ``até 50 mil'' dos dois lados e empata com o piso; sua AUC de \svRegraAuc\% mostra que a pergunta ordena bem as pessoas, e o que falha é o corte. Todos os modelos sem pesos erram cerca de duas vezes mais por falso negativo do que por falso positivo.
+
+\begin{table}[ht]
+\centering
+\caption{Os dez modelos na base de renda (média $\pm$ desvio em 10 seeds; FP e FN: falsos positivos e negativos em \svTeste{} pessoas de teste, \svPositivosTeste{} delas acima de 50 mil). Tempos: mediana das 10 seeds, num único núcleo; treino do modelo final e previsão do teste inteiro.}
+\label{tab:sv_modelos}
+\footnotesize
+\input{results/tab_svm_modelos}
+\end{table}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\textwidth]{figures/svm_acc_auc.pdf}
+\caption{(a) Acurácia e (b) AUC no teste, média e desvio de 10 seeds. Os eixos começam em 80\% e 85\%. Em verde-escuro, as SVMs.}
+\label{fig:sv_acc_auc}
+\end{figure}
+
+\textbf{A SVM.} A SVM RBF tem a melhor acurácia, \svRBFAcc~$\pm$~\svRBFSd\%, e o melhor F1 macro entre as SVMs (\svRBFFum\%). Comparando seed a seed, supera a SVM linear em \svSeedsRBFLinAcc{} das 10 seeds (\svDifRBFLinAcc{} ponto) e a Random Forest em \svSeedsRBFRFAcc{} (\svDifRBFRFAcc), mas contra a árvore ajustada fica à frente em só \svSeedsRBFArvAcc{} (\svDifRBFArvAcc{} ponto, menos que o desvio entre seeds): é um empate (teste de Wilcoxon pareado, $p = \svPRBFArvAcc$; contra a SVM linear, $p = \svPRBFLinAcc$, o menor valor possível com 10 seeds). As 10 divisões compartilham os mesmos dados, então os valores de $p$ são otimistas e servem só para separar empate de diferença. A SVM polinomial, de grau 2 em quase todas as seeds, fica entre as duas (\svPoliAcc\%). A SVM linear e a regressão logística são, na prática, o mesmo modelo: \svDifLinLogAcc{} ponto de diferença. A fronteira curva rende, portanto, menos de um ponto sobre a reta, longe do teto de \svTeto\%. A busca foi estável: a SVM RBF escolheu $C = 1$ em \svRBFCUmSeeds{} seeds e a linear, $C = \svLinC$ em \svLinCSeeds{} (Tabela~\ref{tab:sv_grades}).
+
+\textbf{Acurácia contra AUC.} Na AUC a ordem se inverte: a SVM RBF tem \svRBFAuc\%, abaixo da SVM linear e da polinomial (\svLinAuc\% e \svPoliAuc\%), e perde para a linear em todas as seeds (\svDifRBFLinAuc{} ponto). A causa é o critério da busca. A acurácia só olha de que lado da fronteira cada pessoa cai; a AUC olha a ordem das notas. Guiada pela acurácia, a busca prefere $\gamma$ alto, que ajusta bem a fronteira; mas com $\gamma$ alto cada vetor de suporte só influencia a sua vizinhança, e longe deles a nota de quase todos se aproxima do mesmo valor, o que desfaz a ordem entre as pessoas longe da fronteira. Nas \svGTresSeeds{} seeds em que a busca escolheu $\gamma = 0{,}3$, a AUC foi \svGTresAuc\%; nas \svGUmSeeds{} com $\gamma = 0{,}1$, \svGUmAuc\%. E a acurácia no teste nem foi maior com $\gamma = 0{,}3$ (\svGTresAcc\% contra \svGUmAcc\%): a preferência veio de décimos na validação que não se repetiram no teste. Para ordenar pessoas por chance de renda alta, a busca deveria usar a AUC como critério.
+
+\textbf{Pesos por classe.} Com os mesmos $C$ e $\gamma$, os pesos por classe reduzem os falsos negativos de \svRBFFN{} para \svPesosFN: o modelo passa a encontrar \svRecallPesos\% das pessoas de renda alta, contra \svRecallRBF\%. Em troca, os falsos positivos sobem de \svRBFFP{} para \svPesosFP, e a acurácia cai para \svPesosAcc\%. O F1 da classe acima de 50 mil é o maior de todos (\svPesosFpos\%). Qual versão usar depende do custo de cada erro.
+
+\textbf{A rede neural.} A rede chega a \svRedeAcc~$\pm$~\svRedeSd\%, com o melhor F1 macro (\svRedeFum\%) e a melhor AUC (\svRedeAuc\%) dos dez modelos. Na acurácia, a rede supera a SVM RBF em só \svSeedsRedeRBFAcc{} das 10 seeds (\svDifRedeRBFAcc{} ponto); no F1 macro, em \svSeedsRedeRBFFum{} (\svDifRedeRBFFum), um empate; na AUC, em todas (\svDifRedeRBFAuc{} pontos, $p = \svPRedeRBFAuc$; na acurácia, $p = \svPRedeRBFAcc$, e no F1 macro, $p = \svPRedeRBFFum$), e também supera todos os outros modelos na AUC em todas as seeds. A rede é treinada para estimar probabilidades, e suas notas ordenam bem as pessoas em toda a faixa; a SVM só aprende o lado da fronteira. Em troca, varia mais entre seeds: a busca escolheu \svRedeComb{} combinações diferentes em 10 seeds, e a parada antecipada interrompeu o treino entre \svRedeEpMin{} e \svRedeEpMax{} épocas.
+
+\textbf{Tempo.} A SVM com kernel é cara duas vezes. O treino final da SVM RBF leva \svRBFTreino{} s, contra \svLinTreino{} s da SVM linear e \svRedeTreino{} s da rede, e a busca leva \svRBFBusca{} min por seed, contra \svRedeBusca{} min da rede; nas 10 seeds, \svBuscaTotalRBF{} minutos só na busca da SVM RBF. Prever o teste leva \svRBFPrevS{} s, cerca de \svRazaoPrevRBFLin{} vezes a SVM linear e \svRazaoPrevRBFRede{} vezes a rede, porque cada pessoa é comparada com os vetores de suporte (\svRBFVet{}, em média), enquanto a SVM linear e a rede só multiplicam a pessoa por pesos fixos.

@@ -1,0 +1,18 @@
+\setlength{\tabcolsep}{3.5pt}
+\begin{tabular}{lcccccccc}
+\toprule
+Modelo & Acurácia (\%) & \shortstack{F1 macro\\(\%)} & \shortstack{F1 $>$50K\\(\%)} & AUC (\%) & FP & FN & \shortstack{Treino\\(s)} & \shortstack{Previsão\\(ms)} \\
+\midrule
+Classe majoritária & 75,1 $\pm$ 0,0 & 42,9 & 0,0 & 50,0 & 0 & 1.501 & 0,01 & 4,3 \\
+Regra de um corte & 75,1 $\pm$ 0,0 & 42,9 & 0,0 & 75,6 & 0 & 1.501 & 0,02 & 4,8 \\
+Regressão logística & 84,8 $\pm$ 0,3 & 78,3 & 66,5 & 90,2 & 325 & 592 & 0,06 & 4,5 \\
+Árvore de decisão & 85,2 $\pm$ 0,4 & 78,4 & 66,4 & 90,0 & 277 & 617 & 0,06 & 5,1 \\
+Random Forest & 84,3 $\pm$ 0,4 & 78,1 & 66,5 & 89,1 & 391 & 559 & 2,8 & 180 \\
+\midrule
+SVM linear & 84,8 $\pm$ 0,3 & 78,2 & 66,2 & 90,2 & 311 & 604 & 0,05 & 4,5 \\
+SVM RBF & 85,4 $\pm$ 0,4 & 79,0 & 67,5 & 88,9 & 294 & 587 & 5,7 & 2016 \\
+SVM polinomial & 85,2 $\pm$ 0,4 & 78,7 & 66,9 & 90,2 & 298 & 596 & 3,6 & 488 \\
+SVM RBF com pesos & 80,9 $\pm$ 0,3 & 77,6 & 69,0 & 89,8 & 929 & 221 & 6,3 & 2283 \\
+Rede neural (MLP) & 85,2 $\pm$ 0,6 & 79,4 & 68,4 & 90,8 & 362 & 533 & 1,0 & 5,6 \\
+\bottomrule
+\end{tabular}

@@ -1,0 +1,50 @@
+\section{Metodologia de modelagem}\label{sec:metodologia}
+
+Tudo foi implementado em Python com scikit-learn~\cite{pedregosa:11}. A tarefa é classificação multiclasse: prever a proteína-alvo (4 classes) das 27.476 moléculas com os cinco descritores completos.
+
+\subsection{Conjuntos de atributos}
+
+Além dos descritores, foram criados 12 atributos por contagem de caracteres do SMILES: comprimento da cadeia; número de átomos de N, O e S; de halogênios (F, Cl, Br, I); de anéis (dígitos de fechamento dividido por 2); de ramificações (\texttt{(}); de átomos aromáticos (c, n, o, s minúsculos); de ligações duplas (\texttt{=}) e triplas (\texttt{\#}); de cargas (\texttt{+}, \texttt{-}); e de marcas de estereoquímica (\texttt{@}, \texttt{/}). Comparam-se três conjuntos de atributos: os 5 descritores, as 12 contagens de SMILES e os 17 atributos juntos.
+
+\subsection{Divisão treino-teste e vazamento}\label{sec:splits}
+
+Os dados são divididos em treino (80\%, 21.980 moléculas) e teste (20\%, 5.496). Há um detalhe: moléculas diferentes podem ter exatamente os mesmos cinco valores de descritores (4.777 linhas repetem outra, sempre da mesma classe). Para o modelo, elas são o mesmo ponto. Se uma cai no treino e a outra no teste, acertar a segunda não exige generalizar: basta lembrar a primeira. Comparamos duas formas de dividir.
+
+Na \emph{divisão aleatória}, sorteia-se 20\% das moléculas para o teste, mantendo a proporção de cada classe e sem olhar as repetições: moléculas com descritores idênticos podem ficar em lados opostos. Na \emph{divisão agrupada}, primeiro reúnem-se num mesmo grupo todas as moléculas com os mesmos cinco descritores, e depois sorteiam-se grupos inteiros para o teste, também mantendo a proporção de classes: um grupo nunca é partido entre treino e teste. Na prática, usa-se uma validação cruzada de 5 partes, estratificada por classe e sem separar grupos, e uma das partes (20\%) serve de teste. A diferença de acurácia entre as duas divisões mede o vazamento~\cite{kapoor:23}.
+
+A combinação dos 3 conjuntos de atributos com as 2 divisões dá os 6 cenários da Tabela~\ref{tab:cenarios}.
+
+\begin{table}[ht]
+\centering
+\caption{Os seis cenários: cada conjunto de atributos com cada divisão treino-teste.}
+\label{tab:cenarios}
+\small
+\begin{tabular}{llc}
+\toprule
+Cenário & Atributos & Divisão \\
+\midrule
+C1 & 5 descritores & aleatória \\
+C2 & 5 descritores & agrupada \\
+C3 & 12 contagens de SMILES & aleatória \\
+C4 & 12 contagens de SMILES & agrupada \\
+C5 & 17 (descritores + contagens) & aleatória \\
+C6 & 17 (descritores + contagens) & agrupada \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Ajuste e avaliação da árvore de decisão}
+
+Em cada cenário da Tabela~\ref{tab:cenarios}, uma busca em grade com validação cruzada de 5 partes escolhe os hiperparâmetros da árvore de decisão: critério de impureza (Gini ou entropia), profundidade máxima (8, 12, 16 ou sem limite), mínimo de amostras por folha (1, 5 ou 20) e parâmetro de poda por custo-complexidade $\alpha$ (0, $10^{-4}$ ou $3\times10^{-4}$), 72 combinações. A validação interna segue a mesma regra da divisão externa: na divisão agrupada, as partes também não separam grupos. A métrica de escolha é a acurácia. No teste, reportam-se acurácia, F1 macro (média simples do F1 das quatro classes), F1 por classe e a matriz de confusão. Como piso, usa-se um classificador que responde sempre a classe majoritária (EGFR).
+
+\subsection{Random Tree e conjuntos de árvores}\label{sec:conjuntos}
+
+Os demais modelos usam o mesmo treino, o mesmo teste e a mesma validação cruzada agrupada da árvore. A Random Tree é implementada como uma árvore do scikit-learn com sorteio de atributos em cada nó (\texttt{max\_features}), o que reproduz o algoritmo do Weka. Ela é avaliada de duas formas nos seis cenários: com os padrões do Weka (entropia, $K = \lfloor \log_2 n \rfloor + 1$, sem poda, o que dá $K = 5$ com 17 atributos) e com uma busca em grade de 54 combinações (critério, fração de atributos sorteados de 0,25, 0,5 ou 0,75, profundidade máxima e mínimo por folha).
+
+A Random Forest e o \emph{gradient boosting} por histogramas são avaliados no cenário principal (17 atributos, divisão agrupada), com os padrões do scikit-learn e com uma busca leve: para a floresta, de 300 árvores, a fração de atributos sorteados e o mínimo por folha (6 combinações); para o \emph{boosting}, com 300 iterações, a taxa de aprendizado e o número máximo de folhas por árvore (9 combinações). Dois recursos ficam desligados porque separam uma validação aleatória dentro do treino e deixariam gêmeas dos dois lados: a estimativa \emph{out-of-bag} da floresta e a parada antecipada do \emph{boosting}.
+
+Para ver o efeito do sorteio de atributos numa árvore só e num conjunto, três modelos com a mesma árvore base, sem poda, são comparados na seed 42: a árvore de decisão (sem sorteio), a Random Tree com $K = \sqrt{n}$, o padrão da floresta, e a Random Forest de 300 dessas árvores. As duas árvores únicas usam a média de 10 sementes, porque a Random Tree varia com a semente.
+
+\subsection{Repetição com várias seeds}\label{sec:seeds}
+
+Um único sorteio pode ser favorável ou desfavorável por acaso. Todo o procedimento acima, com todos os modelos, é repetido com 10 seeds (0 a 9), que mudam as duas divisões, as partes da validação cruzada e a semente dos modelos. As tabelas trazem média $\pm$ desvio padrão amostral. Ganhos e superestimativas são relativos, $(B - A)/A$, calculados em cada seed e depois resumidos pela média; a superestimativa compara a acurácia da divisão aleatória (B) com a da agrupada (A). As curvas, a árvore desenhada, a comparação entre as três árvores base e a análise de erros usam a seed 42. A variação das seeds cobre o sorteio da divisão, mas não a escolha dos dados: a base é a mesma em todas as repetições.

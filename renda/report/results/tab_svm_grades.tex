@@ -1,0 +1,11 @@
+\begin{tabular}{l>{\raggedright\arraybackslash}p{5.6cm}>{\raggedright\arraybackslash}p{4.2cm}}
+\toprule
+Modelo & Valores testados & Escolha nas 10 seeds \\
+\midrule
+Árvore de decisão & critério (Gini, entropia) $\times$ profundidade (3, 5, 8, 12, sem limite) $\times$ mínimo por folha (1, 5, 20): 30 & 8 combinações diferentes; profundidade de 8 para cima ou sem limite \\
+SVM linear & C $\in$ \{0,001; 0,01; 0,1; 1; 10\}: 5 & C = 0,1 em 7 \\
+SVM RBF & C $\in$ \{0,1; 1; 10; 100\} $\times$ $\gamma$ $\in$ \{0,01; 0,03; 0,1; 0,3\}: 16 & C = 1 em 9, com $\gamma$ = 0,3 (5) ou 0,1 (4); C = 10 e $\gamma$ = 0,03 em 1 \\
+SVM polinomial & grau $\in$ \{2; 3\} $\times$ C $\in$ \{0,1; 1; 10\}, coef0 = 1: 6 & grau 2 e C = 1 em 9 \\
+Rede neural & 6 arquiteturas $\times$ $\alpha$ (10$^{-4}$, 10$^{-2}$) $\times$ taxa (10$^{-3}$, 10$^{-2}$): 24 & 10 combinações diferentes \\
+\bottomrule
+\end{tabular}
