@@ -1,14 +1,13 @@
-\section{Análise exploratória}
+\section{Análise exploratória}\label{sec:sv_eda}
 
-As classes são razoavelmente balanceadas (Tabela~\ref{tab:classes}): responder sempre EGFR, a majoritária, acerta 29,3\%, e esse é o piso de comparação do restante do trabalho. A Figura~\ref{fig:boxplots} compara os cinco descritores entre os alvos. DRD2 tem TPSA e HBD claramente menores que os demais. EGFR tem os maiores valores de massa molecular, LogP e HBA. HDAC1 tem o maior HBD. BACE1 e HDAC1 se sobrepõem em massa molecular, TPSA e HBA.
+\svPositivos\% das pessoas ganham mais de 50 mil, cerca de \svRazaoClasses{} pessoas abaixo para cada uma acima: responder sempre ``até 50 mil'' já acerta \svPiso\%, e esse é o piso. Entre os numéricos, os anos de estudo têm a maior correlação com o rótulo (\svCorrEstudo), seguidos da idade (\svCorrIdade), das horas por semana (\svCorrHoras), do ganho de capital (\svCorrGanho) e da perda de capital (\svCorrPerda). Entre os categóricos, o estado civil é o que mais separa: entre os casados, \svCasados\% ganham mais de 50 mil; entre quem nunca casou, \svNuncaCasou\% (Figura~\ref{fig:sv_eda}a). A renda alta cresce com os anos de estudo: \svEstudoNove\% com 9 anos, \svEstudoTreze\% com 13 e \svEstudoQuinze\% com 15 (Figura~\ref{fig:sv_eda}b).
 
 \begin{figure}[ht]
 \centering
-\includegraphics[width=\textwidth]{figures/feature_boxplots.pdf}
-\caption{Descritores por proteína-alvo. Caixas mostram os quartis e as hastes 1,5 vez a amplitude interquartil; valores extremos foram omitidos.}
-\label{fig:boxplots}
+\includegraphics[width=\textwidth]{figures/svm_eda.pdf}
+\caption{Proporção de pessoas que ganham mais de 50 mil (a) por estado civil, nas cinco categorias mais comuns, e (b) por anos de estudo, na base inteira (\svLinhas{} pessoas). A linha tracejada é a proporção geral.}
+\label{fig:sv_eda}
 \end{figure}
 
-TPSA, HBA e HBD são correlacionadas entre si (correlação de Spearman de 0,72 entre TPSA e HBA e de 0,69 entre TPSA e HBD). Isso não prejudica a árvore, mas divide a importância entre elas.
 
-Para medir quanto cada descritor separa os alvos sozinho, fizemos um experimento: para cada um dos cinco, treinamos uma árvore de decisão de profundidade 3 que enxerga apenas aquele atributo e medimos sua acurácia por validação cruzada de 5 partes. Os resultados foram 37,8\% (massa molecular), 38,7\% (LogP), 43,3\% (HBA), 44,9\% (TPSA) e 45,1\% (HBD). Todos superam os 29,3\% de responder sempre a classe majoritária, mas nenhum passa de 45,1\%. Nenhum descritor separa os alvos sozinho, então a árvore precisa combiná-los, e mesmo assim o desempenho esperado com só cinco descritores globais é limitado, sobretudo entre BACE1 e HDAC1. Isso motiva os atributos extraídos do SMILES (Seção~\ref{sec:metodologia}).
+Mesmo o atributo mais forte não basta: nem entre os casados a renda alta passa da metade. Separar as classes exige, portanto, combinar vários atributos, e a distância entre o piso (\svPiso\%) e o teto (\svTeto\%) é o espaço em que os modelos competem.

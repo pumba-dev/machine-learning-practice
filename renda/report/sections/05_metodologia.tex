@@ -1,50 +1,17 @@
-\section{Metodologia de modelagem}\label{sec:metodologia}
+\section{Metodologia}\label{sec:sv_metodo}
 
-Tudo foi implementado em Python com scikit-learn~\cite{pedregosa:11}. A tarefa é classificação multiclasse: prever a proteína-alvo (4 classes) das 27.476 moléculas com os cinco descritores completos.
+\textbf{Pré-processamento.} Os cinco atributos categóricos viram colunas 0/1, uma por categoria (\emph{one-hot}), e os cinco numéricos são padronizados (subtrai-se a média e divide-se pelo desvio padrão). São \svColunas{} colunas no total. Codificação, padronização e modelo ficam num único \emph{pipeline} do scikit-learn~\cite{pedregosa:11}, de modo que a média e o desvio vêm só do treino de cada divisão, e de cada parte da validação cruzada.
 
-\subsection{Conjuntos de atributos}
+\textbf{Protocolo.} Os dados são divididos em treino (80\%, \svTreino{} pessoas) e teste (20\%, \svTeste, das quais \svPositivosTeste{} acima de 50 mil), mantendo a proporção das classes, e o procedimento é repetido com 10 seeds (0 a 9), que mudam a divisão, as partes da validação cruzada e a semente dos modelos. Quando um modelo tem hiperparâmetros, uma busca em grade com validação cruzada estratificada de 5 partes, só no treino, escolhe a combinação de maior acurácia, e o modelo é treinado de novo no treino inteiro. No teste, reportam-se a acurácia, o F1 macro (média do F1 das duas classes), o F1 da classe acima de 50 mil, a AUC e os falsos positivos e negativos, com a classe acima de 50 mil como positiva. A AUC usa a probabilidade prevista ou, na SVM, a distância à fronteira: mede se o modelo ordena bem as pessoas, independentemente do corte.
 
-Além dos descritores, foram criados 12 atributos por contagem de caracteres do SMILES: comprimento da cadeia; número de átomos de N, O e S; de halogênios (F, Cl, Br, I); de anéis (dígitos de fechamento dividido por 2); de ramificações (\texttt{(}); de átomos aromáticos (c, n, o, s minúsculos); de ligações duplas (\texttt{=}) e triplas (\texttt{\#}); de cargas (\texttt{+}, \texttt{-}); e de marcas de estereoquímica (\texttt{@}, \texttt{/}). Comparam-se três conjuntos de atributos: os 5 descritores, as 12 contagens de SMILES e os 17 atributos juntos.
-
-\subsection{Divisão treino-teste e vazamento}\label{sec:splits}
-
-Os dados são divididos em treino (80\%, 21.980 moléculas) e teste (20\%, 5.496). Há um detalhe: moléculas diferentes podem ter exatamente os mesmos cinco valores de descritores (4.777 linhas repetem outra, sempre da mesma classe). Para o modelo, elas são o mesmo ponto. Se uma cai no treino e a outra no teste, acertar a segunda não exige generalizar: basta lembrar a primeira. Comparamos duas formas de dividir.
-
-Na \emph{divisão aleatória}, sorteia-se 20\% das moléculas para o teste, mantendo a proporção de cada classe e sem olhar as repetições: moléculas com descritores idênticos podem ficar em lados opostos. Na \emph{divisão agrupada}, primeiro reúnem-se num mesmo grupo todas as moléculas com os mesmos cinco descritores, e depois sorteiam-se grupos inteiros para o teste, também mantendo a proporção de classes: um grupo nunca é partido entre treino e teste. Na prática, usa-se uma validação cruzada de 5 partes, estratificada por classe e sem separar grupos, e uma das partes (20\%) serve de teste. A diferença de acurácia entre as duas divisões mede o vazamento~\cite{kapoor:23}.
-
-A combinação dos 3 conjuntos de atributos com as 2 divisões dá os 6 cenários da Tabela~\ref{tab:cenarios}.
+\textbf{Modelos.} As referências são a classe majoritária; a regra de um corte, uma árvore de profundidade 1 que escolhe sozinha, no treino, o melhor atributo e o melhor limiar; a regressão logística; a árvore de decisão com busca em grade; e a Random Forest com 300 árvores. A SVM aparece em quatro versões: a SVM linear, pelo LIBLINEAR (\texttt{LinearSVC}); a SVM com kernel RBF e a com kernel polinomial ($c_0 = 1$), pelo LIBSVM (\texttt{SVC}); e a SVM RBF com pesos por classe (\texttt{class\_weight="balanced"}, que faz o erro na classe menor custar cerca de 3 vezes mais), com os $C$ e $\gamma$ escolhidos para a RBF em cada seed. A rede neural é um MLP do scikit-learn: camadas ocultas com ativação ReLU, um neurônio de saída com sigmoide, perda de entropia cruzada e otimizador Adam, com parada antecipada (10\% do treino ficam de fora como validação, e o treino para depois de 30 épocas sem melhora). A busca da rede cobre a arquitetura (8, 16, 32 ou 64 neurônios numa camada; 32 e 16 ou 64 e 32 em duas), a regularização L2 e a taxa de aprendizado. As grades da SVM saíram de um estudo numa única divisão (a seed 0), apresentado na Seção~\ref{sec:sv_estudo}; a Tabela~\ref{tab:sv_grades} reúne todas.
 
 \begin{table}[ht]
 \centering
-\caption{Os seis cenários: cada conjunto de atributos com cada divisão treino-teste.}
-\label{tab:cenarios}
-\small
-\begin{tabular}{llc}
-\toprule
-Cenário & Atributos & Divisão \\
-\midrule
-C1 & 5 descritores & aleatória \\
-C2 & 5 descritores & agrupada \\
-C3 & 12 contagens de SMILES & aleatória \\
-C4 & 12 contagens de SMILES & agrupada \\
-C5 & 17 (descritores + contagens) & aleatória \\
-C6 & 17 (descritores + contagens) & agrupada \\
-\bottomrule
-\end{tabular}
+\caption{Grades da busca (número de combinações após os dois-pontos) e o que a busca escolheu nas 10 seeds.}
+\label{tab:sv_grades}
+\footnotesize
+\input{results/tab_svm_grades}
 \end{table}
 
-\subsection{Ajuste e avaliação da árvore de decisão}
-
-Em cada cenário da Tabela~\ref{tab:cenarios}, uma busca em grade com validação cruzada de 5 partes escolhe os hiperparâmetros da árvore de decisão: critério de impureza (Gini ou entropia), profundidade máxima (8, 12, 16 ou sem limite), mínimo de amostras por folha (1, 5 ou 20) e parâmetro de poda por custo-complexidade $\alpha$ (0, $10^{-4}$ ou $3\times10^{-4}$), 72 combinações. A validação interna segue a mesma regra da divisão externa: na divisão agrupada, as partes também não separam grupos. A métrica de escolha é a acurácia. No teste, reportam-se acurácia, F1 macro (média simples do F1 das quatro classes), F1 por classe e a matriz de confusão. Como piso, usa-se um classificador que responde sempre a classe majoritária (EGFR).
-
-\subsection{Random Tree e conjuntos de árvores}\label{sec:conjuntos}
-
-Os demais modelos usam o mesmo treino, o mesmo teste e a mesma validação cruzada agrupada da árvore. A Random Tree é implementada como uma árvore do scikit-learn com sorteio de atributos em cada nó (\texttt{max\_features}), o que reproduz o algoritmo do Weka. Ela é avaliada de duas formas nos seis cenários: com os padrões do Weka (entropia, $K = \lfloor \log_2 n \rfloor + 1$, sem poda, o que dá $K = 5$ com 17 atributos) e com uma busca em grade de 54 combinações (critério, fração de atributos sorteados de 0,25, 0,5 ou 0,75, profundidade máxima e mínimo por folha).
-
-A Random Forest e o \emph{gradient boosting} por histogramas são avaliados no cenário principal (17 atributos, divisão agrupada), com os padrões do scikit-learn e com uma busca leve: para a floresta, de 300 árvores, a fração de atributos sorteados e o mínimo por folha (6 combinações); para o \emph{boosting}, com 300 iterações, a taxa de aprendizado e o número máximo de folhas por árvore (9 combinações). Dois recursos ficam desligados porque separam uma validação aleatória dentro do treino e deixariam gêmeas dos dois lados: a estimativa \emph{out-of-bag} da floresta e a parada antecipada do \emph{boosting}.
-
-Para ver o efeito do sorteio de atributos numa árvore só e num conjunto, três modelos com a mesma árvore base, sem poda, são comparados na seed 42: a árvore de decisão (sem sorteio), a Random Tree com $K = \sqrt{n}$, o padrão da floresta, e a Random Forest de 300 dessas árvores. As duas árvores únicas usam a média de 10 sementes, porque a Random Tree varia com a semente.
-
-\subsection{Repetição com várias seeds}\label{sec:seeds}
-
-Um único sorteio pode ser favorável ou desfavorável por acaso. Todo o procedimento acima, com todos os modelos, é repetido com 10 seeds (0 a 9), que mudam as duas divisões, as partes da validação cruzada e a semente dos modelos. As tabelas trazem média $\pm$ desvio padrão amostral. Ganhos e superestimativas são relativos, $(B - A)/A$, calculados em cada seed e depois resumidos pela média; a superestimativa compara a acurácia da divisão aleatória (B) com a da agrupada (A). As curvas, a árvore desenhada, a comparação entre as três árvores base e a análise de erros usam a seed 42. A variação das seeds cobre o sorteio da divisão, mas não a escolha dos dados: a base é a mesma em todas as repetições.
+\textbf{Tempo de execução.} Para comparar algoritmos, e não o número de núcleos que cada um usa, tudo roda num único núcleo (\texttt{n\_jobs=1} e as bibliotecas de álgebra linear limitadas a uma \emph{thread}), com uma rodada de aquecimento descartada. Nos modelos com busca, o tempo da busca é medido à parte do treino final. O resumo usa a mediana das 10 seeds. A máquina é um AMD Ryzen 5 9600X (6 núcleos) com 31 GB de memória, Windows 11 e scikit-learn 1.9.1.

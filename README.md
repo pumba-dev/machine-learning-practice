@@ -260,7 +260,7 @@ Média de 10 seeds ([`renda/resultados/`](renda/resultados/)). A busca e a previ
 
 ### Material
 
-- Relatório cumulativo, com as quatro partes (árvores, Random Tree e conjuntos, redes neurais e SVM): [`renda/report/main.pdf`](renda/report/main.pdf)
+- Relatório (SVM): [`renda/report/main.pdf`](renda/report/main.pdf)
 - Apresentação 4, SVM: [`renda/slides/apresentacao_svm.pdf`](renda/slides/apresentacao_svm.pdf), roteiro em [`notas_svm.md`](renda/slides/notas_svm.md)
 
 ---
@@ -293,7 +293,7 @@ python emprestimos/scripts/rn_data.py && python emprestimos/scripts/rn_report.py
 python emprestimos/scripts/build_slides_rn.py                                       # apresentação 3
 
 # base 3: renda
-python renda/scripts/svm_data.py && python renda/scripts/svm_report.py   # números, figuras e tabelas da parte 4
+python renda/scripts/svm_data.py && python renda/scripts/svm_report.py   # números, figuras e tabelas do relatório
 python renda/scripts/build_slides_svm.py                                 # apresentação 4
 
 # PDF de uma apresentação

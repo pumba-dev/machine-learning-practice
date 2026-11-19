@@ -8,20 +8,13 @@
 \usepackage{booktabs}
 \usepackage{array}
 \usepackage{amsmath}
-\usepackage{tikz}
-\usetikzlibrary{arrows.meta,positioning}
 
 \sloppy
-\hyphenation{SMILES}
 
-% Números citados no texto, gerados por scripts/results_tables.py a partir de results/multiseed.csv.
-\input{results/numeros}
-% Números da parte de redes neurais, gerados por scripts/rn_report.py a partir de results/rn_dados.json.
-\input{results/numeros_rn}
-% Números da parte de SVM, gerados por scripts/svm_report.py a partir de results/svm_dados.json.
+% Números citados no texto, gerados por scripts/svm_report.py a partir de results/svm_dados.json.
 \input{results/numeros_svm}
 
-\title{Árvores de decisão, redes neurais e máquinas de vetores de suporte em três tarefas de classificação: alvos proteicos do ChEMBL, aprovação de empréstimos e previsão de renda}
+\title{Máquinas de vetores de suporte na previsão de renda: kernels, custo e comparação com rede neural e modelos de referência}
 
 \author{Bernan R. do Nascimento\inst{1}, Paulo E. R. Araujo\inst{1}, Thiago R. P. de Carvalho\inst{1}}
 
@@ -37,47 +30,25 @@
 \maketitle
 
 \begin{abstract}
-  Predicting which protein target a molecule is associated with is an early step in drug discovery.
-  We rebuild from the ChEMBL 37 API a dataset of 27,714 molecules, each associated with one of four
-  targets (EGFR, BACE1, DRD2 and HDAC1), and train a decision tree on five physicochemical
-  descriptors and twelve counts taken from the SMILES string, a text that describes a molecule's
-  structure. With a grouped split, the SMILES counts raise accuracy from \accGrupDescEn\% to
-  \accGrupAmbosEn\% (a \ganhoAmbosEn\% relative gain; mean of 10 seeds). A random split overestimates
-  accuracy by up to \gapMaxEn\%, because a quarter of the test molecules have a twin with identical
-  descriptors in the training set; the grouped split keeps such twins on the same side. Weka's Random
-  Tree, which samples the features tried at each node, falls \relRTEn\% below the decision tree, while
-  tree ensembles gain \relHGBEn\% to \relGBajEn\%: feature sampling hurts a single tree but, across
-  300 trees, it is what makes the Random Forest work. On a second dataset, \rnLinhasEn{} loan applications, a
-  multilayer perceptron reaches \rnAccRedeEn\%, above a one-threshold rule (\rnAccRegraEn\%) and logistic
-  regression (\rnAccLogEn\%) but below a decision tree (\rnAccArvEn\%), which also trains about
-  \rnRazaoTreino{} times faster. The labels follow a step on the credit score: the tree draws it with one cut,
-  while the network approximates it with a ramp, where its errors concentrate. On a third dataset,
-  \svLinhasEn{} census records, an RBF-kernel support vector machine reaches the best accuracy
-  (\svRBFAccEn\%), less than one point above a linear boundary, but a lower AUC than the linear SVM, because
-  an accuracy-driven search picks a large gamma; the neural network matches it (\svRedeAccEn\%) with the best
-  AUC at a fraction of the cost.
+  We predict whether a person's annual income exceeds 50 thousand dollars from 10 attributes of the
+  1994 US census, on \svLinhasEn{} records of the Adult dataset, and use it to study the support vector
+  machine (SVM) and compare it with simpler models and a neural network, including execution time.
+  Identical profiles with different incomes cap any model at \svTetoEn\% accuracy. An RBF-kernel SVM
+  reaches the best accuracy (\svRBFAccEn\%), less than one point above a linear boundary
+  (\svLinAccEn\%), but a lower AUC than the linear SVM (\svRBFAucEn\% versus \svLinAucEn\%), because an
+  accuracy-driven search picks a large gamma. The neural network matches it (\svRedeAccEn\%) with the
+  best AUC (\svRedeAucEn\%) at a fraction of the cost.
 \end{abstract}
 
 \begin{resumo}
-  Prever a qual proteína-alvo uma molécula está associada é uma etapa inicial da descoberta de
-  fármacos. Reconstruímos pela API do ChEMBL 37 uma base de 27.714 moléculas, cada uma associada a
-  um de quatro alvos (EGFR, BACE1, DRD2 e HDAC1), e treinamos uma árvore de decisão com cinco
-  descritores físico-químicos e doze contagens extraídas do SMILES, texto que descreve a estrutura
-  da molécula. Com divisão agrupada, as contagens elevam a acurácia de \accGrupDesc\% para
-  \accGrupAmbos\% (ganho relativo de \ganhoAmbos\%; média de 10 seeds). A divisão aleatória
-  superestima o resultado em até \gapMax\%, pois um quarto das moléculas de teste tem uma gêmea de
-  descritores idênticos no treino; a divisão agrupada mantém essas gêmeas do mesmo lado. A Random Tree
-  do Weka, que sorteia os atributos de cada nó, fica \relRT\% abaixo da árvore, enquanto conjuntos de
-  árvores ganham de \relHGB\% a \relGBaj\%: o sorteio de atributos piora uma árvore sozinha, mas,
-  somado em 300 árvores, é o que faz a Random Forest funcionar. Numa segunda base, de \rnLinhas{} pedidos
-  de empréstimo, uma rede neural (perceptron de múltiplas camadas) acerta \rnAccRede\%, acima de uma regra de
-  um corte (\rnAccRegra\%) e da regressão logística (\rnAccLog\%), mas abaixo da árvore de decisão
-  (\rnAccArv\%), que ainda treina cerca de \rnRazaoTreino{} vezes mais rápido. Os rótulos seguem um degrau no
-  score de crédito: a árvore o representa com um corte, e a rede o aproxima com uma rampa, onde se concentram
-  seus erros. Numa terceira base, de \svLinhas{} registros do censo dos EUA, uma máquina de vetores de suporte
-  (SVM) com kernel RBF tem a melhor acurácia (\svRBFAcc\%), menos de um ponto acima de uma fronteira reta, mas
-  AUC menor que a da SVM linear, porque a busca guiada pela acurácia escolhe um gamma alto; a rede neural chega
-  ao mesmo nível (\svRedeAcc\%), com a melhor AUC, a uma fração do custo.
+  Prevemos se a renda anual de uma pessoa passa de 50 mil dólares a partir de 10 atributos do censo dos
+  EUA de 1994, em \svLinhas{} registros da base Adult, e a usamos para estudar a máquina de vetores de
+  suporte (SVM) e compará-la com modelos mais simples e com uma rede neural, incluindo o tempo de
+  execução. Perfis idênticos com rendas diferentes limitam qualquer modelo a \svTeto\% de acurácia. Sem
+  padronização, a SVM com kernel RBF cai de \svPadCom\% para \svPadSem\%. Com ela, tem a melhor acurácia
+  (\svRBFAcc\%), menos de um ponto acima de uma fronteira reta (\svLinAcc\%), mas AUC menor que a da SVM
+  linear (\svRBFAuc\% contra \svLinAuc\%), porque a busca guiada pela acurácia escolhe um gamma alto. A
+  rede neural chega ao mesmo nível (\svRedeAcc\%), com a melhor AUC (\svRedeAuc\%), a uma fração do custo.
 \end{resumo}
 
 \input{sections/01_introducao}
@@ -86,10 +57,8 @@
 \input{sections/04_eda}
 \input{sections/05_metodologia}
 \input{sections/06_resultados}
-\input{sections/07_redes_neurais}
-\input{sections/08_svm}
-\input{sections/09_limitacoes}
-\input{sections/10_conclusao}
+\input{sections/07_limitacoes}
+\input{sections/08_conclusao}
 
 \bibliographystyle{sbc}
 \bibliography{refs}
