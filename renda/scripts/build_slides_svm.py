@@ -102,7 +102,7 @@ def slide_base(deck, d):
              size=20, name="Legenda da renda alta")
     card(slide, 7.9, 4.85, 4.2, 1.45, GREEN_DK, ["Rótulo: a renda anual passa de 50 mil dólares?"],
          name="Pergunta", size=24, bold=True, color="FFFFFF", align=PP_ALIGN.CENTER)
-    text_box(slide, 7.9, 6.45, 4.2, 0.4, ["Base Adult (UCI), censo de 1994"], size=18, color=MUTED, name="Fonte")
+    text_box(slide, 7.9, 6.45, 4.2, 0.4, ["Base Adult (UCI), censo de 1994"], size=20, color=MUTED, name="Fonte")
 
 
 def slide_curation(deck, d):
@@ -115,7 +115,7 @@ def slide_curation(deck, d):
         x = 0.92 + index * 3.85
         card(slide, x, 2.0, 3.35, 1.75, fill, [
             {"text": number, "size": 40, "bold": True, "color": color, "align": PP_ALIGN.CENTER, "space_after": 0},
-            {"text": caption, "size": 18, "align": PP_ALIGN.CENTER},
+            {"text": caption, "size": 20, "align": PP_ALIGN.CENTER},
         ], name=f"Etapa {index + 1}")
         if index < 2:
             arrow = shape(slide, MSO_SHAPE.RIGHT_ARROW, x + 3.45, 2.65, 0.32, 0.45, GREEN, name=f"Seta {index + 1}")
@@ -146,14 +146,14 @@ def slide_hard(deck, d):
     chart.has_legend = False
     text_box(slide, 8.3, 2.0, 3.8, 1.75, [
         {"text": f"{br(b['piso'])}%", "size": 48, "bold": True, "color": RED, "space_after": 0},
-        {"text": "regra de um corte: pergunta ‘é casado?’ e responde ‘não’ dos dois lados", "size": 18},
+        {"text": "regra de um corte: pergunta ‘é casado?’ e responde ‘não’ dos dois lados", "size": 20},
     ], name="Regra de um corte")
     text_box(slide, 8.3, 3.95, 3.8, 1.6, [
         {"text": f"{br(b['teto'])}%", "size": 48, "bold": True, "color": GREEN_DK, "space_after": 0},
-        {"text": f"teto: {b['perfis_conflito']} perfis idênticos aparecem com as duas rendas", "size": 18},
+        {"text": f"teto: {b['perfis_conflito']} perfis idênticos aparecem com as duas rendas", "size": 20},
     ], name="Teto")
     card(slide, 8.3, 5.75, 3.8, 1.05, GRAY_TINT, [
-        {"text": "Na base de empréstimos, um corte acertava 95,5%", "size": 18},
+        {"text": "Na base de empréstimos, um corte acertava 95,5%", "size": 20},
     ], name="Contraste", pad=0.2)
 
 
@@ -173,14 +173,13 @@ def slide_rulers(deck, d):
     text_box(slide, 0.92, 6.0, 7.8, 0.8, [
         {"text": "Média de 10 seeds no teste; F1 macro e AUC porque há 3 pessoas abaixo para cada 1 acima",
          "color": MUTED},
-    ], size=18, name="Nota")
-    cards = [("Protocolo", "10 seeds · treino 80% e teste 20% · busca com validação cruzada só no treino · "
-                           "tempo num único núcleo"),
+    ], size=20, name="Nota")
+    cards = [("Protocolo", "10 seeds · treino 80%, teste 20% · busca só no treino · um núcleo"),
              ("Meta da SVM", "passar de 85% de acurácia e 78% de F1 macro")]
     for index, (head, detail) in enumerate(cards):
-        card(slide, 9.15, 2.0 + index * 2.25, 2.95, 2.05, TINT if index == 0 else GREEN_DK, [
+        card(slide, 9.0, [2.0, 4.6][index], 3.1, [2.4, 1.75][index], TINT if index == 0 else GREEN_DK, [
             {"text": head, "size": 22, "bold": True, "color": GREEN_DK if index == 0 else "FFFFFF", "space_after": 4},
-            {"text": detail, "size": 18, "color": INK if index == 0 else "FFFFFF"},
+            {"text": detail, "size": 20, "color": INK if index == 0 else "FFFFFF"},
         ], name=head, anchor=MSO_ANCHOR.MIDDLE, pad=0.2)
 
 
@@ -216,7 +215,7 @@ def slide_margin(deck, d):
     text_box(slide, x0, 6.5, w, 0.4, [{"runs": [("● >50K", {"color": POS, "bold": True}), ("   ", {}),
                                                 ("● ≤50K", {"color": NEG, "bold": True}), ("   ", {}),
                                                 ("○ vetor de suporte", {"color": "9A7A00", "bold": True})]}],
-             size=18, name="Legenda do diagrama")
+             size=20, name="Legenda do diagrama")
     cards = [
         ("Vetores de suporte", "as pessoas na calçada da margem (ou do lado errado): só elas definem a fronteira"),
         ("C: tolerância a erro", "C pequeno aceita erros e deixa a margem larga; C grande exige acertar tudo e a estreita"),
@@ -253,15 +252,15 @@ def slide_map(deck, d):
     text_box(slide, 0.92, 1.95, 7.5, 0.45, ["Acurácia na validação (%), kernel RBF, seed 0"], size=22, bold=True,
              color=GREEN_DK)
     cw, ch, lx, top = 0.94, 0.66, 0.92, 2.5
-    text_box(slide, lx, top, 1.05, ch, ["C \\ γ"], size=18, bold=True, color=MUTED, anchor=MSO_ANCHOR.MIDDLE,
+    text_box(slide, lx, top, 1.05, ch, ["C \\ γ"], size=20, bold=True, color=MUTED, anchor=MSO_ANCHOR.MIDDLE,
              align=PP_ALIGN.CENTER, name="Canto")
     for j, gamma in enumerate(mapa["gamma"]):
-        text_box(slide, lx + 1.05 + j * cw, top, cw, ch, [f"{br(gamma, 3).rstrip('0').rstrip(',')}"], size=18,
+        text_box(slide, lx + 1.05 + j * cw, top, cw, ch, [f"{br(gamma, 3).rstrip('0').rstrip(',')}"], size=20,
                  bold=True, color=MUTED, anchor=MSO_ANCHOR.MIDDLE, align=PP_ALIGN.CENTER, name=f"gamma {gamma}")
     best = mapa["melhor"]
     for i, C in enumerate(mapa["C"]):
         y = top + ch + i * ch
-        text_box(slide, lx, y, 1.05, ch, [f"{br(C, 2).rstrip('0').rstrip(',')}"], size=18, bold=True, color=MUTED,
+        text_box(slide, lx, y, 1.05, ch, [f"{br(C, 2).rstrip('0').rstrip(',')}"], size=20, bold=True, color=MUTED,
                  anchor=MSO_ANCHOR.MIDDLE, align=PP_ALIGN.CENTER, name=f"C {C}")
         for j, gamma in enumerate(mapa["gamma"]):
             value = mapa["acuracia"][i][j]
@@ -274,7 +273,7 @@ def slide_map(deck, d):
             frame = cell.text_frame
             frame.margin_left = frame.margin_right = frame.margin_top = frame.margin_bottom = 0
             frame.vertical_anchor = MSO_ANCHOR.MIDDLE
-            write(frame, [br(value)], size=18, bold=True, color="FFFFFF" if t > 0.45 else INK, align=PP_ALIGN.CENTER)
+            write(frame, [br(value)], size=20, bold=True, color="FFFFFF" if t > 0.45 else INK, align=PP_ALIGN.CENTER)
     grid = slide.shapes[-1]
     alt(grid, "Mapa de calor: acurácia na validação para C (linhas) e gamma (colunas). " + "; ".join(
         f"C {C}: " + ", ".join(br(v) for v in linha) for C, linha in zip(mapa["C"], mapa["acuracia"])) + ".")
@@ -288,10 +287,10 @@ def slide_map(deck, d):
                                 "o modelo decora", RED_TINT),
     ]
     for index, (number, caption, fill) in enumerate(cards):
-        card(slide, 8.65, 2.0 + index * 2.4, 3.45, 2.0, fill, [
+        card(slide, 8.65, 2.0 + index * 2.35, 3.45, 2.15, fill, [
             {"text": number, "size": 28 if index == 0 else 24, "bold": True,
              "color": GREEN_DK if index == 0 else RED, "space_after": 2},
-            {"text": caption, "size": 18},
+            {"text": caption, "size": 20},
         ], name=f"Leitura {index + 1}", anchor=MSO_ANCHOR.MIDDLE, pad=0.2)
 
 
@@ -309,7 +308,7 @@ def slide_scaling(deck, d):
             card(slide, 2.9 + col * 2.55, y, 2.35, 1.6, fill, [
                 {"text": f"{br(info['acuracia'])}%", "size": 36, "bold": True, "color": ink, "align": PP_ALIGN.CENTER,
                  "space_after": 0},
-                {"text": label, "size": 18, "align": PP_ALIGN.CENTER},
+                {"text": label, "size": 20, "align": PP_ALIGN.CENTER},
             ], name=f"{name} {label}")
     f = b["faixas"]
     card(slide, 8.4, 2.0, 3.7, 3.45, TINT, [
@@ -333,10 +332,10 @@ def slide_cost(deck, d):
              size=22, bold=True, color=GREEN_DK)
     rbf, lin = m["SVM RBF"], m["SVM linear"]
     cards = [
-        (seconds(t["SVC RBF"]["tempo_s"][-1]), "SVC com kernel RBF: treino", RED_TINT, RED),
-        (seconds(t["LinearSVC"]["tempo_s"][-1]), "LinearSVC: treino", TINT, GREEN_DK),
+        (seconds(t["SVC RBF"]["tempo_s"][-1]), "SVM com kernel RBF: treino", RED_TINT, RED),
+        (seconds(t["LinearSVC"]["tempo_s"][-1]), "SVM linear: treino", TINT, GREEN_DK),
         (f"{millis(rbf['previsao_ms'])} × {millis(lin['previsao_ms'])}",
-         "prever o teste: SVC RBF × SVM linear", GRAY_TINT, GREEN_DK),
+         "prever o teste: SVM RBF × SVM linear", GRAY_TINT, GREEN_DK),
     ]
     for index, (number, caption, fill, color) in enumerate(cards):
         card(slide, 0.92 + index * 3.8, 2.5, 3.6, 2.2, fill, [
@@ -345,10 +344,10 @@ def slide_cost(deck, d):
         ], name=f"Custo {index + 1}", anchor=MSO_ANCHOR.MIDDLE, pad=0.2)
     razao = k["SVC linear"]["treino_s"] / k["LinearSVC"]["treino_s"]
     card(slide, 0.92, 5.0, 11.18, 1.75, GRAY_TINT, [
-        {"runs": [("Dobrar o treino quadruplica o tempo da SVC; ", {"bold": True, "color": GREEN_DK}),
-                  ("o da LinearSVC só dobra", {})], "space_after": 4},
-        {"runs": [("LinearSVC: ", {"bold": True, "color": GREEN_DK}),
-                  (f"a mesma reta da SVC linear, {br(razao, 0)} vezes mais rápida", {})]},
+        {"runs": [("Dobrar o treino quadruplica o tempo da SVM com kernel RBF; ", {"bold": True, "color": GREEN_DK}),
+                  ("o da SVM linear só dobra", {})], "space_after": 4},
+        {"runs": [("SVM linear: ", {"bold": True, "color": GREEN_DK}),
+                  (f"um algoritmo próprio para retas chega à mesma fronteira, {br(razao, 0)} vezes mais rápido", {})]},
     ], name="Crescimento", size=22, pad=0.3)
 
 
@@ -382,11 +381,11 @@ def slide_grids(deck, d):
     table(slide, 0.92, 2.0, [2.35, 5.15, 3.68], 0.74, rows, "Tabela de grades",
           "Tabela das grades de busca e das escolhas. " + "; ".join(f"{r[0]}: testou {r[1]}; escolheu {r[2]}"
                                                                     for r in rows[1:]) + ".",
-          fills={2: TINT, 3: TINT, 4: TINT}, size=18)
+          fills={2: TINT, 3: TINT, 4: TINT}, size=20)
     text_box(slide, 0.92, 6.55, 11.1, 0.4, [
         {"runs": [("A SVM repete a escolha; ", {"bold": True}),
                   ("na árvore e na rede, várias configurações empatam", {})]},
-    ], size=18, name="Leitura")
+    ], size=20, name="Leitura")
 
 
 def slide_results(deck, d):
@@ -403,7 +402,7 @@ def slide_results(deck, d):
                "Gráfico de barras, eixo de 80% a 90%: " + "; ".join(
                    f"{label} {br(value)}%" for (_, label), value in zip(order, values)) + ".", vmin=80, vmax=90)
     text_box(slide, 0.92, 6.45, 7.3, 0.4, ["Eixo a partir de 80%; em verde-escuro, as SVMs"],
-             size=18, color=MUTED, name="Nota do eixo")
+             size=20, color=MUTED, name="Nota do eixo")
     for index, (key, label, color) in enumerate([
             ("SVM RBF × SVM linear", "sobre a SVM linear", GREEN_DK),
             ("SVM RBF × random forest", "sobre a Random Forest", GREEN_DK),
@@ -411,7 +410,7 @@ def slide_results(deck, d):
         info = c[key]["acuracia"]
         text_box(slide, 8.6, 2.0 + index * 1.6, 3.5, 1.45, [
             {"text": pts(info["pontos"]), "size": 36, "bold": True, "color": color, "space_after": 0},
-            {"text": f"{label}; melhor em {info['seeds']} de 10 seeds", "size": 18},
+            {"text": f"{label}; melhor em {info['seeds']} de 10 seeds", "size": 20},
         ], name=f"Comparação {index + 1}")
 
 
@@ -429,19 +428,19 @@ def slide_auc(deck, d):
                "Gráfico de barras, eixo de 85% a 95%: " + "; ".join(
                    f"{label} {br(value)}%" for (_, label), value in zip(order, values)) + ".", vmin=85, vmax=95)
     text_box(slide, 0.92, 6.45, 7.3, 0.4, ["Eixo a partir de 85%; média de 10 seeds"],
-             size=18, color=MUTED, name="Nota do eixo")
+             size=20, color=MUTED, name="Nota do eixo")
     info = c["SVM RBF × SVM linear"]["auc"]
     text_box(slide, 8.6, 2.0, 3.5, 1.45, [
         {"text": pts(info["pontos"]), "size": 36, "bold": True, "color": RED, "space_after": 0},
-        {"text": f"SVM RBF contra a linear; abaixo em {10 - info['seeds']} de 10 seeds", "size": 18},
+        {"text": f"SVM RBF contra a linear; abaixo em {10 - info['seeds']} de 10 seeds", "size": 20},
     ], name="RBF contra linear")
     card(slide, 8.6, 3.6, 3.5, 1.5, GRAY_TINT, [
-        {"text": "A busca escolhe pela acurácia e prefere γ alto: acerta o lado, ordena pior", "size": 18},
+        {"text": "A busca escolhe pela acurácia e prefere γ alto: acerta o lado, ordena pior", "size": 20},
     ], name="Motivo", pad=0.2)
     rows = [["γ escolhido", "AUC"], [f"0,3 ({g['0.3']['seeds']} seeds)", f"{br(g['0.3']['auc'])}%"],
             [f"0,1 ({g['0.1']['seeds']} seeds)", f"{br(g['0.1']['auc'])}%"]]
     table(slide, 8.6, 5.25, [2.1, 1.4], 0.52, rows, "Tabela de gamma",
-          f"Tabela: AUC da SVM RBF por gamma escolhido. 0,3: {rows[1][1]}; 0,1: {rows[2][1]}.", size=18)
+          f"Tabela: AUC da SVM RBF por gamma escolhido. 0,3: {rows[1][1]}; 0,1: {rows[2][1]}.", size=20)
 
 
 def slide_network(deck, d):
@@ -467,12 +466,12 @@ def slide_network(deck, d):
     for index, (head, detail, color) in enumerate(items):
         card(slide, 8.85, 2.6 + index * 1.4, 3.25, 1.25, GRAY_TINT, [
             {"text": head, "size": 22, "bold": True, "color": color, "space_after": 0},
-            {"text": detail, "size": 18},
+            {"text": detail, "size": 20},
         ], name=f"Seed a seed {head}", anchor=MSO_ANCHOR.MIDDLE, pad=0.2)
     text_box(slide, 0.92, 6.25, 7.6, 0.6, [
         {"runs": [("Mesma rede e mesma grade da parte 3; ", {"bold": True}),
                   ("treinada para estimar probabilidade, ordena melhor", {})]},
-    ], size=18, name="Rede")
+    ], size=20, name="Rede")
 
 
 def slide_conclusion(deck, d):
@@ -486,7 +485,7 @@ def slide_conclusion(deck, d):
     for index, (number, caption) in enumerate(cards):
         card(slide, 0.92 + index * 3.78, 2.0, 3.55, 2.0, TINT, [
             {"text": number, "size": 40, "bold": True, "color": GREEN_DK, "align": PP_ALIGN.CENTER, "space_after": 4},
-            {"text": caption, "size": 18, "align": PP_ALIGN.CENTER},
+            {"text": caption, "size": 20, "align": PP_ALIGN.CENTER},
         ], name=f"Número {index + 1}")
     text_box(slide, 0.92, 4.25, 11.1, 0.45, ["O que aprendemos"], size=24, bold=True, color=GREEN_DK)
     lessons = [("Padronizar", "obrigatório no kernel RBF"),
@@ -495,7 +494,7 @@ def slide_conclusion(deck, d):
     for index, (head, detail) in enumerate(lessons):
         card(slide, 0.92 + index * 3.78, 4.8, 3.55, 1.2, "FFFFFF", [
             {"text": head, "size": 22, "bold": True, "color": GREEN_DK, "align": PP_ALIGN.CENTER, "space_after": 0},
-            {"text": detail, "size": 18, "align": PP_ALIGN.CENTER},
+            {"text": detail, "size": 20, "align": PP_ALIGN.CENTER},
         ], name=f"Lição {index + 1}").line.color.rgb = rgb(GRAY_BAR)
     text_box(slide, 0.92, 6.4, 11.1, 0.4, [
         {"runs": [("Código e dados: ", {"bold": True}), ("github.com/pumba-dev/machine-learning-practice", {}),

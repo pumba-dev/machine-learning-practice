@@ -195,14 +195,14 @@ A padronização é obrigatória para o RBF. Ele mede a distância entre as pess
 
 **Roteiro (o que falar)** · Paulo · 0:45
 
-O custo da SVM com kernel cresce rápido: dobrar o treino quadruplica o tempo. Com as 24 mil pessoas, a SVC treina em 5,8 segundos e a LinearSVC, que chega à mesma reta da SVC linear, em 0,07. A previsão também pesa: a SVC compara cada pessoa com todos os vetores de suporte, e leva 2,0 segundos para prever o teste, contra 4,5 milissegundos da SVM linear.
+O custo da SVM com kernel cresce rápido: dobrar o treino quadruplica o tempo. Com as 24 mil pessoas, a SVM com kernel RBF treina em 5,8 segundos e a SVM linear, que usa um algoritmo próprio para retas e chega à mesma fronteira, em 0,07. A previsão também pesa: a SVM com kernel RBF compara cada pessoa com todos os vetores de suporte, e leva 2,0 segundos para prever o teste, contra 4,5 milissegundos da SVM linear.
 
 > Passagem para Bernan: “Com o modelo entendido, o que a busca escolheu e como ficou o resultado?”
 
 **Para estudar** (apoio; não faz parte da fala)
 
 - Medição na seed 0 (notebook 04), treinos com 1.000 a 24.111 pessoas; inclinação ajustada de 4.000 pessoas para cima (nos tamanhos pequenos, um custo fixo pesa mais que os dados).
-- Num gráfico log-log (Figura do relatório), a inclinação diz como o tempo cresce: 1,9 na SVC RBF (dobrar o treino quadruplica o tempo) e 1,1 na LinearSVC (cresce junto com os dados). Não está no slide para não precisar explicar escala logarítmica.
+- Num gráfico log-log (Figura do relatório), a inclinação diz como o tempo cresce: 1,9 na SVM RBF (dobrar o treino quadruplica o tempo) e 1,1 na SVM linear, implementada pela LinearSVC (cresce junto com os dados). Não está no slide para não precisar explicar escala logarítmica.
 - Pela regra do quadrado, a mesma SVC levaria cerca de 100 s com 100 mil pessoas e quase 3 horas com 1 milhão. Numa base assim, usa-se a LinearSVC ou uma aproximação do kernel.
 - Previsão das 6.028 pessoas do teste (mediana de 10 seeds): SVM RBF 2,0 s, SVM linear 4,5 ms. A linear guarda só um peso por coluna.
 - Por que n²: a SVC trabalha com a semelhança entre pares de pessoas, e o número de pares cresce com o quadrado.

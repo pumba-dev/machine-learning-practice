@@ -294,15 +294,17 @@ def build_notes(d):
     notes.append({
         "tempo": "0:45",
         "fala": f"O custo da SVM com kernel cresce rápido: dobrar o treino quadruplica o tempo. Com as 24 mil pessoas, "
-                f"a SVC treina em {comma(svc['tempo_s'][-1])} segundos e a LinearSVC, que chega à mesma reta da SVC "
-                f"linear, em {comma(lsvc['tempo_s'][-1], 2)}. A previsão também pesa: a SVC compara cada pessoa com todos "
+                f"a SVM com kernel RBF treina em {comma(svc['tempo_s'][-1])} segundos e a SVM linear, que usa um "
+                f"algoritmo próprio para retas e chega à mesma fronteira, em {comma(lsvc['tempo_s'][-1], 2)}. A previsão "
+                f"também pesa: a SVM com kernel RBF compara cada pessoa com todos "
                 f"os vetores de suporte, e leva {comma(rbf['previsao_ms'] / 1000)} segundos para prever o teste, contra "
                 f"{comma(lin['previsao_ms'])} milissegundos da SVM linear.",
         "estudo": [
             "Medição na seed 0 (notebook 04), treinos com 1.000 a 24.111 pessoas; inclinação ajustada de 4.000 pessoas "
             "para cima (nos tamanhos pequenos, um custo fixo pesa mais que os dados).",
             f"Num gráfico log-log (Figura do relatório), a inclinação diz como o tempo cresce: {comma(svc['inclinacao'])} "
-            f"na SVC RBF (dobrar o treino quadruplica o tempo) e {comma(lsvc['inclinacao'])} na LinearSVC (cresce junto "
+            f"na SVM RBF (dobrar o treino quadruplica o tempo) e {comma(lsvc['inclinacao'])} na SVM linear, implementada "
+            f"pela LinearSVC (cresce junto "
             "com os dados). Não está no slide para não precisar explicar escala logarítmica.",
             "Pela regra do quadrado, a mesma SVC levaria cerca de 100 s com 100 mil pessoas e quase 3 horas com 1 "
             "milhão. Numa base assim, usa-se a LinearSVC ou uma aproximação do kernel.",
