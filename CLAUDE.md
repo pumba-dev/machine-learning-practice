@@ -4,7 +4,7 @@ Trabalhos da disciplina de Aprendizagem de Máquina (PPGCC010, UFPI). Cada famí
 
 - **`proteinas/`**: base 1, molécula → proteína-alvo (ChEMBL 37, 27.714 moléculas, 4 classes). Árvore de decisão e variações: Random Tree, Random Forest, Gradient Boosting. Concluída.
 - **`emprestimos/`**: base 2, cliente → aprovação de empréstimo (Kaggle, 4.269 pedidos, binária). Redes neurais. Concluída.
-- **`renda/`**: base 3, pessoa → renda anual acima de 50 mil dólares ([Adult Census Income](https://www.kaggle.com/datasets/uciml/adult-census-income), censo dos EUA de 1994, 30.139 pessoas após a curadoria, binária). SVM, comparada com a rede neural da base 2. Notebooks, slides e relatório concluídos.
+- **`renda/`**: base 3, pessoa → renda anual acima de 50 mil dólares ([Adult Census Income](https://www.kaggle.com/datasets/uciml/adult-census-income), censo dos EUA de 1994, 30.139 pessoas após a curadoria, binária). Parte 4: SVM, comparada com a rede neural da base 2; notebooks, slides e relatório concluídos. Parte 5: clusterização com K-means e agrupamento hierárquico; próxima etapa.
 - **`comum/`**: o que os slides das bases compartilham (`slides_common.py`, template SBC, `export_slides_pdf.ps1`).
 
 O README explica as bases e os resultados. Este arquivo trata de como trabalhar no código.
@@ -43,11 +43,39 @@ Todas as bases têm um pacote chamado `src`. Nunca importe duas delas no mesmo p
 - **Base 1, divisão agrupada.** Moléculas com os mesmos 5 descritores ficam do mesmo lado da divisão (`modeling.descriptor_groups`). A divisão aleatória existe só para medir o vazamento.
 - **Base 2, protocolo comum.** Todo modelo novo passa por `emprestimos/src/avaliacao.py`: `rodar_seeds(fabrica, X, y)` faz a divisão estratificada 80/20, a busca com validação cruzada de 5 partes dentro do treino e mede os tempos num único núcleo. `resumir` agrega as seeds. Os resultados ficam em `emprestimos/resultados/` (`referencias.csv`, `rede.csv`), uma linha por seed e modelo.
 - **Base 3, mesmo protocolo.** `renda/src/avaliacao.py` é uma cópia adaptada do da base 2: `preprocessador()` faz o one-hot dos categóricos e a padronização dos numéricos dentro do `Pipeline` (80 colunas), e `treinar_e_medir` grava também F1 da classe >50K, falsos positivos e negativos, vetores de suporte (SVC) e épocas (rede). Resultados em `renda/resultados/`: `referencias.csv`, `svm.csv`, `rede.csv`, uma linha por seed e modelo; os demais CSVs são do estudo numa seed (`svm_mapa.csv`, `svm_tempo_por_tamanho.csv`) e dos erros por grupo.
-- **Base 3, raça e sexo.** `race` e `sex` ficam em `renda.csv`, mas fora de `config.FEATURES`: nenhum modelo os usa. Servem só à análise exploratória e à comparação de erros entre grupos depois da previsão (`carregar_sensiveis`).
+- **Base 3, raça e sexo.** `race` e `sex` ficam em `renda.csv`, mas fora de `config.FEATURES`: nenhum modelo os usa. Servem só à análise exploratória e à comparação de erros entre grupos depois da previsão (`carregar_sensiveis`). Na clusterização vale o mesmo: os dois ficam fora dos atributos agrupados.
 - **Base 3, notebooks demorados.** O `04_svm_estudo` leva cerca de 45 min, o `05_svm_comparacao` cerca de 2 h e o `06_rede_comparacao` cerca de 20 min. O 06 não treina as SVMs de novo: lê `svm.csv`. Rode em segundo plano.
 
-- **Um relatório por base.** Cada base tem o seu `report/`, que trata só dela: `proteinas/report/` (árvores, Random Tree e conjuntos), `emprestimos/report/` (rede neural) e `renda/report/` (SVM). Nenhum relatório cita números, figuras ou seções de outra base; o que uma base precisar de outra (fundamentação, descrição de um modelo), copie para o texto dela. Em `renda/report/`, `numeros_svm.tex`, `tab_svm_*.tex`, `svm_dados.json` e `figures/svm_*.pdf` são gerados por `renda/scripts/svm_data.py` e `svm_report.py`.
+- **Um relatório por base.** Cada base tem o seu `report/`, que trata só dela: `proteinas/report/` (árvores, Random Tree e conjuntos), `emprestimos/report/` (rede neural) e `renda/report/` (SVM e, na parte 5, clusterização). Nenhum relatório cita números, figuras ou seções de outra base; o que uma base precisar de outra (fundamentação, descrição de um modelo), copie para o texto dela. Em `renda/report/`, `numeros_svm.tex`, `tab_svm_*.tex`, `svm_dados.json` e `figures/svm_*.pdf` são gerados por `renda/scripts/svm_data.py` e `svm_report.py`.
 - **Base 3, slides.** `renda/scripts/build_slides_svm.py` e `slides_svm_notes.py` montam `renda/slides/apresentacao_svm.pptx` (15 slides, 10 min) a partir de `svm_dados.json`. Raça e sexo ficam fora dos slides por decisão do grupo.
+
+## Próxima etapa: clusterização na base 3
+
+A parte 5 estuda aprendizado não supervisionado na mesma base de renda: K-means como algoritmo principal e agrupamento hierárquico aglomerativo (Ward) como contraponto. Só scikit-learn, sem dependência nova. Siga o formato da SVM:
+
+- `renda/src/clusters.py`: fábricas do K-means e do aglomerativo, métricas e perfil dos grupos. O pré-processamento reusa `avaliacao.preprocessador()` (80 colunas);
+- notebooks `07_kmeans.ipynb` e `08_hierarquico.ipynb`, que só chamam funções de `src/`;
+- resultados em `renda/resultados/` com prefixo `clusters_` (por exemplo, `clusters_kmeans.csv` e `clusters_hierarquico.csv`).
+
+Protocolo:
+
+- não há divisão treino/teste: os grupos são formados na base inteira, só com `config.FEATURES`. `income`, `race` e `sex` entram só depois, para comparar;
+- métricas internas por k (de 2 a cerca de 10): inércia (cotovelo), silhueta e Davies-Bouldin;
+- estabilidade do K-means nas 10 seeds (ARI entre as partições de seeds diferentes); análises de uma seed usam 42;
+- comparação com a renda: proporção de `>50K` em cada grupo, pureza e ARI contra `income`;
+- perfil de cada grupo pelos atributos, com os nomes de `config.NOMES`.
+
+O que a base traz de difícil e precisa de decisão no notebook:
+
+- o Ward em 30 mil pessoas exige uma matriz de distâncias de ordem n² (cerca de 3,6 GB). Use uma amostra (por exemplo, 5.000 pessoas) ou aglomere os centroides de um K-means com muitos grupos;
+- as 75 colunas do one-hot pesam mais na distância que as 5 numéricas padronizadas; avalie a escala dos categóricos;
+- `capital.gain` e `capital.loss` são muito assimétricos, e poucos pontos distantes podem formar um grupo próprio; avalie o log;
+- a silhueta em 30 mil pontos também é de ordem n²: use `sample_size` com seed fixa.
+
+Relatório e slides:
+
+- relatório: novas seções em `renda/report/sections/`; título e resumo do `main.tex` serão revistos para cobrir as duas partes. Números em `report/results/numeros_clusters.tex` e figuras em `report/figures/clusters_*.pdf`, gerados por `renda/scripts/clusters_data.py` e `clusters_report.py`;
+- slides: `renda/scripts/build_slides_clusters.py` e `slides_clusters_notes.py` montam `renda/slides/apresentacao_clusters.pptx` e `notas_clusters.md`, com a mesma regra de 18 pt. Pergunte a duração e o número de slides antes de criá-los.
 
 ## Ambiente (Windows)
 

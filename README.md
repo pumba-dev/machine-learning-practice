@@ -1,21 +1,21 @@
-# Prática de Machine Learning: três bases, três famílias de modelos
+# Prática de Machine Learning: três bases, quatro famílias de modelos
 
 Trabalhos da disciplina de Aprendizagem de Máquina (PPGCC010, UFPI). Cada família de modelos é estudada numa base própria, escolhida para o tipo de problema que esses modelos resolvem:
 
 | | Base 1: molécula → proteína | Base 2: cliente → empréstimo | Base 3: pessoa → renda |
 |---|---|---|---|
 | Pergunta | A qual de 4 proteínas-alvo uma molécula está associada? | Um pedido de empréstimo foi aprovado? | A renda anual de uma pessoa passa de 50 mil dólares? |
-| Tarefa | Classificação multiclasse (4 classes) | Classificação binária | Classificação binária |
+| Tarefa | Classificação multiclasse (4 classes) | Classificação binária | Classificação binária e agrupamento (não supervisionado) |
 | Origem | API do [ChEMBL](https://www.ebi.ac.uk/chembl/) (versão 37) | [Kaggle](https://www.kaggle.com/datasets/architsharma01/loan-approval-prediction-dataset) | [Kaggle](https://www.kaggle.com/datasets/uciml/adult-census-income) (UCI Adult, censo dos EUA de 1994) |
 | Tamanho | 27.714 moléculas, 17 atributos | 4.269 pedidos, 11 atributos | 32.561 pessoas, 14 atributos (30.139 e 10 atributos após a curadoria) |
-| Modelos estudados | Árvore de decisão e variações: Random Tree, Random Forest, Gradient Boosting | Redes neurais (MLP) | SVM, comparada com a rede neural |
+| Modelos estudados | Árvore de decisão e variações: Random Tree, Random Forest, Gradient Boosting | Redes neurais (MLP) | SVM, comparada com a rede neural; clusterização (K-means e hierárquico) |
 | Pasta | [`proteinas/`](proteinas/) | [`emprestimos/`](emprestimos/) | [`renda/`](renda/) |
 
 Cada pasta é autocontida: tem os dados, os notebooks, o código, os resultados, o relatório e os slides da sua base.
 
 - [Base 1: moléculas e árvores de decisão](#base-1-moléculas-e-árvores-de-decisão)
 - [Base 2: empréstimos e redes neurais](#base-2-empréstimos-e-redes-neurais)
-- [Base 3: renda e SVM](#base-3-renda-e-svm)
+- [Base 3: renda, SVM e clusterização](#base-3-renda-svm-e-clusterização)
 - [Como executar](#como-executar)
 
 ## Organização do repositório
@@ -177,7 +177,7 @@ Média de 10 seeds ([`emprestimos/resultados/`](emprestimos/resultados/)):
 
 ---
 
-## Base 3: renda e SVM
+## Base 3: renda, SVM e clusterização
 
 ### Os dados
 
@@ -220,6 +220,8 @@ O mesmo da base 2 ([`renda/src/avaliacao.py`](renda/src/avaliacao.py)), com 10 s
 | [`04_svm_estudo`](renda/notebooks/04_svm_estudo.ipynb) | Estudo numa seed: distância à fronteira, kernels, mapa C × gamma, padronização, vetores de suporte, tempo por tamanho, pesos por classe (cerca de 45 min) |
 | [`05_svm_comparacao`](renda/notebooks/05_svm_comparacao.ipynb) | SVM linear, RBF, polinomial e RBF com pesos em 10 seeds, erros por sexo e raça (cerca de 2 h) |
 | [`06_rede_comparacao`](renda/notebooks/06_rede_comparacao.ipynb) | Rede neural da base 2 em 10 seeds e comparação final (cerca de 20 min) |
+| `07_kmeans` | A fazer |
+| `08_hierarquico` | A fazer |
 
 | Módulo em `renda/src/` | Conteúdo |
 |---|---|
@@ -228,7 +230,7 @@ O mesmo da base 2 ([`renda/src/avaliacao.py`](renda/src/avaliacao.py)), com 10 s
 | `svm.py` | Pipelines da SVC e da LinearSVC e as grades de busca |
 | `rede.py` | A rede neural da base 2, com o pré-processamento desta base |
 
-### Resultados
+### Resultados da SVM
 
 Média de 10 seeds ([`renda/resultados/`](renda/resultados/)). A busca e a previsão estão em mediana por seed, e a previsão cobre as 6.028 pessoas do teste.
 
@@ -258,10 +260,21 @@ Média de 10 seeds ([`renda/resultados/`](renda/resultados/)). A busca e a previ
   - a rede repete a diferença (43,6% contra 34,0%);
   - a diferença vem dos atributos relacionados ao sexo, como o relacionamento (`Husband` e `Wife`).
 
+### Clusterização
+
+A fazer. A quinta análise estuda aprendizado não supervisionado na mesma base: o K-means e o agrupamento hierárquico aglomerativo (Ward) formam grupos de pessoas a partir dos mesmos 10 atributos, sem ver a renda.
+
+- **Avaliação interna:** inércia (cotovelo), silhueta e Davies-Bouldin para cada número de grupos, e estabilidade do K-means nas 10 seeds.
+- **Comparação com a renda:** só depois do agrupamento, a proporção de pessoas acima de 50 mil em cada grupo, a pureza e o ARI contra o rótulo.
+- **Perfil dos grupos:** idade, estudo, estado civil, ocupação e horas de trabalho de cada grupo.
+
+A base traz duas dificuldades para a clusterização: os atributos são mistos (numéricos e categóricos em one-hot), e o hierárquico não cabe na memória com 30 mil pessoas, o que pede uma amostra.
+
 ### Material
 
-- Relatório (SVM): [`renda/report/main.pdf`](renda/report/main.pdf)
+- Relatório (SVM; clusterização a fazer): [`renda/report/main.pdf`](renda/report/main.pdf)
 - Apresentação 4, SVM: [`renda/slides/apresentacao_svm.pdf`](renda/slides/apresentacao_svm.pdf), roteiro em [`notas_svm.md`](renda/slides/notas_svm.md)
+- Apresentação 5, clusterização: a fazer
 
 ---
 
