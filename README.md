@@ -8,7 +8,7 @@ Trabalhos da disciplina de Aprendizagem de Máquina (PPGCC010, UFPI). Cada famí
 | Tarefa | Classificação multiclasse (4 classes) | Classificação binária | Classificação binária e agrupamento (não supervisionado) |
 | Origem | API do [ChEMBL](https://www.ebi.ac.uk/chembl/) (versão 37) | [Kaggle](https://www.kaggle.com/datasets/architsharma01/loan-approval-prediction-dataset) | [Kaggle](https://www.kaggle.com/datasets/uciml/adult-census-income) (UCI Adult, censo dos EUA de 1994) |
 | Tamanho | 27.714 moléculas, 17 atributos | 4.269 pedidos, 11 atributos | 32.561 pessoas, 14 atributos (30.139 e 10 atributos após a curadoria) |
-| Modelos estudados | Árvore de decisão e variações: Random Tree, Random Forest, Gradient Boosting | Redes neurais (MLP) | SVM, comparada com a rede neural; clusterização (K-means e hierárquico) |
+| Modelos estudados | Árvore de decisão e variações: Random Tree, Random Forest, Gradient Boosting | Redes neurais (MLP) | SVM, comparada com a rede neural; clusterização (K-means) |
 | Pasta | [`proteinas/`](proteinas/) | [`emprestimos/`](emprestimos/) | [`renda/`](renda/) |
 
 Cada pasta é autocontida: tem os dados, os notebooks, o código, os resultados, o relatório e os slides da sua base.
@@ -220,8 +220,7 @@ O mesmo da base 2 ([`renda/src/avaliacao.py`](renda/src/avaliacao.py)), com 10 s
 | [`04_svm_estudo`](renda/notebooks/04_svm_estudo.ipynb) | Estudo numa seed: distância à fronteira, kernels, mapa C × gamma, padronização, vetores de suporte, tempo por tamanho, pesos por classe (cerca de 45 min) |
 | [`05_svm_comparacao`](renda/notebooks/05_svm_comparacao.ipynb) | SVM linear, RBF, polinomial e RBF com pesos em 10 seeds, erros por sexo e raça (cerca de 2 h) |
 | [`06_rede_comparacao`](renda/notebooks/06_rede_comparacao.ipynb) | Rede neural da base 2 em 10 seeds e comparação final (cerca de 20 min) |
-| `07_kmeans` | A fazer |
-| `08_hierarquico` | A fazer |
+| [`07_kmeans`](renda/notebooks/07_kmeans.ipynb) | K-means sem a renda: peso de cada atributo na distância, com e sem log no capital, curvas de k = 2 a 10 e estabilidade nas 10 seeds, perfil dos 6 grupos e comparação com a renda (cerca de 4 min) |
 
 | Módulo em `renda/src/` | Conteúdo |
 |---|---|
@@ -229,6 +228,7 @@ O mesmo da base 2 ([`renda/src/avaliacao.py`](renda/src/avaliacao.py)), com 10 s
 | `avaliacao.py` | Pré-processamento e protocolo (cópia adaptada do da base 2) |
 | `svm.py` | Pipelines da SVC e da LinearSVC e as grades de busca |
 | `rede.py` | A rede neural da base 2, com o pré-processamento desta base |
+| `clusters.py` | Pré-processamento com log no capital, K-means, métricas internas, estabilidade e perfil dos grupos |
 
 ### Resultados da SVM
 
@@ -262,13 +262,13 @@ Média de 10 seeds ([`renda/resultados/`](renda/resultados/)). A busca e a previ
 
 ### Clusterização
 
-A fazer. A quinta análise estuda aprendizado não supervisionado na mesma base: o K-means e o agrupamento hierárquico aglomerativo (Ward) formam grupos de pessoas a partir dos mesmos 10 atributos, sem ver a renda.
+A fazer. A quinta análise estuda aprendizado não supervisionado na mesma base: o K-means forma grupos de pessoas a partir dos mesmos 10 atributos, sem ver a renda.
 
-- **Avaliação interna:** inércia (cotovelo), silhueta e Davies-Bouldin para cada número de grupos, e estabilidade do K-means nas 10 seeds.
+- **Avaliação interna:** inércia (cotovelo), silhueta e Davies-Bouldin para k de 2 a 10, e estabilidade nas 10 seeds para cada k.
 - **Comparação com a renda:** só depois do agrupamento, a proporção de pessoas acima de 50 mil em cada grupo, a pureza e o ARI contra o rótulo.
 - **Perfil dos grupos:** idade, estudo, estado civil, ocupação e horas de trabalho de cada grupo.
 
-A base traz duas dificuldades para a clusterização: os atributos são mistos (numéricos e categóricos em one-hot), e o hierárquico não cabe na memória com 30 mil pessoas, o que pede uma amostra.
+A base traz duas dificuldades para a clusterização: os atributos são mistos (numéricos e categóricos em one-hot), e o ganho e a perda de capital são muito assimétricos, o que pede um log antes da padronização.
 
 ### Material
 
