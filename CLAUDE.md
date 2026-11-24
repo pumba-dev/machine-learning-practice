@@ -4,7 +4,7 @@ Trabalhos da disciplina de Aprendizagem de Máquina (PPGCC010, UFPI). Cada famí
 
 - **`proteinas/`**: base 1, molécula → proteína-alvo (ChEMBL 37, 27.714 moléculas, 4 classes). Árvore de decisão e variações: Random Tree, Random Forest, Gradient Boosting. Concluída.
 - **`emprestimos/`**: base 2, cliente → aprovação de empréstimo (Kaggle, 4.269 pedidos, binária). Redes neurais. Concluída.
-- **`renda/`**: base 3, pessoa → renda anual acima de 50 mil dólares ([Adult Census Income](https://www.kaggle.com/datasets/uciml/adult-census-income), censo dos EUA de 1994, 30.139 pessoas após a curadoria, binária). Parte 4: SVM, comparada com a rede neural da base 2; notebooks, slides e relatório concluídos. Parte 5: clusterização com K-means; em andamento.
+- **`renda/`**: base 3, pessoa → renda anual acima de 50 mil dólares ([Adult Census Income](https://www.kaggle.com/datasets/uciml/adult-census-income), censo dos EUA de 1994, 30.139 pessoas após a curadoria, binária). Parte 4: SVM, comparada com a rede neural da base 2; notebooks, slides e relatório concluídos. Parte 5: clusterização com K-means; notebook e slides concluídos, relatório a fazer.
 - **`comum/`**: o que os slides das bases compartilham (`slides_common.py`, template SBC, `export_slides_pdf.ps1`).
 
 O README explica as bases e os resultados. Este arquivo trata de como trabalhar no código.
@@ -48,6 +48,7 @@ Todas as bases têm um pacote chamado `src`. Nunca importe duas delas no mesmo p
 
 - **Um relatório por base.** Cada base tem o seu `report/`, que trata só dela: `proteinas/report/` (árvores, Random Tree e conjuntos), `emprestimos/report/` (rede neural) e `renda/report/` (SVM e, na parte 5, clusterização). Nenhum relatório cita números, figuras ou seções de outra base; o que uma base precisar de outra (fundamentação, descrição de um modelo), copie para o texto dela. Em `renda/report/`, `numeros_svm.tex`, `tab_svm_*.tex`, `svm_dados.json` e `figures/svm_*.pdf` são gerados por `renda/scripts/svm_data.py` e `svm_report.py`.
 - **Base 3, slides.** `renda/scripts/build_slides_svm.py` e `slides_svm_notes.py` montam `renda/slides/apresentacao_svm.pptx` (15 slides, 10 min) a partir de `svm_dados.json`. Raça e sexo ficam fora dos slides por decisão do grupo.
+- **Base 3, slides do K-means.** `renda/scripts/clusters_data.py` reúne os números do notebook 07 em `report/results/clusters_dados.json`; `build_slides_clusters.py` e `slides_clusters_notes.py` montam `renda/slides/apresentacao_clusters.pptx` (15 slides, 10 min) e `notas_clusters.md` a partir dele. Os nomes dos 6 grupos ficam em `clusters_data.py` (`NOMES_GRUPOS`), conferidos pelo tamanho de cada grupo. Nos gráficos de linha, os valores são multiplicados por 10 ou 100 e o formato põe uma vírgula literal, para a vírgula decimal não depender do idioma do Office. Raça e sexo ficam fora.
 
 ## Próxima etapa: clusterização na base 3
 

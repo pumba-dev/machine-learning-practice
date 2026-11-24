@@ -262,19 +262,39 @@ Média de 10 seeds ([`renda/resultados/`](renda/resultados/)). A busca e a previ
 
 ### Clusterização
 
-A fazer. A quinta análise estuda aprendizado não supervisionado na mesma base: o K-means forma grupos de pessoas a partir dos mesmos 10 atributos, sem ver a renda.
+A quinta análise estuda aprendizado não supervisionado na mesma base: o K-means forma grupos de pessoas a partir dos mesmos 10 atributos, sem ver a renda, que entra só no fim, para comparar. Não há divisão treino/teste.
 
-- **Avaliação interna:** inércia (cotovelo), silhueta e Davies-Bouldin para k de 2 a 10, e estabilidade nas 10 seeds para cada k.
-- **Comparação com a renda:** só depois do agrupamento, a proporção de pessoas acima de 50 mil em cada grupo, a pureza e o ARI contra o rótulo.
-- **Perfil dos grupos:** idade, estudo, estado civil, ocupação e horas de trabalho de cada grupo.
+- **Pré-processamento:** o mesmo da SVM (80 colunas), com log (`log1p`) no ganho e na perda de capital antes da padronização.
+- **Escolha do k:** inércia (cotovelo), silhueta e Davies-Bouldin para k de 2 a 10, cada k com as 10 seeds e 10 inicializações por seed, mais a estabilidade (ARI entre as seeds).
+- **Partição descrita:** k = 6, seed 42.
 
-A base traz duas dificuldades para a clusterização: os atributos são mistos (numéricos e categóricos em one-hot), e o ganho e a perda de capital são muito assimétricos, o que pede um log antes da padronização.
+| Grupo | Pessoas | Perfil | % >50K |
+|---|---|---|---|
+| 1. Jovens solteiros | 8.439 | 26 anos, 82% nunca casados, 45% moram com os pais | 1,1 |
+| 2. Mais velhos sem cônjuge | 5.443 | 53 anos, divorciados e viúvos, 8,5 anos de estudo | 12,6 |
+| 3. Casados em ofícios manuais | 6.538 | 38 anos, 90% casados, 48 h por semana | 27,5 |
+| 4. Profissionais com muito estudo | 5.791 | 13,3 anos de estudo, especialistas e gerentes | 44,8 |
+| 5. Com perda de capital | 1.427 | todos com perda de capital | 51,6 |
+| 6. Com ganho de capital | 2.501 | todos com ganho de capital | 63,8 |
+| Base inteira | 30.139 | | 24,9 |
+
+- **k = 6:** cotovelo entre 5 e 6, e as 10 seeds chegam aos mesmos grupos (ARI de 0,995). Silhueta e Davies-Bouldin preferem k = 2, que só separa quem tem ganho de capital.
+- **A base não tem grupos nítidos:** silhueta de 0,17 de k = 4 em diante. Os grupos são regiões de uma nuvem contínua.
+- **10 inicializações são necessárias:** com uma só, o ARI entre seeds cai de 0,995 para 0,59 em k = 6.
+- **O capital domina a distância:**
+  - sem log, as 148 pessoas com ganho de 99.999 (o teto do censo) formam um grupo só delas;
+  - com log, esse grupo some, mas quem tem ganho ou perda (13% da base) forma dois grupos próprios.
+- **Os grupos descrevem, não preveem:**
+  - eles se ordenam pela renda sem tê-la visto;
+  - a pureza (cada grupo responde a renda da sua maioria) é de 77,5%, contra 75,1% do chute e 85,4% da SVM RBF;
+  - o ARI contra a renda é de 0,09.
+- **Custo:** 0,9 s por ajuste com k = 6 e 10 inicializações, num núcleo; o estudo inteiro leva cerca de 4 min.
 
 ### Material
 
 - Relatório (SVM; clusterização a fazer): [`renda/report/main.pdf`](renda/report/main.pdf)
 - Apresentação 4, SVM: [`renda/slides/apresentacao_svm.pdf`](renda/slides/apresentacao_svm.pdf), roteiro em [`notas_svm.md`](renda/slides/notas_svm.md)
-- Apresentação 5, clusterização: a fazer
+- Apresentação 5, clusterização: [`renda/slides/apresentacao_clusters.pdf`](renda/slides/apresentacao_clusters.pdf), roteiro em [`notas_clusters.md`](renda/slides/notas_clusters.md)
 
 ---
 
@@ -308,6 +328,7 @@ python emprestimos/scripts/build_slides_rn.py                                   
 # base 3: renda
 python renda/scripts/svm_data.py && python renda/scripts/svm_report.py   # números, figuras e tabelas do relatório
 python renda/scripts/build_slides_svm.py                                 # apresentação 4
+python renda/scripts/clusters_data.py && python renda/scripts/build_slides_clusters.py   # apresentação 5
 
 # PDF de uma apresentação
 powershell -File comum/export_slides_pdf.ps1 proteinas/slides/apresentacao_random_tree.pptx
