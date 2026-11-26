@@ -1,0 +1,12 @@
+\section{Introdução}
+
+A base Adult~\cite{uci:adult,kohavi:96} reúne cerca de 30 mil pessoas do censo dos EUA de 1994, cada uma descrita por 10 atributos, como idade, anos de estudo, estado civil e ocupação, e pela informação de a sua renda anual passar ou não de 50 mil dólares. Na parte anterior do trabalho, usamos essa base para prever a renda. Aqui a pergunta muda: em vez de prever, queremos descobrir que grupos de pessoas parecidas compõem a base.
+
+Para isso, usamos o K-means~\cite{lloyd:82,macqueen:67}, um método não supervisionado. Os métodos supervisionados aprendem a partir de exemplos com a resposta; o K-means recebe só os atributos, sem a renda, e divide as pessoas em grupos de acordo com a distância entre elas. Não há resposta certa a acertar: avaliamos os grupos pela sua compacidade, pela sua estabilidade e pelo sentido que fazem. A renda entra só no fim, para conferir se os grupos encontrados têm relação com ela.
+
+As contribuições são:
+\begin{itemize}
+  \item a medida do efeito do pré-processamento sobre os grupos: quanto cada atributo pesa na distância com o one-hot, e como o logaritmo no capital tira um grupo artificial mas faz quem tem capital formar grupos próprios (Seções~\ref{sec:cl_onehot} e~\ref{sec:cl_log});
+  \item a escolha do número de grupos por métricas internas e pela estabilidade entre 10 seeds, que mostra por que o K-means precisa de várias inicializações (Seção~\ref{sec:cl_k});
+  \item seis perfis de pessoas, descritos pela composição e pela coesão de cada grupo, que se ordenam pela renda sem tê-la visto, mas que, como previsão, ficam pouco acima do chute (Seções~\ref{sec:cl_grupos} e~\ref{sec:cl_renda}).
+\end{itemize}

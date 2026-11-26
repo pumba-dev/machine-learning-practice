@@ -1,0 +1,9 @@
+\section{Conclusão e trabalhos futuros}
+
+Sem a renda, o K-means dividiu as \clLinhas{} pessoas da base Adult em seis grupos estáveis entre seeds (ARI de \clAriSeis): quatro separados pela fase da vida e pelo tipo de trabalho (jovens solteiros, mais velhos sem cônjuge, casados em ofícios manuais e profissionais com muito estudo) e dois pelo capital. A base, porém, não tem grupos nítidos: a silhueta é de \clSilSeis, e os grupos sem capital são regiões de uma nuvem contínua, das quais a dos mais velhos sem cônjuge é a menos coesa.
+
+O estudo mostrou que o pré-processamento decide os grupos. Com o one-hot, trocar de ocupação afasta duas pessoas tanto quanto \clTrocaAnos{} anos de idade, e as categorias marcam as fronteiras entre os grupos. O logaritmo no capital tira um grupo artificial, formado pelas \clTeto{} pessoas no teto do censo, mas faz quem tem capital formar dois grupos próprios. Mostrou também que as métricas internas sozinhas não escolhem o $k$, e que a estabilidade entre seeds, que exige várias inicializações, ajuda a decidir.
+
+Os grupos se ordenam pela renda, de \clPosUm\% a \clPosSeis\% acima de 50 mil, porque os atributos que os formam são os mesmos que explicam a renda. Como previsão, porém, ficam pouco acima do chute: pureza de \clPureza\%, contra \clChute\%. O K-means serve para descrever a população; para classificar a renda de uma pessoa, um modelo treinado com ela, como a SVM da parte anterior do trabalho (\clSvmAcc\%), é muito melhor.
+
+Os próximos passos seriam usar uma distância própria para dados mistos, como a do k-prototypes, que trata as categorias sem one-hot; representar o capital só como ``tem ou não tem'', para que ele não ocupe dois grupos; e testar uma mistura de gaussianas, que dá a cada pessoa uma probabilidade de pertencer a cada grupo.

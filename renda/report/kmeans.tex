@@ -1,0 +1,73 @@
+\documentclass[12pt]{article}
+
+\usepackage{sbc-template}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[english,brazilian]{babel}
+\usepackage{graphicx,url}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{amsmath}
+
+\sloppy
+
+% Relatório da parte 5 (K-means). O relatório da parte 4 (SVM) é o main.tex, na mesma pasta.
+% Números gerados por scripts/clusters_report.py (numeros_clusters) e, para a curadoria da base,
+% por scripts/svm_report.py (numeros_svm).
+\input{results/numeros_svm}
+\input{results/numeros_clusters}
+
+\title{K-means na base Adult: que grupos de pessoas existem quando não olhamos a renda}
+
+\author{Bernan R. do Nascimento\inst{1}, Paulo E. R. Araujo\inst{1}, Thiago R. P. de Carvalho\inst{1}}
+
+\address{Universidade Federal do Piauí (UFPI)\\
+  Programa de Pós-Graduação em Ciência da Computação -- Teresina -- PI -- Brasil\\
+  PPGCC010 -- Aprendizagem de Máquina (2026.2) -- Prof. Vinicius Ponte Machado
+  \email{bernanr7@gmail.com, pauloaraujo@ufpi.edu.br}
+  \email{thiago.rafael.pc@gmail.com}
+}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+  We cluster \clLinhasEn{} people of the 1994 US census (Adult dataset) with K-means, an unsupervised
+  method, using 10 attributes and leaving their income out, to find which groups of similar people make
+  up the data. The preprocessing decides the groups: with one-hot encoding, a different occupation sets two
+  people as far apart as about 19 years of age, and a logarithm on capital gain and loss removes an
+  artificial group of \clTeto{} people at the census cap but makes the people with any capital form two
+  groups of their own. With $k = 6$, chosen by the elbow and by stability across 10 seeds (ARI
+  \clAriSeisEn), four groups differ by stage of life and type of work and two by capital. A silhouette of
+  \clSilSeisEn{} shows no sharp groups. The groups follow income without having seen it, from \clPosUmEn\%
+  to \clPosSeisEn\% above 50 thousand, but as predictors they are weak: a purity of \clPurezaEn\% against
+  \clChuteEn\% for always answering ``no'' and \clSvmAccEn\% for a support vector machine trained on income.
+\end{abstract}
+
+\begin{resumo}
+  Agrupamos \clLinhas{} pessoas do censo dos EUA de 1994 (base Adult) com o K-means, um método não
+  supervisionado, a partir de 10 atributos e sem a renda, para descobrir que grupos de pessoas parecidas
+  compõem a base. O pré-processamento decide os grupos: com o one-hot, trocar de ocupação afasta duas
+  pessoas tanto quanto \clTrocaAnos{} anos de idade, e um logaritmo no ganho e na perda de capital tira um
+  grupo artificial de \clTeto{} pessoas no teto do censo, mas faz quem tem capital formar dois grupos
+  próprios. Com $k = 6$, escolhido pelo cotovelo e pela estabilidade entre 10 seeds (ARI de \clAriSeis),
+  quatro grupos se distinguem pela fase da vida e pelo tipo de trabalho, e dois pelo capital. A silhueta de
+  \clSilSeis{} mostra que não há grupos nítidos. Os grupos se ordenam pela renda sem tê-la visto, de
+  \clPosUm\% a \clPosSeis\% acima de 50 mil, mas como previsão são fracos: pureza de \clPureza\%, contra
+  \clChute\% de responder sempre ``não'' e \clSvmAcc\% de uma máquina de vetores de suporte treinada com a
+  renda.
+\end{resumo}
+
+\input{sections/km_01_introducao}
+\input{sections/km_02_fundamentacao}
+\input{sections/km_03_dados}
+\input{sections/km_04_metodologia}
+\input{sections/km_05_resultados}
+\input{sections/km_06_limitacoes}
+\input{sections/km_07_conclusao}
+
+\bibliographystyle{sbc}
+\bibliography{refs}
+
+\end{document}

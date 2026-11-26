@@ -6,6 +6,8 @@ script do relatório. Fontes:
 - renda/resultados/clusters_curvas.csv e clusters_estabilidade.csv: as curvas de k = 2 a 10 nas 10 seeds
   do notebook 07, sem refazer;
 - renda/resultados/clusters_grupos.csv e clusters_kmeans.csv: a partição escolhida (k = 6, seed 42);
+- renda/resultados/clusters_log_curvas.csv, clusters_silhueta_grupos.csv e clusters_alternativas.csv: as seções
+  11 a 13 do notebook 07 (curvas com e sem log, silhueta por grupo, perfis com k = 5 e k = 8);
 - renda/resultados/svm.csv: a acurácia da SVM RBF, para comparar com a pureza;
 - o que o notebook mostra e não fica em CSV, refeito com as mesmas funções de renda/src/clusters.py: o peso
   de cada atributo na distância, a comparação com e sem log (k = 4, seed 42) e a projeção em 2D (alguns
@@ -142,13 +144,59 @@ def main():
            "pontos": {str(g): [[num(x, 3), num(y, 3)] for x, y in coords[amostra][grupo[amostra] == g]]
                       for g in range(1, escolha["k"] + 1)}}
 
+    # Só para o relatório (os slides não mostram raça e sexo): estado civil, ocupação mais comum e a
+    # distribuição de sexo e raça em cada grupo da partição escolhida, mais a base inteira.
+    _, _, sensiveis = clusters.carregar()
+    partes = [(str(g), grupo == g) for g in range(1, escolha["k"] + 1)] + [("base", np.ones(len(X), bool))]
+    composicao = {}
+    for nome, m in partes:
+        ocupacao = X.loc[m, "occupation"].value_counts(normalize=True)
+        composicao[nome] = {
+            "idade": num(X.loc[m, "age"].mean(), 2), "estudo": num(X.loc[m, "education.num"].mean(), 2),
+            "horas": num(X.loc[m, "hours.per.week"].mean(), 2),
+            "casados": pct((X.loc[m, "marital.status"] == "Married-civ-spouse").mean()),
+            "nunca_casados": pct((X.loc[m, "marital.status"] == "Never-married").mean()),
+            "ocupacao": ocupacao.index[0], "ocupacao_parte": pct(ocupacao.iloc[0]),
+            "mulheres": pct((sensiveis.loc[m, "sex"] == "Female").mean()),
+            "raca": {r: pct(v) for r, v in sensiveis.loc[m, "race"].value_counts(normalize=True).items()},
+        }
+
+    # Proporções de estado civil, relacionamento e ocupação em cada grupo (categorias com 10% ou mais em
+    # algum grupo; as demais somadas em "outras").
+    proporcoes = {}
+    for atributo in ["marital.status", "relationship", "occupation"]:
+        tabela = clusters.proporcoes(X, grupo, atributo)
+        principais = [c for c in tabela.index if tabela.loc[c].max() >= 10]
+        bloco = {c: [num(v, 2) for v in tabela.loc[c]] for c in principais}
+        bloco["outras"] = [num(100 - tabela.loc[principais, g].sum(), 2) for g in tabela.columns]
+        proporcoes[atributo] = bloco
+
+    # Do notebook 07 (seções 11 a 13): curvas com e sem log na seed 42, silhueta por grupo e k = 5 e 8.
+    lc = pd.read_csv(RES / "clusters_log_curvas.csv")
+    log_curvas = {("com" if log else "sem"): {str(int(r["k"])): {"silhueta": num(r["silhueta"]), "db": num(r["Davies-Bouldin"]),
+                                                               "menor": int(r["menor grupo"])}
+                                             for _, r in lc[lc["log"] == log].iterrows()} for log in (False, True)}
+    sg = pd.read_csv(RES / "clusters_silhueta_grupos.csv", index_col="grupo")
+    silhueta_grupos = {str(g): {"media": num(r["média"]), "q1": num(r["1º quartil"]), "mediana": num(r["mediana"]),
+                                "q3": num(r["3º quartil"]), "negativa": num(r["% negativa"], 2),
+                                "amostra": int(r["pessoas na amostra"])} for g, r in sg.iterrows()}
+    alt = pd.read_csv(RES / "clusters_alternativas.csv")
+    alternativas = {str(k): [{"grupo": int(r["grupo"]), "pessoas": int(r["pessoas"]), "idade": num(r["idade"], 1),
+                              "estudo": num(r["anos de estudo"], 1), "horas": num(r["horas por semana"], 1),
+                              "casados": num(r["% casados"], 1), "com_ganho": num(r["% com ganho"], 1),
+                              "com_perda": num(r["% com perda"], 1), "ocupacao": r["ocupação mais comum"],
+                              "positivos": num(r["% >50K"], 2)} for _, r in alt[alt["k"] == k].iterrows()]
+                    for k in (5, 8)}
+
     svm = pd.read_csv(RES / "svm.csv")
     svm_rbf = svm[svm["modelo"] == "SVM RBF"]
     referencia = {"svm_rbf_acuracia": pct(svm_rbf["acurácia"].mean()),
                   "svm_rbf_treino_s": num(svm_rbf["tempo de treino (s)"].median(), 2)}
 
     dados = {"base": base, "log": comparar_log(X, renda), "por_k": por_k, "quedas_inercia": quedas,
-             "escolha": escolha, "grupos": grupos, "pca": pca, "referencia": referencia,
+             "escolha": escolha, "grupos": grupos, "composicao": composicao, "proporcoes": proporcoes,
+             "log_curvas": log_curvas, "silhueta_grupos": silhueta_grupos, "alternativas": alternativas,
+             "pca": pca, "referencia": referencia,
              "estudo_total_ajustes": int(len(curvas))}
     OUT.parent.mkdir(parents=True, exist_ok=True)
     OUT.write_text(json.dumps(dados, ensure_ascii=False, indent=1), encoding="utf-8")

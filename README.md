@@ -220,7 +220,7 @@ O mesmo da base 2 ([`renda/src/avaliacao.py`](renda/src/avaliacao.py)), com 10 s
 | [`04_svm_estudo`](renda/notebooks/04_svm_estudo.ipynb) | Estudo numa seed: distância à fronteira, kernels, mapa C × gamma, padronização, vetores de suporte, tempo por tamanho, pesos por classe (cerca de 45 min) |
 | [`05_svm_comparacao`](renda/notebooks/05_svm_comparacao.ipynb) | SVM linear, RBF, polinomial e RBF com pesos em 10 seeds, erros por sexo e raça (cerca de 2 h) |
 | [`06_rede_comparacao`](renda/notebooks/06_rede_comparacao.ipynb) | Rede neural da base 2 em 10 seeds e comparação final (cerca de 20 min) |
-| [`07_kmeans`](renda/notebooks/07_kmeans.ipynb) | K-means sem a renda: peso de cada atributo na distância, com e sem log no capital, curvas de k = 2 a 10 e estabilidade nas 10 seeds, perfil dos 6 grupos e comparação com a renda (cerca de 4 min) |
+| [`07_kmeans`](renda/notebooks/07_kmeans.ipynb) | K-means sem a renda: peso de cada atributo na distância, com e sem log no capital, curvas de k = 2 a 10 e estabilidade nas 10 seeds, perfil dos 6 grupos, comparação com a renda, silhueta por grupo e as alternativas k = 5 e k = 8 (cerca de 5 min) |
 
 | Módulo em `renda/src/` | Conteúdo |
 |---|---|
@@ -292,7 +292,8 @@ A quinta análise estuda aprendizado não supervisionado na mesma base: o K-mean
 
 ### Material
 
-- Relatório (SVM; clusterização a fazer): [`renda/report/main.pdf`](renda/report/main.pdf)
+- Relatório da SVM: [`renda/report/main.pdf`](renda/report/main.pdf)
+- Relatório do K-means: [`renda/report/kmeans.pdf`](renda/report/kmeans.pdf)
 - Apresentação 4, SVM: [`renda/slides/apresentacao_svm.pdf`](renda/slides/apresentacao_svm.pdf), roteiro em [`notas_svm.md`](renda/slides/notas_svm.md)
 - Apresentação 5, clusterização: [`renda/slides/apresentacao_clusters.pdf`](renda/slides/apresentacao_clusters.pdf), roteiro em [`notas_clusters.md`](renda/slides/notas_clusters.md)
 
@@ -328,7 +329,8 @@ python emprestimos/scripts/build_slides_rn.py                                   
 # base 3: renda
 python renda/scripts/svm_data.py && python renda/scripts/svm_report.py   # números, figuras e tabelas do relatório
 python renda/scripts/build_slides_svm.py                                 # apresentação 4
-python renda/scripts/clusters_data.py && python renda/scripts/build_slides_clusters.py   # apresentação 5
+python renda/scripts/clusters_data.py && python renda/scripts/clusters_report.py   # números, figuras e tabelas do K-means
+python renda/scripts/build_slides_clusters.py                                        # apresentação 5
 
 # PDF de uma apresentação
 powershell -File comum/export_slides_pdf.ps1 proteinas/slides/apresentacao_random_tree.pptx

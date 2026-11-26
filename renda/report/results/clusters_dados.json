@@ -136,8 +136,8 @@
    "ari_1": 0.7862,
    "ari_min_1": -0.0093,
    "inercia_piora_1": 0.73,
-   "tempo_s": 0.188,
-   "tempo_1_s": 0.035,
+   "tempo_s": 0.202,
+   "tempo_1_s": 0.034,
    "iteracoes": 3.6
   },
   "3": {
@@ -152,8 +152,8 @@
    "ari_1": 0.605,
    "ari_min_1": 0.1134,
    "inercia_piora_1": 3.25,
-   "tempo_s": 0.307,
-   "tempo_1_s": 0.039,
+   "tempo_s": 0.333,
+   "tempo_1_s": 0.04,
    "iteracoes": 11.3
   },
   "4": {
@@ -168,7 +168,7 @@
    "ari_1": 0.7166,
    "ari_min_1": 0.5152,
    "inercia_piora_1": 6.09,
-   "tempo_s": 0.397,
+   "tempo_s": 0.456,
    "tempo_1_s": 0.044,
    "iteracoes": 16.2
   },
@@ -184,8 +184,8 @@
    "ari_1": 0.8563,
    "ari_min_1": 0.3923,
    "inercia_piora_1": 1.72,
-   "tempo_s": 1.176,
-   "tempo_1_s": 0.175,
+   "tempo_s": 1.259,
+   "tempo_1_s": 0.182,
    "iteracoes": 30.7
   },
   "6": {
@@ -200,8 +200,8 @@
    "ari_1": 0.5877,
    "ari_min_1": 0.3211,
    "inercia_piora_1": 3.0,
-   "tempo_s": 0.889,
-   "tempo_1_s": 0.121,
+   "tempo_s": 0.946,
+   "tempo_1_s": 0.109,
    "iteracoes": 46.0
   },
   "7": {
@@ -216,8 +216,8 @@
    "ari_1": 0.5578,
    "ari_min_1": 0.3204,
    "inercia_piora_1": 4.13,
-   "tempo_s": 1.215,
-   "tempo_1_s": 0.133,
+   "tempo_s": 1.218,
+   "tempo_1_s": 0.128,
    "iteracoes": 36.5
   },
   "8": {
@@ -232,8 +232,8 @@
    "ari_1": 0.5664,
    "ari_min_1": 0.3569,
    "inercia_piora_1": 2.15,
-   "tempo_s": 0.969,
-   "tempo_1_s": 0.103,
+   "tempo_s": 0.897,
+   "tempo_1_s": 0.097,
    "iteracoes": 42.1
   },
   "9": {
@@ -248,8 +248,8 @@
    "ari_1": 0.6493,
    "ari_min_1": 0.4044,
    "inercia_piora_1": 1.83,
-   "tempo_s": 1.109,
-   "tempo_1_s": 0.12,
+   "tempo_s": 1.069,
+   "tempo_1_s": 0.113,
    "iteracoes": 35.6
   },
   "10": {
@@ -264,8 +264,8 @@
    "ari_1": 0.7302,
    "ari_min_1": 0.5403,
    "inercia_piora_1": 1.9,
-   "tempo_s": 1.126,
-   "tempo_1_s": 0.12,
+   "tempo_s": 1.105,
+   "tempo_1_s": 0.112,
    "iteracoes": 51.0
   }
  },
@@ -286,7 +286,7 @@
   "silhueta": 0.1654,
   "db": 1.707,
   "iteracoes": 13,
-  "tempo_s": 0.888,
+  "tempo_s": 0.822,
   "pureza": 77.5374,
   "ari_renda": 0.0908,
   "chute": 75.0954
@@ -401,6 +401,595 @@
    "classe": "Private (67%)"
   }
  ],
+ "composicao": {
+  "1": {
+   "idade": 25.68,
+   "estudo": 9.4,
+   "horas": 34.44,
+   "casados": 2.7136,
+   "nunca_casados": 82.2609,
+   "ocupacao": "Other-service",
+   "ocupacao_parte": 20.0735,
+   "mulheres": 47.7426,
+   "raca": {
+    "White": 81.8699,
+    "Black": 12.7503,
+    "Asian-Pac-Islander": 3.0928,
+    "Amer-Indian-Eskimo": 1.1494,
+    "Other": 1.1376
+   }
+  },
+  "2": {
+   "idade": 53.37,
+   "estudo": 8.52,
+   "horas": 36.35,
+   "casados": 36.9465,
+   "nunca_casados": 9.0759,
+   "ocupacao": "Adm-clerical",
+   "ocupacao_parte": 18.0231,
+   "mulheres": 48.2822,
+   "raca": {
+    "White": 82.6934,
+    "Black": 13.3933,
+    "Asian-Pac-Islander": 2.2598,
+    "Amer-Indian-Eskimo": 1.0472,
+    "Other": 0.6063
+   }
+  },
+  "3": {
+   "idade": 37.63,
+   "estudo": 9.0,
+   "horas": 47.62,
+   "casados": 90.3793,
+   "nunca_casados": 3.6556,
+   "ocupacao": "Craft-repair",
+   "ocupacao_parte": 26.323,
+   "mulheres": 8.3053,
+   "raca": {
+    "White": 89.5228,
+    "Black": 6.5769,
+    "Asian-Pac-Islander": 1.8966,
+    "Amer-Indian-Eskimo": 1.1471,
+    "Other": 0.8565
+   }
+  },
+  "4": {
+   "idade": 40.86,
+   "estudo": 13.29,
+   "horas": 45.06,
+   "casados": 56.8986,
+   "nunca_casados": 23.4156,
+   "ocupacao": "Prof-specialty",
+   "ocupacao_parte": 39.5269,
+   "mulheres": 29.2005,
+   "raca": {
+    "White": 88.603,
+    "Black": 5.733,
+    "Asian-Pac-Islander": 4.6797,
+    "Amer-Indian-Eskimo": 0.5008,
+    "Other": 0.4835
+   }
+  },
+  "5": {
+   "idade": 41.65,
+   "estudo": 10.99,
+   "horas": 43.55,
+   "casados": 63.63,
+   "nunca_casados": 19.972,
+   "ocupacao": "Exec-managerial",
+   "ocupacao_parte": 20.2523,
+   "mulheres": 23.616,
+   "raca": {
+    "White": 89.8388,
+    "Black": 6.1668,
+    "Asian-Pac-Islander": 3.0834,
+    "Other": 0.4905,
+    "Amer-Indian-Eskimo": 0.4205
+   }
+  },
+  "6": {
+   "idade": 43.7,
+   "estudo": 11.16,
+   "horas": 44.33,
+   "casados": 68.2527,
+   "nunca_casados": 15.7937,
+   "ocupacao": "Prof-specialty",
+   "ocupacao_parte": 21.5514,
+   "mulheres": 21.7913,
+   "raca": {
+    "White": 89.4042,
+    "Black": 6.4374,
+    "Asian-Pac-Islander": 2.8389,
+    "Amer-Indian-Eskimo": 0.8796,
+    "Other": 0.4398
+   }
+  },
+  "base": {
+   "idade": 38.44,
+   "estudo": 10.12,
+   "horas": 40.93,
+   "casados": 46.6472,
+   "nunca_casados": 32.2207,
+   "ocupacao": "Prof-specialty",
+   "ocupacao_parte": 13.3847,
+   "mulheres": 32.4264,
+   "raca": {
+    "White": 85.975,
+    "Black": 9.3434,
+    "Asian-Pac-Islander": 2.9663,
+    "Amer-Indian-Eskimo": 0.9489,
+    "Other": 0.7664
+   }
+  }
+ },
+ "proporcoes": {
+  "marital.status": {
+   "Divorced": [
+    9.36,
+    33.99,
+    4.45,
+    14.61,
+    11.28,
+    10.96
+   ],
+   "Married-civ-spouse": [
+    2.71,
+    36.95,
+    90.38,
+    56.9,
+    63.63,
+    68.25
+   ],
+   "Never-married": [
+    82.26,
+    9.08,
+    3.66,
+    23.42,
+    19.97,
+    15.79
+   ],
+   "Widowed": [
+    0.39,
+    11.26,
+    0.17,
+    1.38,
+    2.38,
+    2.24
+   ],
+   "outras": [
+    5.27,
+    8.73,
+    1.35,
+    3.7,
+    2.73,
+    2.76
+   ]
+  },
+  "relationship": {
+   "Husband": [
+    0.62,
+    30.52,
+    84.31,
+    50.13,
+    57.32,
+    60.42
+   ],
+   "Not-in-family": [
+    34.57,
+    34.48,
+    5.52,
+    30.12,
+    22.0,
+    20.03
+   ],
+   "Own-child": [
+    44.84,
+    3.05,
+    1.32,
+    3.8,
+    7.01,
+    4.24
+   ],
+   "Unmarried": [
+    12.66,
+    22.52,
+    2.43,
+    8.63,
+    5.96,
+    6.92
+   ],
+   "outras": [
+    7.32,
+    9.42,
+    6.42,
+    7.32,
+    7.71,
+    8.4
+   ]
+  },
+  "occupation": {
+   "Adm-clerical": [
+    18.63,
+    18.02,
+    6.09,
+    7.17,
+    8.69,
+    9.16
+   ],
+   "Craft-repair": [
+    9.8,
+    13.47,
+    26.32,
+    4.35,
+    13.31,
+    12.08
+   ],
+   "Exec-managerial": [
+    5.4,
+    10.12,
+    11.15,
+    24.64,
+    20.25,
+    21.55
+   ],
+   "Machine-op-inspct": [
+    6.94,
+    8.71,
+    10.08,
+    1.02,
+    4.48,
+    4.88
+   ],
+   "Other-service": [
+    20.07,
+    15.3,
+    5.92,
+    2.49,
+    4.48,
+    3.48
+   ],
+   "Prof-specialty": [
+    5.55,
+    5.03,
+    2.69,
+    39.53,
+    20.18,
+    21.55
+   ],
+   "Sales": [
+    13.8,
+    9.99,
+    10.43,
+    11.92,
+    13.31,
+    12.51
+   ],
+   "Transport-moving": [
+    3.42,
+    6.23,
+    10.71,
+    1.12,
+    5.05,
+    4.28
+   ],
+   "outras": [
+    16.38,
+    13.12,
+    16.61,
+    7.77,
+    10.23,
+    10.52
+   ]
+  }
+ },
+ "log_curvas": {
+  "sem": {
+   "2": {
+    "silhueta": 0.4155,
+    "db": 1.0144,
+    "menor": 1393
+   },
+   "3": {
+    "silhueta": 0.1522,
+    "db": 1.8146,
+    "menor": 1394
+   },
+   "4": {
+    "silhueta": 0.1637,
+    "db": 1.4135,
+    "menor": 148
+   },
+   "5": {
+    "silhueta": 0.1545,
+    "db": 1.5518,
+    "menor": 148
+   },
+   "6": {
+    "silhueta": 0.1499,
+    "db": 1.5859,
+    "menor": 148
+   },
+   "7": {
+    "silhueta": 0.1389,
+    "db": 1.5992,
+    "menor": 148
+   },
+   "8": {
+    "silhueta": 0.1345,
+    "db": 1.6434,
+    "menor": 148
+   },
+   "9": {
+    "silhueta": 0.1412,
+    "db": 1.5934,
+    "menor": 148
+   },
+   "10": {
+    "silhueta": 0.1478,
+    "db": 1.6094,
+    "menor": 148
+   }
+  },
+  "com": {
+   "2": {
+    "silhueta": 0.3043,
+    "db": 1.3035,
+    "menor": 2533
+   },
+   "3": {
+    "silhueta": 0.1469,
+    "db": 1.8711,
+    "menor": 1427
+   },
+   "4": {
+    "silhueta": 0.1812,
+    "db": 1.6205,
+    "menor": 1427
+   },
+   "5": {
+    "silhueta": 0.169,
+    "db": 1.7157,
+    "menor": 1427
+   },
+   "6": {
+    "silhueta": 0.1654,
+    "db": 1.707,
+    "menor": 1427
+   },
+   "7": {
+    "silhueta": 0.1517,
+    "db": 1.7435,
+    "menor": 1427
+   },
+   "8": {
+    "silhueta": 0.1521,
+    "db": 1.6675,
+    "menor": 1427
+   },
+   "9": {
+    "silhueta": 0.1601,
+    "db": 1.6623,
+    "menor": 1427
+   },
+   "10": {
+    "silhueta": 0.1614,
+    "db": 1.6852,
+    "menor": 1427
+   }
+  }
+ },
+ "silhueta_grupos": {
+  "1": {
+   "media": 0.1891,
+   "q1": 0.1026,
+   "mediana": 0.1939,
+   "q3": 0.2719,
+   "negativa": 0.9,
+   "amostra": 2770
+  },
+  "2": {
+   "media": 0.0576,
+   "q1": -0.0086,
+   "mediana": 0.0491,
+   "q3": 0.1192,
+   "negativa": 28.29,
+   "amostra": 1806
+  },
+  "3": {
+   "media": 0.1741,
+   "q1": 0.1217,
+   "mediana": 0.1774,
+   "q3": 0.2296,
+   "negativa": 0.18,
+   "amostra": 2193
+  },
+  "4": {
+   "media": 0.1047,
+   "q1": 0.0569,
+   "mediana": 0.1042,
+   "q3": 0.1536,
+   "negativa": 7.4,
+   "amostra": 1919
+  },
+  "5": {
+   "media": 0.4042,
+   "q1": 0.3785,
+   "mediana": 0.4166,
+   "q3": 0.4543,
+   "negativa": 0.0,
+   "amostra": 465
+  },
+  "6": {
+   "media": 0.3014,
+   "q1": 0.2557,
+   "mediana": 0.3177,
+   "q3": 0.3613,
+   "negativa": 0.12,
+   "amostra": 847
+  }
+ },
+ "alternativas": {
+  "5": [
+   {
+    "grupo": 1,
+    "pessoas": 9282,
+    "idade": 25.9,
+    "estudo": 9.6,
+    "horas": 34.9,
+    "casados": 7.4,
+    "com_ganho": 0.3,
+    "com_perda": 0.0,
+    "ocupacao": "Other-service",
+    "positivos": 1.79
+   },
+   {
+    "grupo": 2,
+    "pessoas": 9313,
+    "idade": 47.6,
+    "estudo": 8.5,
+    "horas": 38.9,
+    "casados": 61.3,
+    "com_ganho": 0.0,
+    "com_perda": 0.0,
+    "ocupacao": "Craft-repair",
+    "positivos": 18.72
+   },
+   {
+    "grupo": 3,
+    "pessoas": 7608,
+    "idade": 40.2,
+    "estudo": 12.3,
+    "horas": 49.3,
+    "casados": 66.3,
+    "com_ganho": 0.0,
+    "com_perda": 0.0,
+    "ocupacao": "Prof-specialty",
+    "positivos": 42.92
+   },
+   {
+    "grupo": 4,
+    "pessoas": 1427,
+    "idade": 41.6,
+    "estudo": 11.0,
+    "horas": 43.5,
+    "casados": 63.6,
+    "com_ganho": 0.0,
+    "com_perda": 100.0,
+    "ocupacao": "Exec-managerial",
+    "positivos": 51.65
+   },
+   {
+    "grupo": 5,
+    "pessoas": 2509,
+    "idade": 43.8,
+    "estudo": 11.1,
+    "horas": 44.2,
+    "casados": 68.1,
+    "com_ganho": 100.0,
+    "com_perda": 0.0,
+    "ocupacao": "Prof-specialty",
+    "positivos": 63.57
+   }
+  ],
+  "8": [
+   {
+    "grupo": 1,
+    "pessoas": 2551,
+    "idade": 22.9,
+    "estudo": 9.2,
+    "horas": 20.3,
+    "casados": 6.0,
+    "com_ganho": 1.2,
+    "com_perda": 0.0,
+    "ocupacao": "Other-service",
+    "positivos": 1.06
+   },
+   {
+    "grupo": 2,
+    "pessoas": 7403,
+    "idade": 28.5,
+    "estudo": 9.8,
+    "horas": 41.1,
+    "casados": 0.9,
+    "com_ganho": 0.1,
+    "com_perda": 0.0,
+    "ocupacao": "Adm-clerical",
+    "positivos": 2.26
+   },
+   {
+    "grupo": 3,
+    "pessoas": 4479,
+    "idade": 55.2,
+    "estudo": 8.2,
+    "horas": 36.4,
+    "casados": 37.0,
+    "com_ganho": 0.2,
+    "com_perda": 0.0,
+    "ocupacao": "Adm-clerical",
+    "positivos": 11.61
+   },
+   {
+    "grupo": 4,
+    "pessoas": 5344,
+    "idade": 37.5,
+    "estudo": 9.0,
+    "horas": 41.9,
+    "casados": 99.9,
+    "com_ganho": 0.0,
+    "com_perda": 0.0,
+    "ocupacao": "Craft-repair",
+    "positivos": 28.74
+   },
+   {
+    "grupo": 5,
+    "pessoas": 1881,
+    "idade": 40.4,
+    "estudo": 10.3,
+    "horas": 66.3,
+    "casados": 65.6,
+    "com_ganho": 0.5,
+    "com_perda": 0.0,
+    "ocupacao": "Exec-managerial",
+    "positivos": 33.49
+   },
+   {
+    "grupo": 6,
+    "pessoas": 4570,
+    "idade": 43.2,
+    "estudo": 13.4,
+    "horas": 42.4,
+    "casados": 65.7,
+    "com_ganho": 0.0,
+    "com_perda": 0.0,
+    "ocupacao": "Prof-specialty",
+    "positivos": 50.24
+   },
+   {
+    "grupo": 7,
+    "pessoas": 1427,
+    "idade": 41.6,
+    "estudo": 11.0,
+    "horas": 43.5,
+    "casados": 63.6,
+    "com_ganho": 0.0,
+    "com_perda": 100.0,
+    "ocupacao": "Exec-managerial",
+    "positivos": 51.65
+   },
+   {
+    "grupo": 8,
+    "pessoas": 2484,
+    "idade": 43.7,
+    "estudo": 11.2,
+    "horas": 44.2,
+    "casados": 68.4,
+    "com_ganho": 100.0,
+    "com_perda": 0.0,
+    "ocupacao": "Prof-specialty",
+    "positivos": 64.13
+   }
+  ]
+ },
  "pca": {
   "variancia": [
    19.4692,

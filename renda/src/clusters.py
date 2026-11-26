@@ -200,6 +200,62 @@ def proporcoes(X, rotulos, atributo):
                              rownames=[config.NOMES.get(atributo, atributo)], colnames=["grupo"])
 
 
+def amostra_silhueta(n):
+    """Índices da amostra fixa da silhueta: os mesmos que `silhouette_score` sorteia com a mesma seed."""
+    return np.random.RandomState(config.RANDOM_STATE).permutation(n)[:min(AMOSTRA_SILHUETA, n)]
+
+
+def silhueta_por_grupo(Z, rotulos):
+    """Silhueta de cada pessoa da amostra fixa, resumida por grupo (média, quartis e % negativa).
+
+    A média geral da amostra é a mesma silhueta de `metricas_internas`.
+    """
+    from sklearn.metrics import silhouette_samples
+    idx = amostra_silhueta(len(Z))
+    Z, rotulos = np.asarray(Z)[idx], np.asarray(rotulos)[idx]
+    with threadpool_limits(1):
+        s = pd.Series(silhouette_samples(Z, rotulos), name="silhueta")
+    grupos = s.groupby(rotulos)
+    return pd.DataFrame({
+        "pessoas na amostra": grupos.size(), "média": grupos.mean(), "1º quartil": grupos.quantile(0.25),
+        "mediana": grupos.median(), "3º quartil": grupos.quantile(0.75),
+        "% negativa": 100 * grupos.apply(lambda v: (v < 0).mean()),
+    }).rename_axis("grupo"), s, rotulos
+
+
+def resumo_grupos(X, rotulos, renda):
+    """Uma linha por grupo: tamanho, médias dos numéricos, % casados, % com capital, ocupação mais comum e % >50K."""
+    linhas = []
+    for g in np.unique(rotulos):
+        m = np.asarray(rotulos) == g
+        parte = X[m]
+        ocupacao = parte["occupation"].value_counts(normalize=True)
+        linhas.append({
+            "grupo": g, "pessoas": int(m.sum()), "idade": parte["age"].mean(),
+            "anos de estudo": parte["education.num"].mean(), "horas por semana": parte["hours.per.week"].mean(),
+            "% casados": 100 * (parte["marital.status"] == "Married-civ-spouse").mean(),
+            "% nunca casados": 100 * (parte["marital.status"] == "Never-married").mean(),
+            "% com ganho": 100 * (parte["capital.gain"] > 0).mean(),
+            "% com perda": 100 * (parte["capital.loss"] > 0).mean(),
+            "ocupação mais comum": ocupacao.index[0], "% da ocupação": 100 * ocupacao.iloc[0],
+            "% >50K": 100 * np.asarray(renda)[m].mean(),
+        })
+    return pd.DataFrame(linhas).set_index("grupo")
+
+
+def curvas_uma_seed(Z, ks=None, seed=config.RANDOM_STATE):
+    """Inércia, silhueta, Davies-Bouldin e tamanho do menor grupo para cada k, numa seed só."""
+    ks = KS if ks is None else ks
+    Z = np.asarray(Z)
+    linhas = []
+    for k in ks:
+        modelo, tempo = ajustar(Z, k, seed)
+        silhueta, db = metricas_internas(Z, modelo.labels_)
+        linhas.append({"k": k, "inércia": modelo.inertia_, "silhueta": silhueta, "Davies-Bouldin": db,
+                       "menor grupo": int(np.bincount(modelo.labels_).min()), "tempo (s)": tempo})
+    return pd.DataFrame(linhas)
+
+
 def pca_2d(Z, seed=config.RANDOM_STATE):
     """Projeção em 2 componentes principais, só para desenhar; devolve (coordenadas, variância explicada)."""
     pca = PCA(n_components=2, random_state=seed)

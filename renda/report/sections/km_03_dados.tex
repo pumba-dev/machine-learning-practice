@@ -1,0 +1,30 @@
+\section{Dados}\label{sec:km_dados}
+
+A base Adult~\cite{uci:adult} foi extraída do censo dos EUA de 1994 e doada à UCI por Becker e Kohavi~\cite{kohavi:96}. A versão do Kaggle~\cite{kaggle:adult} tem \svLinhasBrutas{} registros, um por pessoa, com 14 atributos e o rótulo \texttt{income}, que diz se a renda anual passa de 50 mil dólares. A curadoria é a da parte anterior do trabalho: foram removidas \svDuplicadas{} linhas repetidas e \svAusentes{} com valor ausente (marcado com ``?''), e restam \svLinhas{} pessoas, \svPositivos\% com renda acima de 50 mil. Saíram também dois atributos: o \texttt{fnlwgt}, um peso amostral do censo, que não descreve a pessoa, e o \texttt{education}, que repete em texto os anos de estudo.
+
+Ficam 10 atributos (Tabela~\ref{tab:km_atributos}): 5 numéricos e 5 de texto. Raça e sexo continuam no arquivo, mas ficam fora do agrupamento por decisão do grupo, como ficaram fora da classificação; são usados só depois, para ver como se distribuem nos grupos (Seção~\ref{sec:cl_sensiveis}). A renda também fica fora e serve só para comparar.
+
+\begin{table}[ht]
+\centering
+\caption{Os 10 atributos usados no agrupamento, após a curadoria.}
+\label{tab:km_atributos}
+\footnotesize
+\begin{tabular}{lll}
+\toprule
+Coluna original & Nome neste trabalho & Valores \\
+\midrule
+\texttt{age} & idade & 17 a 90 anos \\
+\texttt{education.num} & anos de estudo & 1 a 16 \\
+\texttt{capital.gain} & ganho de capital & 0 a \svGanhoMax{} dólares \\
+\texttt{capital.loss} & perda de capital & 0 a 4.356 dólares \\
+\texttt{hours.per.week} & horas por semana & 1 a 99 \\
+\texttt{workclass} & classe de trabalho & 7 categorias \\
+\texttt{marital.status} & estado civil & 7 categorias \\
+\texttt{occupation} & ocupação & 14 categorias \\
+\texttt{relationship} & relacionamento & 6 categorias \\
+\texttt{native.country} & país de origem & 41 países \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Duas características da base pesam na distância entre as pessoas. O ganho e a perda de capital são zero para quase todos (só \clComGanho\% das pessoas têm algum ganho e \clComPerda\% alguma perda), com poucos valores muito altos: \clTeto{} pessoas têm ganho de 99.999 dólares, o teto do censo. E os atributos de texto são desequilibrados: 91\% das pessoas são dos EUA, enquanto a ocupação se divide em 14 categorias de tamanhos parecidos.

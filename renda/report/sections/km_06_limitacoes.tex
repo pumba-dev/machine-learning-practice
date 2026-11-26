@@ -1,0 +1,7 @@
+\section{Limitações}\label{sec:km_limitacoes}
+
+Os grupos dependem das escolhas que definem a distância. O one-hot, a padronização e o logaritmo no capital dizem o que é ``parecido'', e outra escolha daria outros grupos; os dois grupos do capital são, em parte, efeito do logaritmo. O K-means foi feito para atributos numéricos, e o one-hot é uma adaptação: o centro de um grupo tem proporções nas colunas de texto, e não uma pessoa possível.
+
+A escolha de $k = 6$ combina métricas e interpretação, e $k = 5$ ou $k = 8$ também seriam defensáveis. A silhueta foi calculada numa amostra de 10 mil pessoas. Só o K-means foi testado: algoritmos que não supõem grupos arredondados, ou que dão a cada pessoa uma probabilidade de pertencer a cada grupo, poderiam encontrar outra estrutura.
+
+Deixar raça e sexo fora do agrupamento não impede que os grupos reflitam essas características, porque outros atributos carregam a mesma informação (Seção~\ref{sec:cl_sensiveis}). A curadoria removeu as linhas com valor ausente, e os grupos não descrevem essas pessoas. A base é de 1994, e os perfis valem para aquela população.
