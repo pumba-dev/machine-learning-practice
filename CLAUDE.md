@@ -50,33 +50,14 @@ Todas as bases têm um pacote chamado `src`. Nunca importe duas delas no mesmo p
 - **Base 3, slides.** `renda/scripts/build_slides_svm.py` e `slides_svm_notes.py` montam `renda/slides/apresentacao_svm.pptx` (15 slides, 10 min) a partir de `svm_dados.json`. Raça e sexo ficam fora dos slides por decisão do grupo.
 - **Base 3, slides do K-means.** `renda/scripts/clusters_data.py` reúne os números do notebook 07 em `report/results/clusters_dados.json`; `build_slides_clusters.py` e `slides_clusters_notes.py` montam `renda/slides/apresentacao_clusters.pptx` (15 slides, 10 min) e `notas_clusters.md` a partir dele. Os nomes dos 6 grupos ficam em `clusters_data.py` (`NOMES_GRUPOS`), conferidos pelo tamanho de cada grupo. Nos gráficos de linha, os valores são multiplicados por 10 ou 100 e o formato põe uma vírgula literal, para a vírgula decimal não depender do idioma do Office. Raça e sexo ficam fora.
 
-## Próxima etapa: clusterização na base 3
+## Base 3, parte 5: K-means (concluída)
 
-A parte 5 estuda aprendizado não supervisionado na mesma base de renda, só com o K-means (o professor pediu K-means; o agrupamento hierárquico ficou de fora por decisão do grupo). Só scikit-learn, sem dependência nova. Siga o formato da SVM:
+Só o K-means (o professor pediu K-means; o agrupamento hierárquico ficou de fora por decisão do grupo), só com scikit-learn.
 
-- `renda/src/clusters.py`: pré-processamento, fábrica do K-means, métricas e perfil dos grupos. O pré-processamento parte do de `avaliacao.preprocessador()` (80 colunas);
-- notebook `07_kmeans.ipynb`, que só chama funções de `src/`;
-- resultados em `renda/resultados/` com prefixo `clusters_`.
-
-Protocolo:
-
-- não há divisão treino/teste: os grupos são formados na base inteira, só com `config.FEATURES`. `income`, `race` e `sex` entram só depois, para comparar (raça e sexo no relatório, nunca nos slides);
-- métricas internas para k de 2 a 10: inércia (cotovelo), silhueta e Davies-Bouldin, cada uma nas 10 seeds (média e desvio);
-- estabilidade nas 10 seeds para cada k (ARI entre as partições de seeds diferentes), comparada com `n_init=1`;
-- a partição descrita (perfis, comparação com a renda, PCA) é a da seed 42, fora das seeds 0 a 9;
-- comparação com a renda: proporção de `>50K` em cada grupo, pureza e ARI contra `income`;
-- perfil de cada grupo pelos atributos, com os nomes de `config.NOMES`.
-
-Decisões de pré-processamento:
-
-- one-hot sem reescala: cada atributo de texto custa 2 na distância ao quadrado quando difere, e os categóricos respondem por cerca de 37% da distância média entre duas pessoas;
-- log (`log1p`) em `capital.gain` e `capital.loss` antes da padronização: sem ele, o ganho de 99.999 fica a 13,3 desvios da média e tende a formar um grupo próprio; o notebook mostra a diferença;
-- a silhueta em 30 mil pontos é de ordem n²: use `sample_size` com seed fixa.
-
-Relatório e slides:
-
-- relatório: novas seções em `renda/report/sections/`; título e resumo do `main.tex` serão revistos para cobrir as duas partes. Números em `report/results/numeros_clusters.tex` e figuras em `report/figures/clusters_*.pdf`, gerados por `renda/scripts/clusters_data.py` e `clusters_report.py`;
-- slides: `renda/scripts/build_slides_clusters.py` e `slides_clusters_notes.py` montam `renda/slides/apresentacao_clusters.pptx` e `notas_clusters.md`, com a mesma regra de 18 pt. Pergunte a duração e o número de slides antes de criá-los.
+- Código: `renda/src/clusters.py` (pré-processamento, K-means, métricas, estabilidade, perfil e silhueta por grupo) e o notebook `07_kmeans.ipynb` (cerca de 5 min), que grava `renda/resultados/clusters_*.csv`.
+- Protocolo: sem divisão treino/teste; só `config.FEATURES` (renda, raça e sexo entram só depois, para comparar); k de 2 a 10 com as 10 seeds e `n_init=10`, comparado com `n_init=1`; estabilidade pelo ARI entre seeds; silhueta numa amostra fixa de 10 mil pessoas; partição descrita com k = 6 e seed 42, grupos renumerados pelo % >50K.
+- Pré-processamento: o da SVM (one-hot sem reescala e padronização, 80 colunas) mais `log1p` no ganho e na perda de capital. Sem o log, as 148 pessoas com ganho de 99.999 formam um grupo próprio; com ele, quem tem ganho e quem tem perda formam dois grupos.
+- Saídas: `clusters_data.py` → `clusters_dados.json` → slides (`build_slides_clusters.py`) e relatório (`clusters_report.py` → figuras, tabelas e `numeros_clusters.tex`; texto em `kmeans.tex` e `sections/km_*.tex`). A apresentação já foi feita: os slides ficam como estão, mesmo que os tempos medidos mudem ao rodar o notebook de novo.
 
 ## Ambiente (Windows)
 
